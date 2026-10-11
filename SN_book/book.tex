@@ -1,0 +1,179 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% book.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Springer Nature SNmono root file
+% Adapted from the official monograph template supplied by the author.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[graybox,envcountchap]{SNmono}
+
+% Packages retained from the official SNmono template.
+\usepackage{type1cm}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage[bottom,multiple]{footmisc}
+\usepackage{newtxtext}
+\usepackage[varvw]{newtxmath}
+
+% Mathematics used by the manuscript. SNmono already defines theorem/example environments.
+\usepackage{amsmath}
+\usepackage{bm}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Algorithms.
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+% Tables and manuscript-specific formatting that is actually used.
+\usepackage{adjustbox}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{pifont}
+\usepackage[normalem]{ulem}
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{70}{1em}}}
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+
+% TikZ/PGFPlots retained because several current figures are generated in LaTeX.
+% Springer advises converting these to external image files for final multi-format production.
+\usepackage{tikz}
+\usetikzlibrary{calc,intersections,arrows.meta,positioning}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots,fillbetween}
+\pgfplotsset{compat=1.18}
+
+% SNmono already loads xcolor. Define only the manuscript colours needed by current figures/revisions.
+\definecolor{EkfBlue}{RGB}{31,86,158}
+\definecolor{TruthBlack}{RGB}{25,25,25}
+\definecolor{MeasGrey}{RGB}{160,160,160}
+\definecolor{BandGrey}{RGB}{225,225,225}
+\definecolor{ManoeuvreOrange}{RGB}{244,177,131}
+\definecolor{ZonoGreen}{RGB}{46,125,95}
+\definecolor{RevisionBlue}{RGB}{0,0,255}
+\definecolor{RevisionOlive}{RGB}{107,115,13}
+\definecolor{MarkerGreen}{RGB}{34,139,34}
+\definecolor{MarkerOrange}{RGB}{255,140,0}
+\definecolor{olive}{RGB}{107,115,13}
+\definecolor{BLUE}{RGB}{0,0,255}
+
+% Revision markup retained exactly as working-manuscript functionality.
+% Springer advises removing colour-based revision emphasis before final production.
+\newcommand{\cmark}{\textcolor{MarkerGreen}{\ding{51}}}
+\newcommand{\pmark}{\textcolor{MarkerOrange}{\ding{108}}}
+\newcommand{\xmark}{\textcolor{red}{\ding{55}}}
+\newcommand{\added}[1]{\textcolor{RevisionBlue}{#1}}
+\newcommand{\deleted}[1]{\textcolor{red}{\sout{#1}}}
+\newcommand{\deletedmath}[1]{\textcolor{red}{#1}}
+\newcommand{\addednew}[1]{\textcolor{RevisionOlive}{#1}}
+\newcommand{\TC}[1]{\textcolor{cyan}{#1}}
+
+% Only the compact list environment actually used in the manuscript is retained.
+\newenvironment{list4a}{
+  \begin{list}{$\bullet$}{%
+      \setlength{\itemsep}{0.05cm}%
+      \setlength{\labelsep}{0.2cm}%
+      \setlength{\labelwidth}{0.3cm}%
+      \setlength{\parsep}{0in}%
+      \setlength{\parskip}{0in}%
+      \setlength{\topsep}{0in}%
+      \setlength{\partopsep}{0in}%
+      \setlength{\leftmargin}{0.16in}}}
+      {\end{list}}
+
+% Fallback for figure files not included in the upload.
+% If the real file exists, normal \includegraphics behaviour is used.
+\let\SNOriginalIncludeGraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{%
+  \IfFileExists{#2}{\SNOriginalIncludeGraphics[#1]{#2}}{%
+    \fbox{\parbox[c][20mm][c]{0.85\linewidth}{\centering\scriptsize Missing figure file}}%
+  }%
+}
+
+% General biography environment retained from the current manuscript.
+\newenvironment{authorbiography}[2][]{%
+  \par\medskip\noindent
+  \begin{minipage}[t]{0.18\textwidth}
+    #1
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.78\textwidth}
+    \textbf{#2}\par\smallskip
+}{%
+  \end{minipage}\par\medskip
+}
+
+% Handles doi correctly in references
+\usepackage{doi}
+
+\makeindex
+
+% ----------------------------------------------------------------------
+% Book metadata retained from main_book_v04.tex
+% ----------------------------------------------------------------------
+\author{Kyriakos M. Deliparaschos \and Gabriele Oliva \and Themistoklis Charalambous}
+\title{Towards a Unified View of Sensor Fusion}
+\subtitle{Theory, Methods, and Autonomous Driving Applications}
+\institute{%
+Kyriakos M. Deliparaschos: Department of Electrical Engineering, and Computer Science and Engineering, Cyprus University of Technology, Limassol, Cyprus
+\at
+Gabriele Oliva: Department of Engineering, University Campus Bio-Medico of Rome, Rome, Italy
+\at
+Themistoklis Charalambous: Department of Electrical and Computer Engineering, University of Cyprus, Nicosia, Cyprus; Department of Electrical Engineering and Automation, Aalto University, Espoo, Finland; FinEst Centre for Smart Cities, Tallinn, Estonia
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Empty files below are intentionally retained so the project follows the official SNmono structure.
+% \include{dedication} % currently empty
+% \include{foreword} % currently empty
+% \include{preface} % currently empty
+\include{SN_book/book_abstract}
+\include{SN_book/acknowledgement}
+% \include{ethics} % currently empty
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+% \include{acronym} % currently empty
+
+\mainmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Optional part file retained from the official structure; currently empty.
+% \include{part} % currently empty
+
+\include{SN_book/chapter_01_introduction}
+\include{SN_book/chapter_02_principles_and_components}
+\include{SN_book/chapter_03_classical_sensor_fusion}
+\include{SN_book/chapter_04_learning_based_and_hybrid_fusion}
+\include{SN_book/chapter_05_autonomous_driving_application}
+\include{SN_book/chapter_06_multi_agent_sensor_fusion}
+\include{SN_book/chapter_07_applications_beyond_autonomous_vehicles}
+\include{SN_book/chapter_08_open_challenges_and_future_directions}
+\include{SN_book/chapter_09_concluding_remarks}
+
+% Optional appendix file retained from the official structure; currently empty.
+% \include{appendix} % currently empty
+
+\backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{spmpsci}
+\bibliography{SN_book/references}
+
+\include{SN_book/author_biographies}
+% \include{glossary} % currently empty
+% \include{solutions} % currently empty
+\printindex
+
+\end{document}

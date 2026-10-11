@@ -1,0 +1,21 @@
+\chapter{Concluding Remarks}
+\label{sec:conclusions}
+% ============================================
+
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract*{}
+\suppressfloats[t]
+
+This book has presented a tutorial and survey of sensor fusion for autonomous driving vehicles. By focusing on autonomous driving as the central application domain, the book has connected classical fusion methods, learning-based multimodal perception, reliability-aware reasoning, practical implementation, and safety-critical evaluation. Classical methods such as Bayesian filtering, statistical fusion, evidence theory, and optimisation remain essential for localisation, tracking, uncertainty management, and sensor-health reasoning. Learning-based methods, particularly deep multimodal and bird's-eye-view fusion, have become central to perception tasks such as object detection, segmentation, tracking, and occupancy estimation.
+
+Set-membership and zonotopic estimation add a conservative bounded-error layer for consistency checking, complementing probabilistic and learning-based fusion when explicit guarantees are needed.
+
+A central theme of this survey is that robust autonomous driving requires more than combining sensor outputs for improved benchmark accuracy. Fusion systems must also handle calibration errors, asynchronous data, adverse weather, sensor degradation, out-of-distribution scenes, computational constraints, and uncertainty propagation. The interaction between fusion outputs and downstream prediction, planning, and control means that safety, latency, interpretability, and fault tolerance must be considered throughout the design process.
+
+%\deleted{[Check what follows.]} % Checked and approved.
+\added{If a single lesson is to be drawn from this survey, it is that additional sensors improve a system only when their measurement models, uncertainties, and mutual dependencies are represented honestly: an ignored correlation, a miscalibrated covariance, or an unmodelled failure mode can make a fused estimate confidently wrong, which is worse than being uncertain. The corollary is architectural: learned perception and classical estimation are not competitors but layers, with the classical layer supplying the uncertainty bookkeeping that makes learned outputs safe to act on.}
+
+Future research is likely to move towards hybrid architectures that combine the representational power of deep learning with the structure, uncertainty handling, and interpretability of classical estimation and decision-making methods. Progress will also depend on improved datasets, more realistic robustness benchmarks, efficient embedded deployment, and rigorous verification and validation. Sensor fusion will therefore remain a core research and engineering challenge in the development of safe, reliable, and scalable autonomous driving vehicles. %\deleted{[This is chatgpt 100\%. but the idea of a final personal address is nice.]}
+\added{We hope this survey serves as both a map and an invitation: the most valuable near-term contributions are likely to come not from a single better detector or filter, but from the disciplined integration of the two traditions reviewed here, and from the community adopting shared benchmarks that reward calibrated uncertainty and graceful degradation rather than average-case accuracy alone.}

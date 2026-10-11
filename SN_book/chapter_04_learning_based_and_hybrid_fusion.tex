@@ -1,0 +1,330 @@
+\chapter{Learning-Based and Hybrid Sensor Fusion Techniques}
+\label{sec:learning}
+% ============================================
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract*{}
+\suppressfloats[t]
+
+Classical and learning-based fusion are best viewed as complementary layers rather than separate pipelines. Learned models turn camera, LiDAR, radar, and temporal data into detections, depth estimates, semantic masks, occupancy scores, associations, or learned uncertainties; classical estimators then use these outputs as measurements, priors, factors, or reliability weights while enforcing temporal, geometric, and uncertainty consistency. In the reverse direction, Kalman filters, factor graphs, evidence-theoretic rules, and set-membership or zonotopic estimators provide residuals, innovation tests, covariance checks, bounded reachable sets, and outlier labels that can calibrate confidence, detect domain shift, reject implausible detections, and trigger conservative fallbacks. This interface is especially useful under fog, glare, occlusion, sensor degradation, and other distribution shifts: learning supplies flexible perception, while classical estimation supplies auditability and safety-relevant consistency checks \cite{khaleghi_multisensor_2013,baltrusaitis_multimodal_2019,li2022_gp_zkf}.
+
+
+\section{Machine Learning for Sensor Fusion}
+%\deleted{[Guys this needs a significant improvement. We need at the veryt least to cite papers and mention possible approaches.]}
+Machine learning methods provide data-driven mechanisms for modelling complex relationships between heterogeneous sensor inputs and driving-scene outputs. Earlier approaches used hand-crafted features combined with classifiers or regressors such as support vector machines\addednew{~\cite{cortes1995_svm}}, decision trees, random forests\addednew{~\cite{breiman2001_rf}}, or probabilistic graphical models. These methods remain useful in settings where training data are limited, interpretability is important, or the fusion task is relatively structured.
+
+In autonomous driving, machine learning can be used to estimate sensor reliability, classify objects from fused features, detect abnormal sensor behaviour, or select between alternative fusion strategies. For example, a reliability model may learn to reduce the contribution of camera features under glare or darkness, while increasing the relative weight of radar velocity measurements under poor visibility. Such methods bridge purely rule-based fusion and end-to-end deep multimodal fusion.
+
+\addednew{In terms of where learning enters the fusion pipeline, three recurring patterns can be distinguished. In \emph{fusion of learned outputs}, each modality is first processed by its own model and a classical combiner merges the resulting detections, classes, or confidence scores; stacking, boosting-style weighting, and mixture-of-experts gating are typical realisations \cite{breiman2001_rf,khaleghi_multisensor_2013}. In \emph{learning on fused features}, hand-crafted or learned descriptors from several sensors are concatenated into a joint feature vector that a single classifier or regressor maps to the task output, an approach widely used in multimodal recognition before end-to-end training became dominant \cite{atrey_multimodal_2010,gao_survey_2020}. In \emph{learning about the sensors themselves}, models are trained to predict quality indicators --- visibility, blockage, calibration residuals, expected noise level --- that parameterise a downstream classical fusion rule, for instance by scaling measurement covariances in a Kalman filter or by supplying the reliability weights and discounting factors used in the fuzzy and evidence-theoretic schemes of Chapter~\ref{sec:classicalSF}. Comparable designs appear outside the driving domain as well, for example in fuzzy-based fusion of physiological sensors \cite{testa_fuzzyfusion_2025}, underlining that the pattern is generic rather than domain-specific.}
+
+\addednew{Compared with the deep multimodal architectures discussed next, these approaches require far less annotated data, train in minutes rather than days, expose feature importances that support auditing, and degrade more predictably; their price is limited representational power on raw high-dimensional inputs such as images and point clouds, for which deep feature extractors \cite{guo_deep_2019} are now the standard front end. A pragmatic guideline is therefore to reserve classical machine learning for low-dimensional, structured fusion decisions --- reliability estimation, track-quality scoring, fault and anomaly flags, fusion-strategy selection --- and to employ deep networks where perception from raw sensor data is required.}
+
+\section{Deep Multimodal Fusion}
+%\deleted{[This is much better but, differently from previous traditional methods covered, does not give the reader any clue on how to implement the method. - DELK - REVISED]}
+Deep learning has become central to autonomous-driving perception because it can learn rich representations from high-dimensional sensor data. Camera networks extract semantic and appearance features from images, LiDAR networks process point clouds or voxelised representations, and radar networks process sparse detections, point clouds, or range--Doppler representations. Multimodal fusion networks combine these representations to improve 3D object detection, segmentation, tracking, occupancy prediction, and scene understanding.
+
+% [July 2026 pass] The following four paragraphs and the equation were marked in green (an ad-hoc
+% colour from an earlier revision round with no legend entry). They have been reviewed, accepted,
+% and normalised to standard text so that only the documented blue/red/olive markup remains.
+Deep multimodal fusion generally consists of four stages: sensor-specific feature extraction, spatial or temporal alignment, feature fusion, and task-specific prediction. Let $\mathbf{f}_c$, $\mathbf{f}_l$, and $\mathbf{f}_r$ denote feature representations extracted from camera, LiDAR, and radar, respectively. A generic multimodal fusion operation may be expressed as
+\begin{equation}
+\mathbf{f}_{\mathrm{fusion}}
+=
+\mathcal{F}
+\left(
+\mathbf{f}_c,
+\mathbf{f}_l,
+\mathbf{f}_r
+\right),
+\label{eq:deep_fusion}
+\end{equation}
+where $\mathcal{F}(\cdot)$ denotes the fusion operator, which may correspond to feature concatenation, weighted summation, attention, gating, or transformer-based cross-modal interaction. The fused representation is subsequently processed by task-specific prediction heads for object detection, semantic segmentation, occupancy estimation, or tracking.
+
+Algorithm~\ref{alg:deep_fusion} summarises the generic processing pipeline adopted by many contemporary multimodal perception systems.
+
+\begin{algorithm}[t]
+\caption{Generic Deep Multimodal Fusion Pipeline}
+\label{alg:deep_fusion}
+\begin{algorithmic}[1]
+\State Acquire synchronised multi-sensor measurements
+\State Extract modality-specific features
+\State Align features in a common spatial representation
+\State Fuse features using concatenation, attention, or cross-modal interaction
+\State Predict objects, occupancy, or semantic classes
+\State Optionally refine predictions using temporal information
+\end{algorithmic}
+\end{algorithm}
+
+\added{Single-modality LiDAR detectors form the backbone of many fusion architectures. VoxelNet introduced end-to-end learning on voxelised point clouds \cite{zhou2018_voxelnet}, SECOND accelerated it with sparse convolutions \cite{yan2018_second}, PointPillars organised points into vertical columns for fast embedded-friendly inference \cite{lang2019_pointpillars}, and CenterPoint reformulated detection and tracking around object centres \cite{yin2021_centerpoint}. These detectors are the typical starting point on top of which multimodal fusion is added.}
+
+Camera--LiDAR fusion is one of the most widely studied forms of deep fusion. Early-fusion methods project LiDAR points into the image plane or enrich point clouds with image features\added{; representative examples are PointPainting, which decorates each LiDAR point with image-segmentation scores before applying a standard LiDAR detector \cite{vora2020_pointpainting}, and MVX-Net, which injects image features into a VoxelNet-style pipeline at point or voxel level \cite{sindagi2019_mvxnet}}. Feature-level methods extract modality-specific features and combine them through concatenation, attention, gating, or cross-modal transformers\added{, as in TransFusion, whose transformer decoder queries image features only where LiDAR evidence is ambiguous, yielding robustness to degraded image quality \cite{bai2022_transfusion}}. Late-fusion methods combine separate detections or confidence scores. Bird's-eye-view fusion has become especially important because it provides a common spatial representation for camera, LiDAR, and radar information\added{; BEVFusion is a representative architecture that unifies camera and LiDAR features in a shared BEV grid and supports detection and segmentation from the same fused representation \cite{liu2023_bevfusion}}.
+
+Camera--radar fusion is also important because radar provides long-range detection and relative velocity, while cameras provide semantic detail. The complementary nature of these sensors is valuable in adverse weather and low-visibility conditions. However, radar fusion is challenging because radar measurements are sparse, noisy, and lower in angular resolution than images or LiDAR point clouds. Learning-based radar fusion must therefore handle uncertain associations, ghost detections, and different radar signal representations. \added{CenterFusion associates radar detections with image-based object centres using a frustum-based mechanism and uses radar range and velocity to improve 3D localisation \cite{nabati2021_centerfusion}, while CRN builds a radar-assisted view transformation so that camera features are placed in BEV at radar-confirmed depths \cite{kim2023_crn}.}
+
+LiDAR--radar fusion combines accurate geometry with velocity and weather robustness. It is particularly useful for object tracking and dynamic-scene understanding. More recent architectures also fuse temporal information across frames, allowing the system to accumulate evidence, compensate for ego-motion, and improve detection stability. \added{Table~\ref{tab:deep-fusion-methods} summarises representative deep fusion architectures together with their modalities, fusion level, key idea, and indicative published benchmark results.}
+
+\begin{table}[!t]
+    \centering
+    \color{blue}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \caption{\color{blue}Representative deep multimodal fusion methods for autonomous-driving perception. Benchmark figures are indicative published results on the nuScenes \emph{test} split (detection mAP~/~NDS, in \%); ``--'' indicates that the method targets a different task or benchmark.}
+    \label{tab:deep-fusion-methods}
+    \begin{tabular}{l c l l p{0.30\linewidth} c}
+        \hline
+        \textbf{Method} & \textbf{Year} & \textbf{Modalities} & \textbf{Fusion level} & \textbf{Key idea} & \textbf{mAP / NDS} \\
+        \hline
+        PointPillars \cite{lang2019_pointpillars} & 2019 & LiDAR & -- (single modality) & Pillar-based point-cloud encoding for fast detection & 30.5 / 45.3 \\
+        CenterPoint \cite{yin2021_centerpoint} & 2021 & LiDAR & -- (single modality) & Centre-based detection and tracking heads & 60.3 / 67.3 \\
+        PointPainting \cite{vora2020_pointpainting} & 2020 & Camera + LiDAR & Data (early) & Decorates LiDAR points with image segmentation scores & 46.4 / 58.1 \\
+        MVX-Net \cite{sindagi2019_mvxnet} & 2019 & Camera + LiDAR & Data / feature & Image features injected at point or voxel level & -- \\
+        TransFusion \cite{bai2022_transfusion} & 2022 & Camera + LiDAR & Feature (transformer) & Soft-association queries robust to image degradation & 68.9 / 71.7 \\
+        BEVFusion \cite{liu2023_bevfusion} & 2023 & Camera + LiDAR & Feature (BEV) & Task-agnostic shared BEV representation & 70.2 / 72.9 \\
+        Lift-Splat-Shoot \cite{philion2020_lss} & 2020 & Camera (multi-view) & Feature (BEV) & Latent-depth ``lifting'' of image features into BEV & -- \\
+        BEVFormer \cite{li2022_bevformer} & 2022 & Camera (multi-view) & Feature (BEV, temporal) & Spatiotemporal transformer over learned BEV queries & 48.1 / 56.9 \\
+        CenterFusion \cite{nabati2021_centerfusion} & 2021 & Camera + Radar & Feature (mid) & Frustum association of radar detections with image centres & 32.6 / 44.9 \\
+        CRN \cite{kim2023_crn} & 2023 & Camera + Radar & Feature (BEV) & Radar-assisted view transformation and cross-attention & 57.5 / 62.4 \\
+        SurroundOcc \cite{wei2023_surroundocc} & 2023 & Camera (multi-view) & Feature (3D volume) & Multi-scale 3D semantic occupancy prediction & -- \\
+        TPVFormer \cite{huang2023_tpvformer} & 2023 & Camera (multi-view) & Feature (tri-plane) & Tri-perspective-view representation for occupancy & -- \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% [July 2026 pass] Green paragraph below reviewed, accepted, and normalised to standard text.
+From an embedded-systems perspective, deep multimodal fusion consists of both highly parallel and data-dependent computations. Feature extraction using convolutional neural networks or vision transformers is dominated by dense tensor operations and is therefore well suited to GPU and FPGA acceleration. In contrast, cross-modal feature alignment, sparse point-cloud processing, attention mechanisms, and non-maximum suppression exhibit irregular memory access patterns and varying computational loads. Consequently, practical embedded implementations frequently adopt heterogeneous architectures in which dedicated hardware accelerates computationally intensive neural-network inference, while software manages sensor synchronisation, feature association, and high-level decision making.
+
+\section{Bird's-Eye-View and Occupancy-Based Fusion}
+
+%\deleted{[Too short and uninformative. Needs substantial writing. - DELK - REVISED]}
+
+Bird's-eye-view (BEV) fusion converts heterogeneous sensor observations into a common top-down spatial representation, typically defined on the ground plane or in a local ego-centric map. This representation is particularly suitable for autonomous driving because downstream prediction, planning, and control are usually expressed in road-aligned or map-based coordinates rather than in individual camera image planes. Instead of reasoning independently over several perspective images, BEV fusion provides a unified spatial layout in which lanes, vehicles, pedestrians, free space, and static obstacles can be represented consistently across sensors.
+
+The main challenge in camera-based BEV construction is that image measurements are perspective projections and do not directly provide metric three-dimensional structure. Camera features must therefore be lifted into 3D or BEV space using estimated depth, geometric calibration, or learned view transformations. Lift-Splat-Shoot introduced the widely used latent-depth ``lifting'' of multi-camera features into BEV, followed by feature splatting onto a top-down grid \cite{philion2020_lss}. BEVFormer instead avoids explicit dense depth prediction by using learned BEV queries that attend to multi-camera image features and previous BEV states, enabling both spatial and temporal fusion \cite{li2022_bevformer}. LiDAR and radar can be incorporated more directly because their measurements already contain range information. LiDAR provides accurate geometry and object shape, while radar contributes long-range velocity cues and improved robustness under adverse weather conditions. In practice, BEV fusion may be performed at the raw-measurement, feature, or decision level, with feature-level fusion being particularly attractive because it preserves rich semantic and geometric information before final detection or segmentation.
+
+Occupancy-based fusion extends BEV reasoning from object-centric detection to space-centric scene understanding. Instead of representing the environment solely as a collection of detected objects, occupancy methods estimate whether each spatial cell or voxel is free, occupied, unknown, or dynamically occupied. Semantic occupancy further assigns class labels to occupied regions, including vehicles, pedestrians, cyclists, vegetation, road boundaries, and static infrastructure. Such representations naturally describe irregular obstacles, partially visible objects, construction zones, and occluded regions that cannot easily be approximated by bounding boxes. Moreover, occupancy grids provide a direct interface to motion planning, enabling planners to reason explicitly about traversable, blocked, and uncertain regions.
+
+\subsection{Probabilistic Occupancy Mapping}
+
+Classical occupancy mapping formulates environment reconstruction as a probabilistic estimation problem in which every spatial cell stores the belief that the corresponding region of space is occupied. One of the most influential implementations is OctoMap, which represents occupancy using an adaptive probabilistic octree \cite{hornung2013_octomap}. Instead of storing a dense voxel grid, the environment is recursively subdivided into eight child nodes only where higher spatial resolution is required. Consequently, homogeneous regions can be represented compactly while preserving fine geometric detail around obstacles, resulting in substantially lower memory consumption than dense volumetric grids.
+
+Occupancy estimation is commonly performed using Bayesian inference. Rather than storing probabilities directly, OctoMap maintains the log-odds representation of occupancy because it allows recursive Bayesian updates to be expressed as simple additions. Let $m_i$ denote the occupancy state of voxel $i$, and let $z_{1:t}$ represent all sensor measurements acquired up to time $t$. The occupancy estimate is represented as
+
+\begin{equation}
+L_t(m_i)
+=
+\log
+\frac{P(m_i|z_{1:t})}
+     {1-P(m_i|z_{1:t})},
+\label{eq:octomap_logodds}
+\end{equation}
+
+which is recursively updated according to
+
+\begin{equation}
+L_t(m_i)
+=
+L_{t-1}(m_i)
++
+\log
+\frac{P(m_i|z_t)}
+     {1-P(m_i|z_t)}
+-
+L_0,
+\label{eq:octomap_update}
+\end{equation}
+
+where $L_0$ denotes the prior log-odds occupancy. Positive values correspond to occupied space, negative values represent free space, while values near zero indicate unknown regions. This additive formulation avoids repeated Bayesian normalisation and naturally supports incremental map construction as new sensor observations become available.
+
+Algorithm~\ref{alg:octomap_update} summarises the basic occupancy update procedure. Each sensor ray traverses the octree, updating intermediate voxels as free space while marking the measured endpoint as occupied. After processing all measurements, neighbouring child nodes sharing identical occupancy states may be recursively merged into their parent node, preserving the compact hierarchical representation.
+
+\begin{algorithm}[t]
+\caption{Incremental Probabilistic OctoMap Update}
+\label{alg:octomap_update}
+\begin{algorithmic}[1]
+\ForAll{sensor rays}
+    \State Traverse the octree along the ray
+    \ForAll{voxels before the endpoint}
+        \State Update free-space log-odds using (\ref{eq:octomap_update})
+    \EndFor
+    \State Update endpoint voxel as occupied
+\EndFor
+\State Prune child nodes with identical occupancy states
+\end{algorithmic}
+\end{algorithm}
+
+From a hardware perspective, probabilistic occupancy mapping exposes several opportunities for acceleration. Sensor-ray processing, voxel indexing, and occupancy updates exhibit substantial data parallelism and can therefore be efficiently implemented using streaming pipelines. In contrast, octree traversal, dynamic node allocation, and tree maintenance involve irregular memory accesses and pointer-based data structures, making them considerably more challenging to accelerate efficiently on FPGA platforms. Consequently, heterogeneous architectures are often adopted, where dedicated hardware accelerates ray processing and occupancy updates, while a host processor manages octree construction, dynamic memory allocation, and tree maintenance. Since octree traversal is typically memory-bound rather than compute-bound, compressed node representations, locality-aware memory organisations, and hierarchical caching generally provide greater performance improvements than simply increasing arithmetic parallelism \cite{jia2022_omu}.
+
+\subsection{Semantic Occupancy Networks}
+
+Recent research has extended classical occupancy mapping towards learned semantic occupancy estimation, where the environment is represented as a dense three-dimensional semantic volume surrounding the ego vehicle. Rather than relying on explicit Bayesian occupancy updates, deep neural networks learn to infer occupancy directly from multimodal sensor observations while simultaneously assigning semantic labels to occupied regions.
+
+SurroundOcc predicts multi-scale three-dimensional semantic occupancy from surround-view cameras, demonstrating that dense occupancy estimation can recover scene geometry beyond explicit object detections \cite{wei2023_surroundocc}. TPVFormer reduces the computational complexity associated with dense voxel reasoning by replacing full volumetric processing with a tri-perspective-view representation that jointly reasons over top, front, and side projections \cite{huang2023_tpvformer}. These approaches illustrate the ongoing transition from sparse object-centric perception towards dense spatial representations that more closely resemble the internal world models required by autonomous driving systems.
+
+Despite replacing handcrafted Bayesian updates with learned inference, these architectures retain the same underlying objective as classical occupancy mapping: estimating the occupancy state of the surrounding three-dimensional environment while explicitly modelling spatial uncertainty.
+
+\subsection{Design Trade-offs}
+
+Despite their advantages, BEV and occupancy-based representations introduce important design trade-offs. The quality of BEV features depends strongly on sensor calibration, synchronisation, depth estimation accuracy, and the selected spatial resolution. Increasing the grid or voxel resolution improves geometric fidelity but proportionally increases memory traffic and computational cost, making efficient hardware implementation particularly challenging for embedded platforms.
+
+Occupancy representations must also treat uncertainty carefully, since unobserved regions should not be interpreted as free space. Furthermore, dynamic objects require temporal reasoning to distinguish persistent static occupancy from transient motion. Consequently, modern BEV and occupancy systems increasingly integrate temporal fusion, multi-sensor redundancy, uncertainty-aware inference, and hierarchical spatial representations. These characteristics make occupancy-based perception highly attractive for autonomous driving while simultaneously motivating specialised hardware accelerators capable of sustaining real-time throughput under stringent power and memory constraints.
+
+\section{Multi-Sensor Localisation, Odometry, and SLAM}
+%\deleted{[Too short and uninformative. Needs substantial writing. - DELK - REVISED]}
+
+% Simultaneous localisation and mapping (SLAM), odometry, and map-based localisation are essential applications of sensor fusion. Visual odometry estimates motion from camera images, visual--inertial odometry fuses camera and IMU measurements, LiDAR odometry estimates motion through point-cloud registration, and LiDAR--inertial odometry combines geometric scan matching with high-rate inertial prediction. Multi-state constraint Kalman filtering and keyframe-based optimisation are representative approaches for visual--inertial fusion \cite{mourikis_multistate_2007, leutenegger_keyframe_2015}. \added{Widely used systems illustrate the design space: ORB-SLAM2 performs feature-based visual SLAM with loop closure \cite{murartal2017_orbslam2}; LOAM splits LiDAR odometry and mapping into fast and slow threads \cite{zhang2014_loam}; LIO-SAM couples LiDAR and IMU factors in a sliding-window factor graph \cite{shan2020_liosam}; and FAST-LIO2 performs direct LiDAR--inertial odometry with an iterated Kalman filter for real-time embedded operation \cite{xu2022_fastlio2}.}
+
+% In autonomous driving, localisation often combines GNSS, IMU, wheel odometry, LiDAR, camera observations, and high-definition maps. GNSS provides global position updates when available, while IMU and odometry provide short-term motion estimates. Camera and LiDAR measurements can be matched against landmarks or map features to correct drift and achieve lane-level localisation. The fusion problem becomes particularly challenging in tunnels, dense urban environments, areas with poor map coverage, and scenes with repeated or ambiguous structures.
+
+Simultaneous localisation and mapping (SLAM), odometry, and map-based localisation are central applications of sensor fusion in autonomous systems. Odometry estimates the incremental motion of the vehicle, SLAM jointly estimates the vehicle trajectory and a map of the environment, while map-based localisation estimates the vehicle pose with respect to a previously constructed map. These tasks are closely related, but they differ in their assumptions: odometry can operate without a prior map but accumulates drift, SLAM reduces drift by building and revisiting a map, and map-based localisation can provide globally consistent pose estimates when reliable map features are available.
+
+From a probabilistic perspective, SLAM jointly estimates the vehicle trajectory and the map from a sequence of sensor observations. Let $x_{0:t}$ denote the vehicle trajectory up to time $t$, $m$ the map, $u_{1:t}$ the control or inertial inputs, and $z_{1:t}$ the sensor measurements. The SLAM objective is to estimate the posterior distribution
+
+\begin{equation}
+P(x_{0:t},m|z_{1:t},u_{1:t}),
+\label{eq:slam_posterior}
+\end{equation}
+
+which is recursively updated as new measurements become available. Practical implementations approximate this posterior using Bayesian filtering, nonlinear optimisation, or graph-based smoothing techniques depending on the computational requirements and sensor configuration.
+
+Different sensors contribute complementary information to the localisation problem. Visual odometry estimates motion from camera images using feature correspondences, direct photometric alignment, or learned image representations. Visual--inertial odometry combines camera measurements with inertial measurement unit (IMU) data, using high-rate inertial prediction to bridge gaps between image frames and improve robustness during rapid motion or partial visual degradation. Multi-state constraint Kalman filtering and keyframe-based optimisation are representative approaches for visual--inertial fusion \cite{mourikis_multistate_2007, leutenegger_keyframe_2015}. LiDAR odometry estimates motion from point-cloud registration and is generally more robust to illumination changes than vision-only methods, while LiDAR--inertial odometry combines geometric scan matching with high-rate inertial propagation.
+
+Widely used systems illustrate this design space. ORB-SLAM2 performs feature-based visual SLAM with relocalisation and loop closure, making it suitable for camera-based mapping in structured environments \cite{murartal2017_orbslam2}. LOAM separates LiDAR odometry and mapping into fast and slow processing threads, balancing real-time motion estimation with lower-rate map refinement \cite{zhang2014_loam}. LIO-SAM formulates LiDAR--inertial odometry as a factor-graph problem, combining IMU preintegration, LiDAR factors, and optional global measurements in a sliding-window optimisation framework \cite{shan2020_liosam}. FAST-LIO2 instead performs direct LiDAR--inertial odometry with an iterated Kalman filter, avoiding explicit feature extraction and supporting real-time operation on embedded platforms \cite{xu2022_fastlio2}.
+
+Many modern localisation systems formulate sensor fusion as a nonlinear factor-graph optimisation problem. Vehicle poses, landmarks, IMU states, and other variables are represented as graph nodes, while sensor observations define probabilistic constraints (factors) between them. The corresponding optimisation problem can be written as
+
+\begin{equation}
+\hat{\mathbf{x}}
+=
+\arg\min_{\mathbf{x}}
+\sum_i
+\left\|
+\mathbf{r}_i(\mathbf{x})
+\right\|_{\mathbf{\Omega}_i}^{2},
+\label{eq:factor_graph}
+\end{equation}
+
+where $\mathbf{r}_i(\mathbf{x})$ denotes the residual associated with measurement $i$, and $\mathbf{\Omega}_i$ is the corresponding information matrix that weights the confidence of each observation. Visual reprojection errors, LiDAR scan-matching constraints, IMU preintegration factors, GNSS priors, wheel odometry, and loop-closure observations naturally become different factor types within the same optimisation framework.
+
+In autonomous driving, localisation typically combines Global Navigation Satellite System (GNSS) measurements, IMU data, wheel odometry, camera observations, LiDAR scans, radar measurements, and high-definition (HD) maps. GNSS provides global position updates when satellite visibility is sufficient, but it can degrade severely in tunnels, urban canyons, under bridges, or near tall buildings. IMU and wheel odometry provide short-term motion continuity, but their errors accumulate over time. Cameras provide semantic and geometric cues such as lane markings, traffic signs, poles, and road boundaries, while LiDAR provides accurate three-dimensional structure that can be matched against point-cloud or landmark maps. Radar can further improve robustness under adverse weather and low-visibility conditions, although its lower spatial resolution makes data association more challenging. The maps produced or consumed by localisation and SLAM systems may take several forms, including sparse landmarks, point clouds, high-definition maps, or occupancy representations such as OctoMap \cite{hornung2013_octomap}.
+
+Algorithm~\ref{alg:slam_pipeline} summarises the generic processing pipeline adopted by many modern multi-sensor localisation and SLAM systems.
+
+\begin{algorithm}[t]
+\caption{Generic Multi-Sensor Localisation and SLAM Pipeline}
+\label{alg:slam_pipeline}
+\begin{algorithmic}[1]
+\State Acquire and synchronise multi-sensor measurements
+\State Predict the vehicle state using IMU and/or wheel odometry
+\State Extract visual, LiDAR, or radar features
+\State Perform data association or scan registration
+\State Estimate relative motion (odometry)
+\State Insert measurement constraints into the estimation framework
+\If{loop closure is detected}
+    \State Add loop-closure constraints
+\EndIf
+\State Optimise the trajectory estimate
+\State Update the map representation
+\end{algorithmic}
+\end{algorithm}
+
+The probabilistic formulation of localisation gives rise to different estimation architectures depending on the required accuracy, latency, and computational complexity. Filtering-based methods, such as extended Kalman filters or multi-state constraint filters, are computationally efficient and suitable for high-rate state estimation, but they may be less flexible when handling delayed measurements, loop closures, or complex constraints. Graph-based methods represent poses, landmarks, IMU factors, scan-matching constraints, GNSS priors, and map observations in a common optimisation problem, allowing more accurate smoothing and loop-closure correction at the cost of higher computational and memory requirements. Practical systems often combine both: a high-rate filter provides real-time pose estimates, while a lower-rate optimisation back-end refines the trajectory and corrects accumulated drift.
+
+Robust localisation also requires careful treatment of uncertainty and failure modes. Dynamic objects can corrupt visual feature tracking and LiDAR scan matching, repeated structures can cause ambiguous data association, and map changes can make prior maps unreliable. Weather, lighting, motion blur, sensor calibration errors, time synchronisation errors, and vibration further affect localisation accuracy. Consequently, modern localisation systems increasingly rely on redundant sensing, temporal consistency checks, semantic map features, uncertainty-aware fusion, and failure detection rather than a single dominant sensor.
+
+From an embedded-systems perspective, localisation and SLAM workloads are demanding because they combine high-rate sensor input, irregular memory access, matrix operations, nearest-neighbour search, scan matching, feature tracking, and nonlinear optimisation. Efficient hardware/software partitioning therefore requires identifying computational kernels that dominate execution time. Dense linear algebra, point-cloud filtering, feature extraction, and scan registration are well suited to parallel hardware acceleration, whereas graph optimisation, loop-closure detection, and data association remain dominated by irregular memory accesses and dynamic data structures. Consequently, heterogeneous CPU--GPU--FPGA architectures are increasingly adopted, allowing highly parallel numerical kernels to be accelerated in hardware while preserving the flexibility of software for graph management and high-level optimisation.
+
+\section{Reliability-Aware, Fuzzy, and Explainable Fusion}
+
+%\deleted{[The subsection title seems to suggest several approaches, but I see only fuzzy. Also, a numerical example could be beneficial.]} % Addressed: the subsection covers reliability-aware weighting (opening paragraphs), fuzzy inference, explainable fusion, and neuro-fuzzy systems; a worked numerical example has been added below.
+
+
+Reliability-aware fusion aims to adapt the contribution of each sensing modality according to its current quality, uncertainty, and operational context. This is particularly important in autonomous driving because sensor reliability varies continuously with environmental conditions. For example, camera reliability may decrease under darkness, glare, or heavy rain; LiDAR point density may be reduced by fog, snow, or long range; and radar may remain useful for range and velocity estimation while producing lower-resolution spatial measurements. Such reliability variations motivate fusion strategies that explicitly account for uncertainty, imprecision, and context-dependent sensor quality \cite{khaleghi_multisensor_2013, hall_introduction_1997}.
+
+Fuzzy logic provides an interpretable mechanism for modelling gradual changes in sensor reliability and has long been used to represent imprecise information through degrees of membership rather than binary decisions \cite{zadeh_fuzzy_1965}. Instead of treating a sensor as either valid or invalid, fuzzy fusion represents reliability using degrees of membership. Let $q_i$ denote a quality indicator for sensor $i$, such as image brightness, visibility, signal-to-noise ratio, detection confidence, point-cloud density, radar return strength, calibration residual, or estimated measurement uncertainty. A fuzzy membership function maps this quality indicator to a linguistic reliability class:
+\begin{equation}
+    \mu_A(q_i): Q \rightarrow [0,1],
+\end{equation}
+where $A$ may represent classes such as \emph{low reliability}, \emph{medium reliability}, or \emph{high reliability}. A common triangular membership function is given by
+\begin{equation}
+    \mu_A(q_i) =
+    \max\left(0,
+    \min\left(
+    \frac{q_i-a}{b-a},
+    \frac{c-q_i}{c-b}
+    \right)\right),
+\end{equation}
+where $a$, $b$, and $c$ define the support and peak of the fuzzy set \cite{zadeh_fuzzy_1965}.
+
+Fuzzy rules can then be used to infer sensor reliability or fusion weights. For example, an autonomous-driving fusion system may encode rules such as:
+\begin{list4a}
+    \item if camera visibility is low and radar confidence is high, decrease the camera weight and increase the radar weight;
+    \item if LiDAR point density is high and calibration residual is low, assign high reliability to LiDAR geometry.
+\end{list4a}
+Expressing the rules as inference statements avoids a conversational presentation and makes the connection to a deployable rule base explicit. Such rule-based structures are useful when fusion behaviour must remain interpretable, auditable, or adjustable by domain experts \cite{zadeh_fuzzy_1965, khaleghi_multisensor_2013}.
+
+After rule evaluation and aggregation, the fuzzy output is defuzzified into numerical weights. If $\hat{x}_i$ denotes the estimate produced by sensor or modality $i$ and $w_i$ denotes its reliability weight, a simple weighted fusion estimate can be written as
+\begin{equation}
+    \hat{x} =
+    \frac{\sum_{i=1}^{N} w_i \hat{x}_i}
+    {\sum_{i=1}^{N} w_i}.
+\end{equation}
+For classification or detection tasks, the same principle can be applied to modality-specific confidence scores:
+\begin{equation}
+    s_c =
+    \frac{\sum_{i=1}^{N} w_i s_{i,c}}
+    {\sum_{i=1}^{N} w_i},
+\end{equation}
+where $s_{i,c}$ is the confidence assigned by modality $i$ to class $c$ and $s_c$ is the fused class confidence. Weighted fusion schemes of this form are commonly used as simple but effective baselines for combining uncertain or heterogeneous sensor estimates \cite{hall_introduction_1997, khaleghi_multisensor_2013}.
+
+This formulation is useful for autonomous-driving scenarios in which the fusion strategy should adapt to context. In clear daytime conditions, camera and LiDAR features may receive high weights for semantic and geometric perception. In fog, heavy rain, or night-time driving, radar may be assigned greater importance for range and velocity estimation. If calibration residuals increase or LiDAR point density decreases, the system can reduce the influence of LiDAR-derived estimates. Similarly, if camera exposure or visibility indicators degrade, the system can reduce reliance on image-based detections. These examples align with the broader requirement for robust multimodal perception in autonomous-driving systems, where camera, LiDAR, radar, inertial, and map-based information must be combined under changing environmental and operational conditions \cite{khaleghi_multisensor_2013, baltrusaitis_multimodal_2019}.
+
+{\color{RevisionOlive}
+\begin{example}
+Consider the fusion of range estimates to a leading vehicle at dusk in light fog. The quality indicators, normalised to $[0,1]$, are $q_{\mathrm{cam}}=0.3$ (low contrast), $q_{\mathrm{lid}}=0.5$ (reduced point density), and $q_{\mathrm{rad}}=0.9$ (radar largely unaffected). Using the triangular membership function with $(a,b,c)=(0,1,2)$, so that $\mu(q)=q$ on the relevant range, and taking the defuzzified weights proportional to the memberships, we obtain $w_{\mathrm{cam}}=0.3/1.7\approx0.18$, $w_{\mathrm{lid}}=0.5/1.7\approx0.29$, and $w_{\mathrm{rad}}=0.9/1.7\approx0.53$. If the modality-specific range estimates are $\hat{x}_{\mathrm{cam}}=41.8$~m, $\hat{x}_{\mathrm{lid}}=42.6$~m, and $\hat{x}_{\mathrm{rad}}=43.1$~m, the fused estimate is
+\begin{equation*}
+\hat{x} \approx 0.18\cdot41.8 + 0.29\cdot42.6 + 0.53\cdot43.1 \approx 42.7~\mathrm{m},
+\end{equation*}
+which is pulled towards the radar reading, whereas an unweighted average would return $42.5$~m. In clear daylight the same rule base would yield $q_{\mathrm{cam}}\approx0.9$ and shift the weights back towards the camera and LiDAR estimates, illustrating how the fusion behaviour adapts continuously to context while remaining fully auditable: the reported weights themselves explain why each sensor was trusted.
+\end{example}
+}
+
+Explainable fusion extends this idea by making the fusion decision traceable. Instead of producing only a fused detection or trajectory, the system can report which sensors contributed most strongly, which reliability indicators affected the decision, and whether any sensor conflicts were detected. This is valuable for debugging, validation, safety monitoring, and post-incident analysis. Interpretability is particularly important when learning-based multimodal fusion models are used, since such models may achieve strong empirical performance while offering limited visibility into how different modalities contribute to the final output \cite{baltrusaitis_multimodal_2019}.
+
+Neuro-fuzzy systems combine fuzzy reasoning with learning-based parameter estimation. In such systems, membership functions, rule weights, or defuzzification parameters may be learned from data while retaining a partially interpretable rule structure. This can help model complex context-dependent reliability patterns in camera--LiDAR--radar fusion. However, because autonomous driving is safety critical, learned fuzzy or neuro-fuzzy fusion systems must be evaluated under rare events, degraded sensing, and out-of-distribution conditions rather than only on standard benchmark performance \cite{khaleghi_multisensor_2013, baltrusaitis_multimodal_2019}.
+
+\section{Hybrid Classical--Learning Architectures}
+%\deleted{[Needs substantial writing and needs to be checked.]} % Addressed in the previous round: concrete pipeline, TikZ figure, and closed-loop discussion added below (blue block).
+
+Many practical autonomous-driving systems combine learning-based perception with classical estimation. Neural networks may produce object detections, semantic segmentation, depth estimates, or occupancy grids, while filters and optimisation methods maintain temporal consistency, estimate motion, propagate uncertainty, and perform data association. This hybrid design reflects the strengths of both paradigms: deep learning provides powerful perception features, while classical methods provide structured state estimation and uncertainty handling.
+
+Examples include neural camera--LiDAR object detectors followed by Kalman-filter tracking, learned visual features incorporated into visual--inertial odometry, learned uncertainty estimates used as measurement covariances, and occupancy networks combined with rule-based safety monitors. Hybrid systems are especially important for safety-critical deployment because they allow black-box perception components to be supported by interpretable temporal consistency checks, sensor-health monitoring, and conservative fallback mechanisms.
+
+{\color{blue}
+A concrete pipeline illustrates how the classical tools of Chapter~\ref{sec:classicalSF} and the learned components of this section interlock; the structure is sketched in Fig.~\ref{fig:hybrid-pipeline}. A neural camera--LiDAR detector (e.g., a TransFusion- or BEVFusion-style network \cite{bai2022_transfusion,liu2023_bevfusion}) produces 3D detections with class scores and, ideally, learned covariances. A Kalman or unscented Kalman tracker consumes these detections as measurements: the learned covariance enters directly as the measurement-noise matrix $\mathbf{R}$, so that a detection reported with low confidence automatically receives a small gain, and the innovation covariance from Chapter~\ref{sec:classicalSF} supplies a principled gating distance for association. On top of the tracker, an evidence-theoretic conflict monitor converts per-modality detection confidences into basic belief assignments and tracks the conflict mass $K$: persistent conflict between camera- and LiDAR-derived evidence signals glare, miscalibration, or an out-of-distribution scene, and can down-weight the offending modality through the discounting mechanism of the evidence-theory subsection or trigger a conservative fallback. A set-membership layer can finally check that fused tracks remain inside kinematically reachable zonotopes.
+
+This closed loop addresses the two main weaknesses of each paradigm. The learned detector contributes recognition performance that no hand-designed model achieves, while the classical layer contributes exactly what deep networks lack: calibrated temporal consistency, explicit uncertainty propagation, and auditable rejection logic. Learned uncertainty feeds \emph{into} the filter as $\mathbf{R}$; filter residuals feed \emph{back} as a supervision-free health signal for the network's confidence calibration. In deployment, this is the dominant industrial pattern: perception is learned, but tracking, association, ego-state estimation, and safety monitoring remain model-based.
+
+\begin{figure}[!t]
+    \centering
+    \begin{tikzpicture}[
+        font=\scriptsize,
+        blk/.style={draw=blue!70!black, rounded corners=2pt, fill=blue!5, align=center, text width=2.0cm, minimum height=0.95cm},
+        mon/.style={draw=blue!85!black, rounded corners=2pt, fill=blue!12, align=center, text width=2.0cm, minimum height=0.95cm},
+        >=Latex
+    ]
+        \node[blk] (det) at (0,0) {Neural detector\\(camera + LiDAR)\\boxes, scores, $\mathbf{R}$};
+        \node[blk] (kf) at (2.9,0) {Kalman tracker\\gating, association,\\innovation tests};
+        \node[mon] (ev) at (5.8,0) {Evidence monitor\\conflict $K$,\\discounting $\alpha_i$};
+        \node[blk] (plan) at (5.8,-1.6) {Planner /\\conservative\\fallback};
+        \draw[->, thick, blue!75!black] (det.east) -- (kf.west);
+        \draw[->, thick, blue!75!black] (kf.east) -- (ev.west);
+        \draw[->, thick, blue!75!black] (ev.south) -- (plan.north);
+        \draw[->, thick, blue!75!black, dashed] (kf.south) to[out=-90,in=-90] node[below]{residual feedback} (det.south);
+    \end{tikzpicture}
+    \caption{\color{blue}Hybrid classical--learning fusion pipeline: a neural multimodal detector supplies measurements and learned covariances to a Kalman tracker, whose residuals both feed an evidence-theoretic conflict monitor and provide calibration feedback to the detector.}
+    \label{fig:hybrid-pipeline}
+\end{figure}
+}
+
+% ============================================

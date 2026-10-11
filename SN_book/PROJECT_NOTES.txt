@@ -1,0 +1,53 @@
+Springer Nature SNmono conversion notes
+=======================================
+
+Source manuscript: main_book_v04.tex
+Official template: Template_for_Springer_Nature_Monographs.zip
+
+What was done
+-------------
+- Rebuilt the root file around the official SNmono class.
+- Split the manuscript into 9 chapter files, one per existing numbered chapter.
+- Preserved the existing chapter/section hierarchy, labels, citations, equations, algorithms, tables, TikZ/PGFPlots figures, comments, and revision markup.
+- Added empty \abstract*{} placeholders to each chapter because Springer requests an online abstract for every chapter; no chapter abstracts were invented.
+- Moved the existing acknowledgements into the official acknowledgement front-matter file.
+- Retained the existing overall book abstract in book_abstract.tex.
+- Retained author biographies in author_biographies.tex.
+- Created empty official-template files where the manuscript currently has no content: dedication, foreword, preface, ethics/declarations, acronym list, part, appendix, glossary, and solutions.
+- Those empty optional files remain in the project, but their \include lines are commented out in book.tex until content is added.
+- Switched the book bibliography style from unsrt to Springer spbasic, appropriate to Engineering/Computer Science according to the supplied SNmono instructions.
+- Removed generic page/font/layout overrides that conflict with SNmono.
+
+Files not supplied with the upload
+----------------------------------
+The following required manuscript assets were not available and therefore could not be copied into the project:
+- references.bib (a placeholder file is supplied; replace it with the real bibliography)
+- original figure/image files in figures/
+- original example CSV datasets used by PGFPlots
+
+The project contains minimal placeholder CSV data only so a structural compile can proceed. The book.tex file also displays a placeholder when an external figure file is missing. Replace all placeholders with the originals before reviewing numerical figures or submitting.
+
+Referenced figure paths
+-----------------------
+- figures/fusion_pipeline_v02.pdf
+- figures/application_areas.pdf
+- figures/estimates_outputs.pdf
+- figures/autonomous_vehicle_sensors_layout_v02.png
+- figures/autonomous_driving_fusion_pipeline.pdf
+- figures/tracking_with_camera.pdf
+- figures/kdeliparaschos.jpg
+- figures/goliva.jpg
+- figures/themis4-papers.jpg
+
+Springer-specific follow-up items
+---------------------------------
+- Write a 10--15 line abstract for each chapter and replace each empty \abstract*{} placeholder.
+- Add the acronym/list-of-symbols file when ready (Springer specifically recommends this).
+- Replace references.bib with the real bibliography.
+- Before final production, remove revision-colour markup and consider exporting TikZ/PGFPlots diagrams to external image files; the supplied Springer instructions warn that on-the-fly TikZ output cannot be reused in all XML/HTML/ePub production formats.
+- Add declarations/competing interests/ethics text if the publishing contact requests it.
+
+Compilation
+-----------
+Compile book.tex as the root file. On Overleaf select book.tex as Main document.
+Typical local sequence: pdflatex book; bibtex book; makeindex book; pdflatex book; pdflatex book.

@@ -1,0 +1,138 @@
+\chapter{Introduction}
+% ============================================
+
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract*{}
+\suppressfloats[t]
+
+\section{Motivation}
+
+Modern intelligent and cyber-physical systems increasingly rely on multiple heterogeneous sources of information to perceive their operating environment, estimate their own state, and support decision-making under uncertainty. Applications such as autonomous vehicles, mobile robots, unmanned aerial systems, industrial automation, smart infrastructure, healthcare monitoring, and human--machine interaction must operate in complex, dynamic, and often safety-critical conditions. In such settings, no single sensing modality is generally sufficient to provide complete, accurate, and reliable information across all operating scenarios.
+
+Individual sensors provide only partial views of the physical world. Cameras offer rich semantic and appearance information, but they are sensitive to illumination changes, glare, shadows, occlusions, and adverse weather. LiDAR sensors provide accurate three-dimensional geometry, but their performance may degrade in rain, fog, snow, or highly reflective environments. Radar sensors provide long-range measurements and direct velocity information and are comparatively robust to poor visibility, but they typically offer lower angular resolution and may produce ambiguous or noisy detections. GNSS provides global positioning, but it is vulnerable to outages, multipath effects, tunnels, and urban canyon environments. IMUs and wheel odometry provide high-rate ego-motion estimates, but their errors accumulate over time. Other sensing sources, such as ultrasonic sensors, proprioceptive sensors, and prior maps, also have complementary strengths and limitations.
+
+Sensor fusion addresses these limitations by integrating information from multiple sensors or information sources in order to obtain a more accurate, robust, and complete representation than would be possible from any individual source alone. At a conceptual level, fusion supports the combination of complementary measurements, the resolution of conflicting evidence, the reduction of uncertainty, and the propagation of confidence to downstream estimation, prediction, planning, and control modules. It is therefore not only a technique for improving numerical accuracy, but also a fundamental design principle for reliable autonomy and intelligent decision-making.
+
+The key benefits of sensor fusion include:
+\begin{list4a}
+    \item \textbf{Enhanced estimation and perception accuracy}: Combining complementary sensing modalities can improve the estimation of position, velocity, orientation, object state, scene structure, semantic class, free space, and environmental context compared with relying on a single sensor alone.
+    \item \textbf{Improved robustness and redundancy}: Multiple sensors can provide overlapping or complementary observations, allowing a system to remain functional when one modality is noisy, degraded, occluded, temporarily unavailable, or operating outside its optimal conditions.
+    \item \textbf{Increased environmental completeness}: Different sensors capture different physical properties of the environment, such as appearance, geometry, range, motion, temperature, inertial motion, and prior spatial structure. Their fusion enables a richer and more coherent representation of both static and dynamic elements.
+    \item \textbf{Uncertainty-aware decision support}: Fusion methods provide mechanisms for estimating confidence, handling ambiguous or conflicting measurements, and propagating uncertainty to higher-level reasoning, prediction, planning, and control.
+    \item \textbf{Real-time operation in dynamic environments}: Many practical systems must process asynchronous, multi-rate sensor streams under strict computational and latency constraints. Effective fusion architectures support timely and reliable decisions in changing and uncertain environments.
+\end{list4a}
+
+Autonomous driving is one of the most demanding and representative application domains for sensor fusion. Automated vehicles must integrate information from cameras, LiDAR, radar, ultrasonic sensors, GNSS, IMUs, wheel encoders, and high-definition maps to support perception, localisation, tracking, prediction, planning, and control. For example, camera--LiDAR fusion can combine semantic image features with accurate three-dimensional geometry for object detection and scene understanding. Radar--camera and radar--LiDAR fusion can improve object tracking by combining appearance, shape, range, and velocity information. GNSS--IMU--wheel odometry fusion enables robust ego-localisation, particularly when global positioning signals are intermittent or unreliable. Similarly, the fusion of online sensor observations with high-definition maps can improve lane-level localisation and enhance the understanding of road topology.
+
+Despite major progress, sensor fusion remains challenging across application domains. Fusion systems must handle multi-rate and asynchronous sensor streams, calibration errors, uncertain measurements, changing environmental conditions, domain shifts between training and deployment, sensor failures, limited computational resources, and strict latency requirements. In safety-critical applications such as autonomous driving, these challenges are amplified by the need for reliable behaviour not only under typical operating conditions, but also in rare, uncertain, and long-tail scenarios. This motivates the need for a unified treatment of sensor fusion theory, methods, architectures, and application-specific design considerations.
+
+\section{Scope \& Contributions}
+
+The rapid development of autonomous driving has led to significant advances in both classical and learning-based sensor fusion techniques. Classical approaches such as Bayesian filtering, statistical estimation, evidence theory, and optimisation-based fusion remain central to localisation, tracking, uncertainty propagation, and safety monitoring. At the same time, deep learning has transformed multimodal perception through camera--LiDAR, camera--radar, LiDAR--radar, bird's-eye-view, transformer-based, and occupancy-based fusion architectures. However, researchers, engineers, and practitioners still face the challenge of understanding how these methods relate to one another, when each method is appropriate, and how they can be implemented within a complete autonomous-driving system.
+
+This book provides a tutorial and survey of sensor fusion techniques for autonomous driving vehicles. Rather than treating autonomous driving as one application among many, the book uses it as the central organising domain through which classical, learning-based, and hybrid fusion methods are introduced and compared. The main contributions of this book are as follows:
+\begin{list4a}
+    \item \textbf{Autonomous-driving-centred foundations}: We present the fundamental principles of sensor fusion in the context of autonomous driving, including sensing modalities, coordinate frames, calibration, synchronisation, fusion levels, and fusion architectures.
+    \item \textbf{Review of classical fusion techniques}: We survey established methods such as Bayesian filtering, Kalman filtering, particle filtering, statistical fusion, evidence theory, and optimisation-based methods, with emphasis on their roles in vehicle localisation, object tracking, occupancy estimation, and uncertainty management.
+    \item \textbf{Set-membership and zonotopic estimation}: We include deterministic bounded-error estimation as a complementary classical viewpoint, explaining how zonotopes propagate state enclosures, incorporate sensor measurements through strip intersections, and support safety-oriented fusion when probabilistic noise models are incomplete.
+    \item \textbf{MCDM-based sensor weighting and reliability assessment}: We show how multi-criteria decision-making methods, in particular the Analytic Hierarchy Process, can be used to derive context-dependent sensor reliability weights and to audit fusion choices when several imperfect information sources must be balanced.
+    \item \textbf{Review of learning-based multimodal fusion}: We discuss machine learning and deep learning approaches for autonomous-driving perception, including camera--LiDAR fusion, camera--radar fusion, LiDAR--radar fusion, bird's-eye-view fusion, temporal fusion, and occupancy-based scene representation.
+    \item \textbf{Connection between theory and implementation}: We link mathematical foundations to practical autonomous-driving examples, including GNSS--IMU--wheel odometry fusion, camera--LiDAR feature-level fusion, radar-assisted tracking, and reliability-aware fusion under sensor degradation.
+    \item \textbf{Multi-agent and cooperative sensor fusion}: We discuss centralised, decentralised, and hybrid architectures for cooperative fusion across vehicles, infrastructure nodes, and monitoring stations, including the information-exchange levels, consistency issues, and failure modes specific to multi-agent settings.
+    \item \textbf{Applications beyond autonomous driving}: We illustrate how the same classical and hybrid fusion tools combine in other safety-critical domains, using maritime anomaly detection and submarine-cable monitoring as detailed case studies.
+    \item \textbf{Discussion of datasets, benchmarks, and evaluation}: We review common autonomous-driving datasets, perception and localisation tasks, and evaluation metrics, including accuracy, robustness, latency, uncertainty calibration, and safety-relevant performance.
+    \item \textbf{Identification of open challenges}: We discuss unresolved research problems, including adverse-weather robustness, calibration drift, sensor failure, out-of-distribution detection, interpretability, uncertainty estimation, real-time embedded deployment, and verification and validation for safety-critical operation.
+\end{list4a}
+
+By combining theoretical foundations, practical examples, and a review of recent developments, this book aims to serve as a structured resource for readers who wish to understand sensor fusion specifically for autonomous driving. It is intended for researchers entering the field, engineers developing perception and localisation systems, and practitioners seeking a coherent overview of how classical and modern fusion techniques contribute to safe and robust autonomous vehicles. 
+
+\section{Related Surveys \& Positioning}
+\label{subsec:related}
+
+Sensor fusion has long been a central topic in signal processing, robotics, control, and artificial intelligence, enabling robust state estimation and decision-making by combining information from multiple heterogeneous sources. Foundational work in multisensor data fusion established theoretical frameworks and algorithmic principles for combining information across sensing modalities, with early tutorials and surveys providing comprehensive overviews of probabilistic, model-based, and architectural approaches \cite{hall_introduction_1997, luo_multisensor_1989}. These works, together with later consolidated treatments such as the multisensor data fusion handbook \cite{liggins_handbook_2009}, form the basis of much of the classical literature in the field.
+
+Subsequent survey work has further systematised the state of the art, particularly with respect to uncertainty modelling, fusion levels, sensor heterogeneity, and application-driven design choices. A widely cited review by Khaleghi et al. \cite{khaleghi_multisensor_2013} provides a structured taxonomy of multisensor fusion methods and highlights key challenges related to heterogeneity, scalability, and robustness. These surveys remain essential references for understanding the general principles of multisensor fusion. However, the rapid development of autonomous driving has introduced new requirements that are not fully captured by generic fusion surveys, including real-time operation in safety-critical environments, large-scale multimodal datasets, learned perception models, high-definition maps, adverse-weather operation, and the integration of fusion outputs with prediction, planning, and control.
+
+In parallel, advances in machine learning and deep learning have led to increased interest in data-driven and multimodal fusion methods. Surveys in the multimedia and machine learning communities have examined fusion strategies based on feature learning, representation alignment, and end-to-end neural architectures \cite{atrey_multimodal_2010, baltrusaitis_multimodal_2019}. These approaches have influenced modern autonomous-driving perception systems, where neural networks fuse information from cameras, LiDAR, radar, and temporal observations. Nevertheless, learning-based fusion methods often require large annotated datasets, can be sensitive to domain shift, and may provide limited transparency regarding sensor reliability, uncertainty, and failure modes.
+
+Table~\ref{tab:related-surveys-comparison} summarises the positioning of the present book relative to the main surveys and reference works discussed above. The comparison is qualitative: \cmark{} indicates that the topic is treated as a substantial focus, \pmark{} indicates partial or indirect coverage, and \xmark{} indicates that the topic is not a main focus of the corresponding work. The selected features reflect the main requirements of a modern sensor-fusion survey: coverage of general fusion taxonomies, classical estimation and uncertainty modelling, conflict and reliability reasoning, bounded-error and set-membership methods, learning-based multimodal fusion, autonomous-driving pipelines and tasks, datasets and metrics, implementation and validation issues, and the integration of classical and learning-based viewpoints.
+\begin{table}[!t]
+    \centering
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.15}
+    \caption{Qualitative comparison of related sensor-fusion surveys and reference works. \cmark{} denotes substantial coverage, \pmark{} partial or indirect coverage, and \xmark{} no major coverage.}
+    \label{tab:related-surveys-comparison}
+    {
+        \begin{tabular}{p{0.30\textwidth}ccccccccc}
+        \hline
+        \textbf{Work} &
+        \rot{General fusion taxonomy} &
+        \rot{Classical estimation and uncertainty} &
+        \rot{Conflict and reliability reasoning} &
+        \rot{Set-membership / zonotopic fusion} &
+        \rot{Learning-based multimodal fusion} &
+        \rot{Autonomous-driving pipeline and tasks} &
+        \rot{Datasets, benchmarks, and metrics} &
+        \rot{Implementation, real-time, and validation} &
+        \rot{Unified classical--learning view} \\
+        \hline
+        Luo and Kay~\cite{luo_multisensor_1989} &
+        \cmark & \cmark & \pmark & \xmark & \xmark & \xmark & \xmark & \pmark & \xmark \\
+
+        Hall and Llinas~\cite{hall_introduction_1997} &
+        \cmark & \cmark & \pmark & \xmark & \xmark & \xmark & \xmark & \pmark & \xmark \\
+
+        Liggins et al.~\cite{liggins_handbook_2009} &
+        \cmark & \cmark & \cmark & \pmark & \xmark & \pmark & \xmark & \pmark & \xmark \\
+
+        Khaleghi et al.~\cite{khaleghi_multisensor_2013} &
+        \cmark & \cmark & \cmark & \pmark & \pmark & \pmark & \xmark & \pmark & \pmark \\
+
+        Atrey et al.~\cite{atrey_multimodal_2010} &
+        \pmark & \pmark & \pmark & \xmark & \cmark & \xmark & \pmark & \xmark & \pmark \\
+
+        Baltru\v{s}aitis et al.~\cite{baltrusaitis_multimodal_2019} &
+        \pmark & \xmark & \pmark & \xmark & \cmark & \pmark & \pmark & \xmark & \pmark \\
+
+        Xiang et al.~\cite{2023:IEEE_ITSM} &
+        \pmark & \pmark & \pmark & \xmark & \cmark & \cmark & \cmark & \pmark & \pmark \\
+
+        Tang et al.~\cite{TANG2023109165} &
+        \pmark & \pmark & \pmark & \xmark & \cmark & \cmark & \cmark & \pmark & \pmark \\
+
+        \textbf{This book} &
+        \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \cmark & \pmark & \cmark \\
+        \hline
+    \end{tabular}
+    }
+    % [CYAN v05] AUTHOR ACTION: the comparison stops at 2023 (Xiang et al., Tang et al.).
+    % For a survey submitted in 2026 a reviewer will expect two or three 2024-2025
+    % autonomous-driving / BEV-fusion surveys in this table. We deliberately did NOT invent
+    % entries here: please add the ones you consider canonical, together with their bib keys.
+\end{table}
+As shown in Table~\ref{tab:related-surveys-comparison}, existing works provide important foundations, but they tend to emphasise different parts of the sensor-fusion landscape. Foundational multisensor-fusion surveys and handbooks provide general taxonomies, probabilistic estimation principles, and architectural viewpoints, but they predate the modern deep multimodal perception literature and do not focus on autonomous-driving datasets, real-time embedded deployment, or learning-based perception stacks. Multimodal-learning surveys provide detailed treatment of representation learning, feature fusion, and end-to-end neural architectures, but they typically do not cover classical estimation, tracking, bounded-error reasoning, or safety-oriented validation in depth. Autonomous-driving surveys address perception pipelines and benchmark-driven progress, but they often treat classical estimation, learning-based fusion, reliability reasoning, and system-level validation as separate topics.
+
+Despite the breadth and depth of existing tutorials and surveys, ranging from early foundational works, such as \cite{luo_multisensor_1989, hall_introduction_1997, liggins_handbook_2009, khaleghi_multisensor_2013} to more recent overviews like \cite{baltrusaitis_multimodal_2019, 2023:IEEE_ITSM,TANG2023109165}, the field has evolved in ways that expose clear gaps in current syntheses. Much of the literature remains rooted in domain-specific viewpoints, reflecting the historical separation between robotics, signal processing, and machine learning communities, and thus lacks a unifying perspective that integrates these strands into a coherent whole.
+
+At the same time, the dominant paradigm has shifted from model-based state estimation toward data-driven representation learning, a transition that is only partially captured in existing surveys and rarely analysed in a unified framework.
+
+%
+Classical methods remain indispensable for ego-localisation, tracking, state estimation, data association, and principled uncertainty propagation, while learning-based approaches provide powerful representations for object detection, semantic understanding, and multimodal perception. However, these two paradigms are often treated separately in the literature, with limited guidance on how they should be integrated in practice. This gap becomes particularly evident in safety-critical applications such as autonomous driving, where fusion systems must operate in real time, handle heterogeneous and large-scale multimodal data, and interface tightly with downstream modules such as prediction, planning, and control.
+%
+Furthermore, emerging application scenarios characterised by distributed sensing, limited communication resources, and real-time constraints challenge the traditional assumption of centralised fusion and call for a fundamentally different, communication-aware formulation of the problem.
+
+%Despite the maturity of both classical and learning-based sensor fusion literature, a clear gap remains in unifying these perspectives within a single coherent framework that accounts for modern system-level requirements.  
+
+%These factors motivate the need for a unified framework that bridges classical estimation, deep multimodal learning, and hybrid architectures, while explicitly addressing their interaction within complete systems.
+
+These gaps collectively motivate the need for this combined tutorial and survey that not only consolidates prior knowledge but also reinterprets sensor fusion through a unified, modern lens that bridges disciplines, paradigms, and system-level constraints. More specifically, this short book bridges classical estimation with modern learning-based methods and system-level considerations. Autonomous driving is used as a \emph{representative, high-complexity application domain} through which key principles are consistently illustrated. By synthesising foundational concepts and recent methodological developments, the book offers a coherent tutorial overview of sensor fusion, supporting both newcomers and experienced researchers in developing a structured understanding of current challenges and future directions, as well as in designing robust fusion systems.
+
+\section{Organization of the book}
+
+The remainder of the book is organised as follows. Chapter~\ref{sec:Principles} introduces the components and system-level requirements of fusion pipelines. Chapter~\ref{sec:classicalSF} reviews classical techniques, from least squares and Bayesian filtering to set-membership estimation, evidence theory, and MCDM-based weighting. Chapter~\ref{sec:learning} covers learning-based and hybrid architectures. Chapter~\ref{sec:application} instantiates these methods in a complete autonomous-driving stack, including datasets, metrics, and implementation. Chapter~\ref{sec:MAS} extends the discussion to multi-agent fusion, Chapter~\ref{sec:applications} presents two case studies beyond driving, Chapter~\ref{sec:open-challenges} discusses open challenges, and Chapter~\ref{sec:conclusions} concludes.
+
+% ============================================
+%
+%

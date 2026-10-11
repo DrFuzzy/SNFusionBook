@@ -1,0 +1,50 @@
+\chapter{Open Challenges and Future Directions}
+\label{sec:open-challenges}
+
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract*{}
+\suppressfloats[t]
+
+\section{Robustness Under Adverse and Long-Tail Conditions}
+
+Sensor-fusion systems must operate under rare, degraded, and difficult-to-model conditions. In autonomous driving, these include adverse weather, unusual lighting, rare road users, roadworks, emergency vehicles, sensor blockage, and unusual traffic behaviour. In other domains, such as maritime monitoring or critical-infrastructure protection, long-tail events may include spoofed reports, missing data, rare vessel behaviours, or infrequent physical disturbances. Public datasets only partially cover such cases, while synthetic augmentation may not fully reproduce real sensor degradation. Future work should develop more realistic sensor-corruption models, richer adverse-condition datasets\addednew{~\cite{bijelic2020_stf,dong2023_robobev}}, and evaluation protocols that reward robust behaviour rather than only average-case performance.
+
+\section{Calibration Drift, Sensor Failure, and Degraded Modalities}
+
+Fusion performance depends strongly on calibration, synchronisation, and sensor health. Mechanical vibration, temperature change, sensor replacement, clock drift, communication delays, or physical obstruction can introduce spatial or temporal misalignment. Sensors may also be blocked, degraded, spoofed, saturated, or damaged. Future systems require online calibration monitoring, automatic fault detection, sensor-health estimation, and fusion architectures that degrade gracefully when one or more modalities become unreliable.
+
+\section{Uncertainty Estimation, Conflict Handling, and Explainability}
+
+Many learning-based fusion systems produce accurate predictions but poorly calibrated confidence estimates. For safety-critical applications, the system must know when it does not know. Future research should improve uncertainty estimation, out-of-distribution detection, explainable sensor weighting, and conflict detection between modalities. Hybrid approaches that combine neural perception with probabilistic estimation, evidence theory, fuzzy logic, or interpretable reliability models are promising because they can expose why a sensor was trusted, down-weighted, or treated as conflicting.
+
+\section{Real-Time Embedded Deployment}
+
+Modern fusion architectures can be computationally expensive, especially when they use high-resolution images, dense point clouds, radar tensors, distributed acoustic measurements, temporal histories, or transformer-based attention. Real-time deployment requires careful optimisation of latency, memory, power consumption, communication bandwidth, and hardware utilisation, on automotive-grade platforms such as NVIDIA DRIVE Orin, Qualcomm Snapdragon Ride, TI TDA4-class SoCs, and FPGA-based accelerators%\deleted{ [Cite something?]}
+\addednew{~\cite{lin2018_architectural,liu2019_edge_computing,sze2017_efficient}}. 
+Future research should consider efficient model design, sparse computation, quantisation, hardware-aware training, and co-design between algorithms and embedded platforms.
+
+\section{Verification, Validation, and Safety Assurance}
+
+Sensor-fusion systems must be validated under a very large scenario space, including rare events, sensor failures, degraded sensing, and conflicting inputs. Simulation, scenario-based testing, closed-course testing, hardware-in-the-loop systems, real-world trials, and formal safety arguments are all required. A key open problem is how to validate learning-based fusion systems whose behaviour depends on high-dimensional data and may not be easily interpretable. Validation should therefore assess not only task accuracy, but also uncertainty calibration, fault tolerance, graceful degradation, and the effect of fusion errors on downstream decisions. \addednew{Emerging automotive standards give this challenge a concrete regulatory shape: ISO~26262 addresses functional safety of electronic systems, ISO~21448 (SOTIF) addresses hazards arising from functional insufficiencies of the intended behaviour --- including perception and fusion errors without any hardware fault --- and ISO/PAS~8800 targets safety of AI-based functions in road vehicles. A fusion architecture whose uncertainty, conflict, and degradation signals are explicit, as advocated throughout this survey, is substantially easier to argue about under these frameworks than an end-to-end black box.} % [July 2026 pass] A V&V subsection in a 2026 automotive survey should acknowledge the applicable safety standards; added without new bib entries (standards are cited by designation, as is common in IEEE Access).
+
+{\color{blue}
+\section{Sim-to-Real Transfer and Continual Adaptation}
+
+%\deleted{[I don't completely follow. this paragraph is short and could be more informative.]} % Addressed in the previous round: subsection rewritten (blue block).
+
+Learning-based fusion models are increasingly trained or augmented in simulation, because rare and dangerous scenarios are cheap to generate synthetically. However, simulated sensor models rarely reproduce the detailed failure characteristics of real cameras, LiDAR, and radar --- noise textures, multipath, blooming, spray, or weather-dependent attenuation --- so models can inherit a sim-to-real gap precisely in the degraded conditions for which simulation was used. Closing this gap requires physically faithful sensor simulation, domain-adaptation techniques evaluated per modality, and validation protocols that measure transfer explicitly. A related challenge is continual and online learning: fusion systems that adapt during deployment (recalibrating reliability weights, updating maps, or fine-tuning detectors) must do so without catastrophic forgetting and without invalidating prior safety arguments.
+
+\section{Privacy, Standardisation, and Interoperability}
+%\deleted{[I don't completely follow. this paragraph is short and could be more informative.]} % Addressed in the previous round: subsection rewritten (blue block).
+Multi-agent and infrastructure-assisted fusion make data governance a first-order design constraint. Cooperative perception exchanges observations of identifiable people and vehicles across organisational boundaries, raising privacy, retention, and consent questions that pure onboard fusion avoids; techniques such as feature-level sharing, anonymisation, and federated learning trade information content against privacy exposure. Interoperability is equally unresolved: V2X message formats, coordinate conventions, time bases, uncertainty representations, and trust models must be standardised before fused estimates from heterogeneous vendors can be combined safely. Without agreed ways to exchange covariances, confidences, and provenance, receiving agents cannot apply the consistency mechanisms (covariance intersection, evidence discounting) that this survey has argued are essential.
+}
+
+\section{Foundation Models and End-to-End Fusion}
+%\deleted{[I don't completely follow. this paragraph is short and could be more informative.]}
+Recent progress in large-scale representation learning and foundation models may influence future sensor-fusion systems. Large multimodal models could improve generalisation, semantic reasoning, and data efficiency, while end-to-end architectures may learn integrated perception, prediction, planning, or monitoring representations. However, these approaches raise important questions about interpretability, safety, uncertainty, data bias, compute requirements, and failure analysis. Future fusion research must determine how to combine the flexibility of large learned models with the reliability, structure, and auditability required for safety-critical operation.
+
+\addednew{Two concrete developments illustrate the trend. First, planning-oriented end-to-end architectures such as UniAD train perception, prediction, and planning jointly in a single network, so that fusion is no longer an explicit module but an emergent property of intermediate representations \cite{hu2023_uniad}; recent surveys of end-to-end driving systematise the rapidly growing design space and its open problems, including causal confusion, covariate shift, and the difficulty of interpreting intermediate features \cite{chen2024_e2e_survey}. Second, large multimodal language models are being explored as high-level reasoning layers on top of fused perception, for instance to interpret rare scenes, explain decisions in natural language, or serve as a semantic prior for long-tail objects \cite{cui2024_mllm_driving}. For the fusion perspective taken in this survey, the key open questions are where the classical safety layer should sit when the fusion function is implicit --- for example, whether innovation-style consistency checks can be applied to latent representations --- how calibrated uncertainty can be extracted from end-to-end models, and whether foundation-model outputs can be treated as one more (highly capable but occasionally unreliable) information source to be discounted and audited with the conflict-handling machinery of Chapter~\ref{sec:classicalSF}.}
+
+% ============================================

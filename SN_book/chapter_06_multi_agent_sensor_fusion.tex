@@ -1,0 +1,49 @@
+\chapter{Sensor Fusion in Multi-Agent Systems}
+\label{sec:MAS}
+% ============================================
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract*{}
+\suppressfloats[t]
+
+%\deleted{[Needs to be expanded, needs references, perhaps a numerical example]} % Addressed: graph-theoretic setting and consensus references added below, together with a worked numerical example.
+Multi-agent sensor fusion extends the single-platform view by allowing several vehicles, robots, infrastructure nodes, or monitoring stations to share information about a common environment. The fused state may describe the pose of each agent, the state of external objects, a shared map, a risk field, or the health of a distributed infrastructure. This setting is increasingly important in autonomous driving, aerial robotics, smart-city monitoring, maritime surveillance, and critical-infrastructure protection, where a single agent may be occluded, communication-limited, or unable to observe the whole scene.
+
+The main benefit of multi-agent fusion is complementary viewpoint diversity. In cooperative driving, for example, a roadside camera or another connected vehicle may observe a pedestrian hidden behind a parked truck from the ego vehicle's perspective. In aerial robotics, several drones can jointly localise themselves and map an environment while individual GNSS, vision, or range measurements are intermittent. In maritime monitoring, AIS, coastal radar, satellite imagery, and cable-based sensing form a distributed observation network rather than a single colocated sensor suite. These examples show that multi-agent fusion is not merely more data; it changes the observability, latency, trust, and coordination structure of the estimation problem.
+
+Architecturally, multi-agent fusion can be centralised, decentralised, or hybrid. In a centralised architecture, agents transmit measurements, features, tracks, or local maps to a fusion centre, which performs association, estimation, and decision-making. This can produce a globally consistent estimate, but it requires communication bandwidth, low enough latency, and a trusted computational node. In a decentralised architecture, each agent maintains its own estimate and exchanges selected information with neighbours. Consensus filters, distributed Kalman filters, distributed particle filters, covariance-intersection methods, and belief-function frameworks are representative tools when no single node has all information or when cross-correlations are unknown \cite{khaleghi_multisensor_2013,foglietta_networked_2012}.
+
+%\deleted{[Too short this stuff about consensus. What is a neighbor? a graph? needs some explanation and reference if we want to use it.]}
+\addednew{The natural abstraction for decentralised fusion is a communication graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$, where the node set $\mathcal{V}=\{1,\dots,N\}$ collects the agents and an edge $(i,j)\in\mathcal{E}$ indicates that agents $i$ and $j$ can exchange information directly, for example over a V2V or V2I link. The \emph{neighbour set} $\mathcal{N}_i=\{j:(i,j)\in\mathcal{E}\}$ of agent $i$ therefore contains exactly the agents it can hear at a given time; no agent needs global knowledge of the network. Classical results show that if the graph is connected (or, for time-varying and directed networks, suitably jointly connected), simple local averaging rules drive all agents to agreement, with convergence speed governed by the algebraic connectivity of the graph \cite{olfatisaber2007_consensus,ren2005_consensus}.}
+{\color{blue}
+The simplest decentralised mechanism is the consensus filter, in which each agent $i$ repeatedly averages its local estimate with those of its communication neighbours,
+\begin{equation}
+\widehat{\mathbf{x}}_i(k+1)=\widehat{\mathbf{x}}_i(k)+\epsilon\sum_{j\in\mathcal{N}_i}\left(\widehat{\mathbf{x}}_j(k)-\widehat{\mathbf{x}}_i(k)\right),
+\label{eq:consensus-filter}
+\end{equation}
+where $\mathcal{N}_i$ is the neighbour set of agent $i$ and $\epsilon>0$ is a step size bounded by the inverse of the maximum node degree. Under mild connectivity assumptions, all local estimates converge to a common value, so a network can agree on a fused state using only local exchanges. In practice, consensus iterations are interleaved with local measurement updates (consensus-on-information or consensus-on-measurement filters), and when the cross-correlations between agents' estimates are unknown, the covariance-intersection rule of \eqref{eq:ci-cov}--\eqref{eq:ci-est} in Section~\ref{subsec:track-fusion} provides the consistent way to merge the exchanged estimates.
+}
+
+{\color{RevisionOlive}
+\begin{example}
+Consider four vehicles on a path graph $1$--$2$--$3$--$4$ (each vehicle communicates only with its immediate neighbours), holding local range estimates to a common obstacle of $\widehat{x}_1(0)=10$, $\widehat{x}_2(0)=12$, $\widehat{x}_3(0)=11$, and $\widehat{x}_4(0)=15$ metres. The maximum node degree is $2$, so any step size $\epsilon<1/2$ is admissible; take $\epsilon=0.3$. One application of \eqref{eq:consensus-filter} yields
+\begin{equation*}
+\widehat{x}_1(1)=10.6,\,
+\widehat{x}_2(1)=11.1,\,
+\widehat{x}_3(1)=12.5,\,
+\widehat{x}_4(1)=13.8.
+\end{equation*}
+Note that the sum (and hence the average, $12$) is preserved at every iteration; continued iterations contract the spread geometrically, and all four estimates converge to the network average $12$~m without any vehicle ever communicating beyond its neighbours. The outlier estimate of vehicle~4 is thus absorbed gradually, which also illustrates the main operational caveats: consensus requires several communication rounds per fused value, and a faulty or malicious agent biases the entire network unless it is detected and discounted.
+\end{example}
+}
+
+Hybrid architectures are often the most practical: local edge nodes perform fast preprocessing and tracking, while a regional or cloud-level node performs slower map update, validation, learning, or fleet-level coordination \cite{deng_edge_2021,lim_federated_2020}.
+
+The information exchanged between agents strongly affects both performance and deployability. Raw-data sharing can preserve the most information but is expensive and sensitive to synchronisation, calibration, and privacy constraints. Feature-level sharing reduces bandwidth and can support learned cooperative perception, but it requires compatible representations and careful uncertainty calibration. Object- or track-level sharing is efficient and interpretable, but it depends on reliable local detection, association, and covariance or confidence estimates. Decision-level sharing is the lightest option and is useful for warnings, alerts, or manoeuvre coordination, but it may hide the uncertainty and conflict that generated the decision. The choice of communication level is therefore a fusion-design decision, not only a networking detail.
+
+Multi-agent fusion also introduces failure modes that are less visible in single-agent systems. Communication delays can make received information stale; packet losses can create intermittent measurements; inconsistent coordinate frames can corrupt cooperative tracks; duplicated information can cause overconfident estimates; and compromised or faulty agents can inject misleading evidence. Conservative fusion methods, including covariance intersection, evidence-theoretic conflict measures, innovation monitoring, and set-membership consistency checks, are therefore valuable when cross-agent dependencies or trust levels are uncertain. In connected automated vehicles, set-membership methods have been used to support shared situational awareness under occlusion, while evidence-distance and Dempster--Shafer approaches have been applied to real-time inter-vehicle data fusion \cite{narri2021_set_membership_shared_awareness,cho_realtime_2020}.
+
+Validation is particularly demanding because the relevant scenarios involve both sensing and communication. A convincing evaluation should vary not only weather, occlusion, object density, and sensor degradation, but also network latency, packet loss, agent density, viewpoint overlap, calibration error, clock offset, malicious data, and inconsistent local maps. For safety-critical deployment, multi-agent fusion should expose the provenance of fused information, the age of received data, the assumed trust in each source, and the remaining uncertainty after cooperation. The open research challenge is to obtain the robustness benefits of cooperation without allowing communication constraints, correlation errors, or untrusted agents to make the fused estimate less reliable than a well-designed local estimate.
+
+% ============================================
