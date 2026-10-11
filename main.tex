@@ -3,7 +3,7 @@
 % Adapted from the official monograph template supplied by the author.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[graybox,envcountchap]{SNmono}
+\documentclass[graybox,envcountchap]{style/SNmono}
 
 % Packages retained from the official SNmono template.
 \usepackage{type1cm}
@@ -24,7 +24,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \algnewcommand\algorithmicforeach{\textbf{for each}}
-\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorit hmicdo}
 
 % Tables and manuscript-specific formatting that is actually used.
 \usepackage{adjustbox}
@@ -140,8 +140,8 @@ Themistoklis Charalambous: Department of Electrical and Computer Engineering, Un
 % \include{dedication} % currently empty
 % \include{foreword} % currently empty
 % \include{preface} % currently empty
-\include{SN_book/book_abstract}
-\include{SN_book/acknowledgement}
+\include{frontmatter/book_abstract}
+\include{frontmatter/acknowledgement}
 % \include{ethics} % currently empty
 
 \setcounter{tocdepth}{2}
@@ -153,25 +153,25 @@ Themistoklis Charalambous: Department of Electrical and Computer Engineering, Un
 % Optional part file retained from the official structure; currently empty.
 % \include{part} % currently empty
 
-\include{SN_book/chapter_01_introduction}
-\include{SN_book/chapter_02_principles_and_components}
-\include{SN_book/chapter_03_classical_sensor_fusion}
-\include{SN_book/chapter_04_learning_based_and_hybrid_fusion}
-\include{SN_book/chapter_05_autonomous_driving_application}
-\include{SN_book/chapter_06_multi_agent_sensor_fusion}
-\include{SN_book/chapter_07_applications_beyond_autonomous_vehicles}
-\include{SN_book/chapter_08_open_challenges_and_future_directions}
-\include{SN_book/chapter_09_concluding_remarks}
+\include{chapters/ch01_introduction}
+\include{chapters/ch02_principles_and_components}
+\include{chapters/ch03_classical_sensor_fusion}
+\include{chapters/ch04_learning_based_and_hybrid_fusion}
+\include{chapters/ch05_autonomous_driving_application}
+\include{chapters/ch06_multi_agent_sensor_fusion}
+\include{chapters/ch07_applications_beyond_autonomous_vehicles}
+\include{chapters/ch08_open_challenges_and_future_directions}
+\include{chapters/ch09_concluding_remarks}
 
 % Optional appendix file retained from the official structure; currently empty.
 % \include{appendix} % currently empty
 
 \backmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\bibliographystyle{spmpsci}
-\bibliography{SN_book/references}
+\bibliographystyle{style/spmpsci}
+\bibliography{bib/references}
 
-\include{SN_book/author_biographies}
+\include{backmatter/author_biographies}
 % \include{glossary} % currently empty
 % \include{solutions} % currently empty
 \printindex
