@@ -1,2 +1,22 @@
-% Springer Nature optional file.
-% No solutions chapter is applicable/written yet.
+% Solutions to the end-of-chapter problems (Springer SNmono: problems chapterwise, solutions collected here).
+% Each chapter contributes one fragment backmatter/solutions_chNN.tex that uses
+%     \begin{sol}{prob:chNN:k} ... \end{sol}
+% where prob:chNN:k is the label of the corresponding \begin{prob} in the chapter.
+\begin{addedblock}
+\chapter*{Solutions to Selected Problems}
+\addcontentsline{toc}{chapter}{Solutions to Selected Problems}
+\markboth{Solutions}{Solutions}
+
+\section*{Problems of Chapter~\ref{sec:classicalSF}}
+\InputIfFileExists{backmatter/solutions_ch03.tex}{}{}
+\section*{Problems of Chapter~\ref{sec:learning}}
+\InputIfFileExists{backmatter/solutions_ch04.tex}{}{}
+\section*{Problems of Chapter~\ref{sec:application}}
+\InputIfFileExists{backmatter/solutions_ch05.tex}{}{}
+\section*{Problems of Chapter~\ref{sec:MAS}}
+\InputIfFileExists{backmatter/solutions_ch06.tex}{}{}
+\section*{Problems of Chapter~\ref{sec:applications}}
+\InputIfFileExists{backmatter/solutions_ch07.tex}{}{}
+\section*{Problems of Chapter~\ref{sec:open-challenges}}
+\InputIfFileExists{backmatter/solutions_ch08.tex}{}{}
+\end{addedblock}

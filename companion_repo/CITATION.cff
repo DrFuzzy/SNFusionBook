@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the book and the software as below."
+type: software
+title: "snfusion: companion code for 'Towards a Unified View of Sensor Fusion'"
+version: 0.1.0
+date-released: "2026-12-01"
+license: MIT
+authors:
+  - family-names: Deliparaschos
+    given-names: Kyriakos M.
+    affiliation: "Cyprus University of Technology, Limassol, Cyprus"
+  - family-names: Oliva
+    given-names: Gabriele
+    affiliation: "University Campus Bio-Medico of Rome, Rome, Italy"
+  - family-names: Charalambous
+    given-names: Themistoklis
+    affiliation: "University of Cyprus, Nicosia, Cyprus; Aalto University, Espoo, Finland"
+keywords:
+  - sensor fusion
+  - Kalman filtering
+  - set-membership estimation
+  - evidence theory
+  - multi-criteria decision-making
+  - autonomous driving
+preferred-citation:
+  type: book
+  title: "Towards a Unified View of Sensor Fusion: Theory, Methods, and Autonomous Driving Applications"
+  authors:
+    - family-names: Deliparaschos
+      given-names: Kyriakos M.
+    - family-names: Oliva
+      given-names: Gabriele
+    - family-names: Charalambous
+      given-names: Themistoklis
+  publisher:
+    name: "Springer Nature"
+  year: 2026

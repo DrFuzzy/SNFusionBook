@@ -1,0 +1,46 @@
+Laplacian eigenvalues: [0.    1.382 2.382 3.618 4.618]
+algebraic connectivity lambda_2 = 1.3820, lambda_max = 4.6180
+Metropolis weight matrix W =
+ [[0.25   0.25   0.25   0.     0.25  ]
+ [0.25   0.5    0.25   0.     0.    ]
+ [0.25   0.25   0.25   0.25   0.    ]
+ [0.     0.     0.25   0.4167 0.3333]
+ [0.25   0.     0.     0.3333 0.4167]]
+second largest |eigenvalue| of W = 0.6545
+
+chi^2_4 two-sided 95% interval: [0.484, 11.143]
+method                               pos RMSE  mean NEES     median in 95% band
+centralised KF                          0.803       4.25       3.60       95.0%
+isolated local KF                      11.647       4.08       3.37       94.4%
+naive fusion, no feedback               1.100       6.70       5.23       83.6%
+naive fusion with feedback             16.108 42875671.53 13060174.93        0.9%
+consensus on information (L=3)          0.917       2.02       1.53       87.3%
+Kalman-consensus filter                 0.968       3.94       3.31       95.0%
+covariance intersection                 1.021       2.87       2.43       94.6%
+
+steady state (t >= 5 s):
+centralised KF                          0.649       4.41
+isolated local KF                      14.783       4.22
+naive fusion, no feedback               0.837       6.99
+naive fusion with feedback             21.229 75005069.70
+consensus on information (L=3)          0.675       2.33
+Kalman-consensus filter                 0.751       4.09
+covariance intersection                 0.790       3.22
+
+mean CI weight omega over all pairwise fusions (run 0): 0.544
+
+per-node position RMSE (all runs):
+centralised KF                     [0.803 0.803 0.803 0.803 0.803]
+isolated local KF                  [11.665 14.119  2.509 11.691 14.136]
+naive fusion, no feedback          [0.939 0.967 0.954 1.368 1.207]
+naive fusion with feedback         [16.107 16.107 16.107 16.111 16.11 ]
+consensus on information (L=3)     [0.908 0.907 0.909 0.93  0.928]
+Kalman-consensus filter            [0.842 0.895 0.843 1.163 1.055]
+covariance intersection            [0.967 0.967 0.973 1.139 1.048]
+consensus on information with L= 1: pos RMSE 0.956, mean NEES 2.05
+consensus on information with L=10: pos RMSE 0.912, mean NEES 2.01
+
+wrote /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/companion_repo/examples/ch06_distributed_tracking/output/distributed_tracking.csv (100, 27)
+wrote /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/companion_repo/examples/ch06_distributed_tracking/output/distributed_tracking.pdf
+copied distributed_tracking.csv -> /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/data/ch06
+copied distributed_tracking.pdf -> /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/figures/ch06

@@ -8,7 +8,7 @@
 
 % Springer Nature: each chapter should have a 10--15 line online abstract.
 % This chapter abstract has not yet been written in the uploaded manuscript.
-\abstract*{}
+\abstract{\added{This chapter reviews the classical, model-based techniques on which sensor fusion rests, and presents them as variations of a single idea: measurements are pieces of information about a hidden state, to be weighted by their uncertainty and combined additively when they are independent. The chapter starts from the static inverse problem and develops ordinary, weighted, regularised and sequential least squares, their maximum-likelihood and maximum-a-posteriori interpretations, the information matrix, and Gauss--Newton iterations for nonlinear sensor models. The same prediction--correction structure is then extended to dynamic states through Bayesian filtering, covering the Kalman filter, the extended and unscented Kalman filters, particle filters, innovation-based gating and the normalised innovation squared as a consistency diagnostic; a worked automotive-radar cut-in example with real numbers accompanies the discussion. Set-membership and zonotopic estimation are presented as the bounded-error counterpart of probabilistic filtering, with strip intersections, order reduction and a direct comparison with the EKF on the same scenario. Track-level fusion and data association follow, including temporal and spatial alignment, gating, nearest-neighbour, probabilistic and multi-hypothesis association, track management, fusion with known cross-correlation and covariance intersection. Evidence theory (Dempster--Shafer, the transferable belief model and DSmT) is introduced for conflicting qualitative information, optimisation-based fusion and factor graphs for trajectory estimation, and multi-criteria decision-making, in particular incomplete AHP solved by logarithmic least squares, for context-dependent sensor reliability weighting. The chapter closes with ten problems, whose solutions are collected at the end of the book and in the companion repository.}}
 \suppressfloats[t]
 
 \section{Mathematical introduction to sensor fusion}
@@ -18,7 +18,7 @@ Sensor fusion concerns the estimation of an unknown physical quantity from multi
 \begin{table}[!t]
     \centering
     \small
-    \caption{\textcolor{olive}{[To be updated at the end]} Principal notation. Symbols are reused across method families where the literatures conflict; the scope column states where each reading applies.}
+    \caption{\deleted{[To be updated at the end]} Principal notation. Symbols are reused across method families where the literatures conflict; the scope column states where each reading applies.}
     \label{tab:notation}
     \begin{tabular}{p{0.13\linewidth} p{0.44\linewidth} p{0.28\linewidth}}
         \hline
@@ -36,6 +36,13 @@ Sensor fusion concerns the estimation of an unknown physical quantity from multi
         $\Omega$, $m(\cdot)$, $K$ & frame of discernment, belief mass, conflict & evidence theory \\
         $w$, $q$, $\mu$ & fusion weight, quality indicator, membership & reliability-aware fusion \\
         $\mathcal{G}$, $\mathcal{N}_i$ & communication graph, neighbour set & multi-agent fusion \\
+        \added{$\mathbf{H}$} & \added{measurement Jacobian or matrix inside filtering recursions (equals $\mathbf{G}$ for linear models)} & \added{Kalman filtering, Chapters~\ref{sec:learning}--\ref{sec:applications}} \\
+        \added{$\mathbf{L}$, $\lambda_2$, $\epsilon$} & \added{graph Laplacian, algebraic connectivity, consensus step size} & \added{multi-agent fusion} \\
+        \added{$\alpha_i$} & \added{discount (reliability) factor applied to the evidence of source $i$} & \added{evidence theory, reliability-aware fusion} \\
+        \added{NIS, NEES} & \added{normalised innovation squared, normalised estimation error squared (consistency statistics)} & \added{filtering, validation} \\
+        \added{ECE, $T$} & \added{expected calibration error, temperature-scaling parameter} & \added{learning-based fusion} \\
+        \added{$\mathbf{f}_c$, $\mathbf{f}_l$, $\mathbf{f}_r$} & \added{camera, LiDAR, radar feature representations} & \added{deep multimodal fusion} \\
+        \added{$\mathbf{T}_{VS}$, $\mathbf{K}$} & \added{extrinsic sensor-to-vehicle transform in $SE(3)$; camera intrinsic matrix (the gain is written $\mathbf{K}_k$ when both appear)} & \added{calibration and alignment, Chapter~\ref{sec:application}} \\
         \hline
     \end{tabular}
 \end{table}
@@ -208,7 +215,7 @@ For vector-valued measurements, this becomes
 \begin{align}
 J_{\mathrm{LS}}(\mathbf{x}) &=\sum_{n=1}^{N}\left(\mathbf{y}_n-\mathbf{g}_n(\mathbf{x})\right)^{\mathsf T}\left(\mathbf{y}_n-\mathbf{g}_n(\mathbf{x})\right) \nonumber \\
 &= \left( \mathbf{y} - \mathbf{g}(\mathbf{x}) \right)^{\mathsf T}\left(\mathbf{y}-\mathbf{g}(\mathbf{x})\right) \nonumber \\
-& = \left\|\mathbf{y} - \mathbf{g}(\mathbf{x}) \right\|_2^2 . % [July 2026 pass] removed stray {\color{blue}.} left over from a first-round edit
+& = \left\|\mathbf{y} - \mathbf{g}(\mathbf{x}) \right\|_2^2 . % [July 2026 pass] removed stray . left over from a first-round edit
 \end{align}
 The corresponding ordinary least-squares estimate is
 \begin{align}
@@ -977,9 +984,9 @@ This is the essence of modern sensor fusion: \emph{not merely combining sensor o
 %
 %The mathematical foundation of sensor fusion is the idea that measurements are not used as isolated numerical readings, but as uncertain pieces of information about an underlying quantity of interest. Thus, sensor fusion is fundamentally an inverse problem under uncertainty: the measurements are observed, the state is hidden, and the task is to infer which state best explains the data while respecting the reliability of each source. The key point is that a sensor measurement is meaningful only together with its model and uncertainty description. A number reported by a sensor does not, by itself, say how strongly it should influence the estimate. Its influence depends on what physical quantity it observes, how sensitive it is to the unknown state, how noisy it is, whether its error is biased or zero mean, and whether it shares uncertainty with other measurements. This is why covariance matrices play such a central role. They are not merely technical parameters; they encode the confidence assigned to different measurements and directions in the measurement space.
 %
-%%\deleted{From this perspective, least-squares estimation is not simply a curve-fitting tool. It is a way of formalising consistency between the state and the measurements. The residual measures how far the predicted measurements are from the observed ones. Minimising a residual-based cost therefore means selecting the state whose predicted sensor outputs are most compatible with the data. When uncertainty is included, the residual is judged relative to the reliability of the measurements: disagreement with a precise sensor is more serious than the same numerical disagreement with a noisy sensor.}
+%%
 %
-%%\deleted{The same interpretation applies when multiple sensors are fused. Fusion is beneficial because different measurements can provide complementary information about the same unknown state. Some sensors may observe one component of the state accurately but provide little information about another. Other sensors may be individually noisy but geometrically informative. The estimator combines these contributions according to both their sensitivity to the state and their uncertainty. Therefore, the value of a sensor is not determined only by its noise variance, but also by how its measurement model constrains the unknown state.}
+%%
 %
 %This viewpoint also explains why independence and correlation are critical. If two measurements are independent, their information can be combined as genuinely new evidence. If they are correlated, part of their information is shared. Treating correlated measurements as independent leads to double counting. The result is often an estimate that appears more accurate than it really is. In sensor fusion, this is one of the most important failure modes: the estimate may look statistically confident while being physically unreliable.
 %
@@ -987,7 +994,7 @@ This is the essence of modern sensor fusion: \emph{not merely combining sensor o
 %
 %Sequential estimation shows that fusion is also an information-processing mechanism. Past measurements need not always be stored explicitly. Their effect can be summarised by the current estimate and its covariance. A new measurement is then used to correct the previous estimate according to how surprising it is and how reliable it is. The innovation measures disagreement between prediction and observation, while the gain determines how much that disagreement should change the estimate. This prediction-correction interpretation is the conceptual bridge between static least squares and recursive filters such as the Kalman filter.
 %
-%%\deleted{For nonlinear sensors, the same principles remain valid, but the geometry becomes local. A nonlinear measurement does not constrain the state in a globally linear way. Instead, the estimator repeatedly approximates how the measurements change near the current estimate and uses this local sensitivity to compute a correction. Thus, nonlinear least squares and Gauss--Newton methods can be understood as repeatedly solving local fusion problems until the predicted measurements and observed measurements become sufficiently consistent.}
+%%
 %
 %The main lesson is that sensor fusion is not about blindly combining more measurements. More data are useful only when their models, uncertainties, and dependencies are represented correctly. A poorly calibrated sensor, an incorrect covariance matrix, an ignored bias, or an unmodelled correlation can make the fused estimate worse rather than better. Conversely, when the models and uncertainty descriptions are credible, fusion can exploit complementarity: one sensor may compensate for another sensor's weakness, reduce ambiguity, improve robustness, and quantify the remaining uncertainty.
 %
@@ -1003,7 +1010,7 @@ This is the essence of modern sensor fusion: \emph{not merely combining sensor o
 %
 % ============================================
 
-%Bayesian filtering provides a principled framework for estimating hidden states from noisy and incomplete measurements\addednew{~\cite{sarkka2013_bayesian}}. In autonomous driving, the hidden state may represent the ego-vehicle pose and velocity, the state of a surrounding object, the occupancy of a grid cell, or the motion of a tracked agent. The general Bayesian filtering process alternates between a prediction step, which propagates the state estimate using a motion model, and an update step, which incorporates new sensor measurements.
+%Bayesian filtering provides a principled framework for estimating hidden states from noisy and incomplete measurements~\cite{sarkka2013_bayesian}. In autonomous driving, the hidden state may represent the ego-vehicle pose and velocity, the state of a surrounding object, the occupancy of a grid cell, or the motion of a tracked agent. The general Bayesian filtering process alternates between a prediction step, which propagates the state estimate using a motion model, and an update step, which incorporates new sensor measurements.
 
 
 Bayesian filtering provides a probabilistic framework for recursively estimating a time-varying hidden state from noisy, incomplete, and possibly heterogeneous measurements~\cite{sarkka2013_bayesian}. For example, in autonomous driving, the state may represent the ego-vehicle pose, velocity, and inertial-sensor biases; the position, velocity, heading, and extent of a surrounding object; or the occupancy state of a spatial cell. Unlike static estimation, Bayesian filtering explicitly combines a dynamical model with measurements arriving over time.
@@ -1059,7 +1066,7 @@ p(\mathbf{x}_k\mid\mathbf{y}_{1:k-1})
 is the predictive likelihood, or evidence, of the new measurement. Hence, the posterior is obtained by weighting the predicted state distribution according to how well each candidate state explains the new sensor observation. This recursion provides the general mathematical foundation of Bayesian filtering. Different filters arise from different representations and approximations of the posterior distribution. 
 
 
-%Kalman filtering and its variants are among the most widely used Bayesian methods in sensor fusion. The standard Kalman filter is appropriate for linear systems with Gaussian noise\addednew{~\cite{kalman_1960}}, while the extended Kalman filter linearises nonlinear models around the current estimate. The unscented Kalman filter uses deterministic sigma points to approximate nonlinear transformations\addednew{~\cite{julier2004_ukf}}, and particle filters represent the posterior distribution using weighted samples\addednew{~\cite{gordon1993_pf,arulampalam2002_pf_tutorial}}. These methods are widely used for GNSS--IMU fusion, vehicle state estimation, radar tracking, LiDAR-based object tracking, and camera--radar association.
+%Kalman filtering and its variants are among the most widely used Bayesian methods in sensor fusion. The standard Kalman filter is appropriate for linear systems with Gaussian noise~\cite{kalman_1960}, while the extended Kalman filter linearises nonlinear models around the current estimate. The unscented Kalman filter uses deterministic sigma points to approximate nonlinear transformations~\cite{julier2004_ukf}, and particle filters represent the posterior distribution using weighted samples~\cite{gordon1993_pf,arulampalam2002_pf_tutorial}. These methods are widely used for GNSS--IMU fusion, vehicle state estimation, radar tracking, LiDAR-based object tracking, and camera--radar association.
 
 When the process and measurement models are linear,
 \begin{subequations}
@@ -1224,7 +1231,7 @@ association uncertainty.
 
 
 
-%\addednew{A practical caveat concerns filter consistency: the reported covariance is trustworthy only if the process- and measurement-noise models are credible, and standard diagnostics such as the normalised innovation squared (NIS) test can be monitored online to detect model mismatch \cite{barshalom2001_estimation}. This diagnostic viewpoint recurs throughout the paper, from the innovation-based maritime monitoring of Chapter~\ref{sec:applications} to the hybrid classical--learning consistency checks of Chapter~\ref{sec:learning}.} % [July 2026 pass] Added a consistency/diagnostics remark and citations; this subsection previously had no references at all.
+%A practical caveat concerns filter consistency: the reported covariance is trustworthy only if the process- and measurement-noise models are credible, and standard diagnostics such as the normalised innovation squared (NIS) test can be monitored online to detect model mismatch \cite{barshalom2001_estimation}. This diagnostic viewpoint recurs throughout the paper, from the innovation-based maritime monitoring of Chapter~\ref{sec:applications} to the hybrid classical--learning consistency checks of Chapter~\ref{sec:learning}. % [July 2026 pass] Added a consistency/diagnostics remark and citations; this subsection previously had no references at all.
 
 A practical caveat concerns \emph{filter consistency}. The covariance
 reported by a Bayesian filter is meaningful only when the dynamical
@@ -1257,7 +1264,7 @@ Bayesian filtering should therefore be understood not merely as a collection of 
 
 Let us conclude this subsection with some examples.
 
-\color{olive}
+
 \begin{example}
 \label{ex:ekf-radar-cutin}
 Consider an ego vehicle travelling at $27$\,m/s and a target vehicle travelling
@@ -1409,15 +1416,15 @@ intermediate quantity.
     coordinates {(8,1.75) (63,1.75)};
 
 \addplot[only marks, mark=*, mark size=0.5pt, draw=MeasGrey, fill=MeasGrey]
-    table[x=px_meas, y=py_meas, col sep=comma] {./examples/ekf_example/ekf_radar_cutin.csv};
+    table[x=px_meas, y=py_meas, col sep=comma] {data/ch03/ekf_radar_cutin.csv};
 \addlegendentry{radar detections}
 
 \addplot[TruthBlack, line width=1.0pt]
-    table[x=px_true, y=py_true, col sep=comma] {./examples/ekf_example/ekf_radar_cutin.csv};
+    table[x=px_true, y=py_true, col sep=comma] {data/ch03/ekf_radar_cutin.csv};
 \addlegendentry{ground truth}
 
 \addplot[EkfBlue, line width=0.9pt, densely dashed]
-    table[x=px_est, y=py_est, col sep=comma] {./examples/ekf_example/ekf_radar_cutin.csv};
+    table[x=px_est, y=py_est, col sep=comma] {data/ch03/ekf_radar_cutin.csv};
 \addlegendentry{EKF}
 
 % the target closes on the ego vehicle, so time runs right to left
@@ -1448,7 +1455,7 @@ intermediate quantity.
     coordinates {(0,3) (10,3)};
 
 \addplot[EkfBlue, line width=0.5pt]
-    table[x=t, y=nis, col sep=comma] {./examples/ekf_example/ekf_radar_cutin.csv};
+    table[x=t, y=nis, col sep=comma] {data/ch03/ekf_radar_cutin.csv};
 
 \node[anchor=south, font=\scriptsize, text=black!70] at (axis cs:6.5,13.2) {lane change};
 \node[anchor=west, font=\scriptsize, text=black!55] at (axis cs:0.2,10.4) {$95\,\%$ interval};
@@ -1456,7 +1463,7 @@ intermediate quantity.
 \end{groupplot}
 \end{tikzpicture}
 }
-\caption{\color{olive}Extended Kalman filtering from automotive-radar
+\caption{Extended Kalman filtering from automotive-radar
 range, azimuth, and range-rate detections (Example~\ref{ex:ekf-radar-cutin}).
 (a)~Raw detections converted to Cartesian coordinates, ground truth, and EKF
 estimate. The target closes on the ego vehicle, so time runs from right to left;
@@ -1466,7 +1473,7 @@ the azimuth channel and therefore grows with range. (b)~Normalised innovation
 squared against the two-sided $95\,\%$ interval of $\chi^{2}_{3}$. The filter is
 consistent while the constant-velocity assumption holds and becomes measurably
 inconsistent during the lane change (shaded), which is the intended behaviour of
-the diagnostic: it reports a model mismatch, not a sensor fault.\color{black}}
+the diagnostic: it reports a model mismatch, not a sensor fault.}
 \label{fig:ekf-radar-cutin}
 \end{figure}
 
@@ -1541,7 +1548,7 @@ measurement model is nonlinear.
 
 
 
-\color{black}
+
 
 
 
@@ -1564,7 +1571,7 @@ A\mathcal{Z}_a+b
 \begin{bmatrix}H_a&H_b\end{bmatrix}
 \mathbb{B}_{\infty}^{m_a+m_b}.
 \end{align}
-Thus\added{,} affine propagation changes the centre and generator directions, while adding independent uncertainty simply appends new generator columns.
+Thus, affine propagation changes the centre and generator directions, while adding independent uncertainty simply appends new generator columns.
 
 Consider a dynamic sensor-fusion model
 \begin{align}
@@ -1635,7 +1642,7 @@ Here $\hat p$ is the centre of the corrected zonotope. Before any order reductio
 The gain is therefore not a stochastic Kalman gain, but a design variable chosen to reduce the size of the outer approximation while preserving containment.
 
 \begin{figure}[t]
-\color{blue}
+
 \centering
 \resizebox{\columnwidth}{!}{%
 \begin{tikzpicture}[scale=0.78,>=Stealth]
@@ -1744,7 +1751,7 @@ This replacement reduces many low-priority columns to only $d_x$ axis-aligned ge
 
 %A recent extension of this line of work is the use of probabilistic zonotopes for data-driven reachability analysis and uncertainty refinement \cite{modares2026reachability}. While classical zonotopic estimators treat uncertainty mainly through deterministic bounded sets, probabilistic zonotopes combine bounded deterministic components with Gaussian stochastic components, thereby retaining the geometric advantages of zonotopes while also representing probabilistic uncertainty. This is particularly relevant for safety-oriented sensor fusion, where some uncertainty sources are best described by hard bounds, such as calibration tolerances or certified sensor error limits, whereas others are naturally stochastic, such as measurement noise or environmental variability. The framework in \cite{modares2026reachability} further distinguishes between realized disturbances, which are inferred from collected trajectories and used to tighten the data-consistent model set, and future aleatory disturbances, which must still be propagated to obtain high-probability reachable sets. This distinction is important for autonomous and robotic systems because data should not only validate whether a conservative prior uncertainty model is safe, but also refine it to reduce unnecessary conservatism. In this sense, probabilistic zonotopes provide a bridge between deterministic set-membership fusion and stochastic uncertainty propagation: they preserve containment-oriented reasoning while allowing data-driven refinement of the uncertainty model.
 
-\color{olive}
+
 \begin{example}
 \label{ex:zono-radar-cutin}
 The machinery of this subsection can be applied to the scenario of
@@ -1859,19 +1866,19 @@ the point estimate that planning and control actually consume.
 \addplot[draw=none, fill=ManoeuvreOrange, fill opacity=0.40, forget plot]
     coordinates {(5,-1.2) (8,-1.2) (8,8.6) (5,8.6)} \closedcycle;
 \addplot[name path=zlo, draw=none, forget plot]
-    table[x=t, y=zlo, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=zlo, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[name path=zhi, draw=none, forget plot]
-    table[x=t, y=zhi, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=zhi, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[fill=ZonoGreen, fill opacity=0.18] fill between[of=zlo and zhi];
 \addlegendentry{zonotope}
 \addplot[name path=elo, draw=none, forget plot]
-    table[x=t, y=ekf_lo, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=ekf_lo, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[name path=ehi, draw=none, forget plot]
-    table[x=t, y=ekf_hi, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=ekf_hi, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[fill=EkfBlue, fill opacity=0.45] fill between[of=elo and ehi];
 \addlegendentry{EKF $3\sigma$}
 \addplot[TruthBlack, line width=0.8pt]
-    table[x=t, y=py_true, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=py_true, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addlegendentry{ground truth}
 
 %% ---------------- panel (b): the same, relative to the truth ----------------
@@ -1886,14 +1893,14 @@ the point estimate that planning and control actually consume.
 \addplot[draw=none, fill=ManoeuvreOrange, fill opacity=0.40, forget plot]
     coordinates {(5,-0.65) (8,-0.65) (8,0.65) (5,0.65)} \closedcycle;
 \addplot[name path=relo, draw=none, forget plot]
-    table[x=t, y=re_lo, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=re_lo, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[name path=rehi, draw=none, forget plot]
-    table[x=t, y=re_hi, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=re_hi, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \addplot[fill=EkfBlue, fill opacity=0.35, forget plot] fill between[of=relo and rehi];
 \addplot[TruthBlack, line width=0.6pt, forget plot]
     coordinates {(0,0) (10,0)};
 \addplot[EkfBlue, line width=0.6pt, forget plot]
-    table[x=t, y=e_ekf, col sep=comma] {./examples/zonotope/zono_radar_cutin.csv};
+    table[x=t, y=e_ekf, col sep=comma] {data/ch03/zono_radar_cutin.csv};
 \node[anchor=west, font=\scriptsize, text=black!60] at (axis cs:0.25,-0.5)
     {band: EKF $3\sigma$; line: EKF error};
 
@@ -1946,11 +1953,11 @@ disturbance, sensor, and calibration bounds, loose bounds buy conservatism while
 overly tight ones may exclude the true state, and high-dimensional perception
 states force aggressive generator reduction or a problem-specific choice of what
 to enclose.
-\color{black}
+
 
 % ============================================
 %
-\section{\TC{Track-Level Fusion and Data Association}}
+\section{Track-Level Fusion and Data Association}
 \label{subsec:track-fusion}
 %
 % ============================================
@@ -2169,7 +2176,7 @@ barshalom2011tracking}.
 \subsection{Unknown Correlations and Covariance Intersection}
 % --------------------------------------------
 
-\TC{When the cross-correlation is unknown, covariance intersection (CI)
+When the cross-correlation is unknown, covariance intersection (CI)
 provides a conservative alternative. Given two consistent estimates
 $\widehat{\mathbf{x}}_{1}$ and $\widehat{\mathbf{x}}_{2}$ with covariances
 $\mathbf{P}_{1}$ and $\mathbf{P}_{2}$, CI defines
@@ -2195,7 +2202,7 @@ $\log\det(\mathbf{P})$
 perception modules, neighbouring vehicles, or roadside infrastructure when their information histories are unavailable. Its price is conservatism: CI avoids claiming that all information contained in the two estimates is independent. When the true cross covariance is known, the correlated fusion rule generally gives a tighter estimate \cite{barshalom2011tracking,julier2001general}. CI should not be interpreted as simple arithmetic averaging. The scalar
 $\omega$ weights the complete information matrices. Consequently, the
 fusion remains direction dependent: one track may be more informative
-about position, while another is more informative about velocity.}
+about position, while another is more informative about velocity.
 
 
 
@@ -2205,7 +2212,7 @@ about position, while another is more informative about velocity.}
 %
 % ==============================================================
 
-\TC{Track-level fusion is well suited to combining numerical state estimates expressed in a common space and characterised by statistical uncertainty. In many systems, however, information may also be qualitative, incomplete, or conflicting, such as class hypotheses, existence assessments, occupancy states, or risk indicators. Evidence theory complements covariance-based fusion by providing a framework for combining such heterogeneous information while explicitly representing ambiguity, ignorance, and disagreement. Autonomous driving provides a representative case study in which these challenges arise across multiple sensing modalities.}
+Track-level fusion is well suited to combining numerical state estimates expressed in a common space and characterised by statistical uncertainty. In many systems, however, information may also be qualitative, incomplete, or conflicting, such as class hypotheses, existence assessments, occupancy states, or risk indicators. Evidence theory complements covariance-based fusion by providing a framework for combining such heterogeneous information while explicitly representing ambiguity, ignorance, and disagreement. Autonomous driving provides a representative case study in which these challenges arise across multiple sensing modalities.
 
 Evidence theory, also known as Dempster--Shafer theory, provides a mathematical framework for representing partial belief, ignorance, and conflict between information sources \cite{shafer_mathematical_1976,dempster_upperlower_2008,smets_transferable_1990}. It is particularly useful at the object, track, and decision levels of autonomous-driving fusion, where different modules may produce heterogeneous outputs such as class labels, existence probabilities, occupancy states, or risk scores. For example, a camera may classify a distant object as a pedestrian, LiDAR may support only the weaker hypothesis that an occupied vertical structure is present, and radar may provide a velocity measurement without a reliable class label. Evidence theory allows the fusion module to retain this ambiguity instead of forcing an early single-class decision.
 
@@ -2213,7 +2220,7 @@ Let the frame of discernment be a finite set of mutually exclusive hypotheses,
 \begin{equation}
 \Omega = \{\omega_1, \omega_2, \ldots, \omega_n\},
 \end{equation}
-where the hypotheses may correspond to object classes, occupancy states, sensor-health states, or driving-risk categories. Evidence theory operates on the power set \(\Gamma(\Omega)\) \added{(also commonly written $2^{\Omega}$)}, namely the set of all subsets of \(\Omega\):
+where the hypotheses may correspond to object classes, occupancy states, sensor-health states, or driving-risk categories. Evidence theory operates on the power set \(\Gamma(\Omega)\) (also commonly written $2^{\Omega}$), namely the set of all subsets of \(\Omega\):
 \begin{equation}
 \Gamma(\Omega) = \{\gamma_1, \gamma_2, \ldots, \gamma_{2^{|\Omega|}}\}.
 \end{equation}
@@ -2344,7 +2351,7 @@ Optimisation-based fusion estimates the most likely state or trajectory by minim
 
 A typical formulation defines a state vector containing poses, velocities, sensor biases, map landmarks, or object states. Each sensor measurement contributes a residual term that penalises the discrepancy between the predicted measurement and the observed measurement. The final estimate is obtained by minimising a weighted sum of residuals, where the weights are related to measurement uncertainty. This formulation naturally supports heterogeneous sensors because each measurement type can be represented as a factor connected to the relevant state variables.
 
-Factor graphs provide a structured representation of this problem. Nodes represent unknown states, while factors represent constraints from IMU integration, camera reprojection, LiDAR scan matching, GNSS measurements, wheel odometry, loop closures, or map priors. Compared with purely filtering-based methods, smoothing and factor graph approaches can use measurements over a time window or an entire trajectory, which can improve consistency and accuracy. Their main limitation is computational cost, particularly for real-time deployment on embedded platforms. \addednew{Standard references and tooling have made this formulation the de facto back-end of modern localisation stacks: iSAM2 introduced incremental smoothing via the Bayes tree, and GTSAM and related libraries provide reusable factor abstractions \cite{kaess2012_isam2,dellaert2017_factor_graphs}.} % [July 2026 pass] This subsection previously cited nothing; added the two canonical factor-graph references.
+Factor graphs provide a structured representation of this problem. Nodes represent unknown states, while factors represent constraints from IMU integration, camera reprojection, LiDAR scan matching, GNSS measurements, wheel odometry, loop closures, or map priors. Compared with purely filtering-based methods, smoothing and factor graph approaches can use measurements over a time window or an entire trajectory, which can improve consistency and accuracy. Their main limitation is computational cost, particularly for real-time deployment on embedded platforms. Standard references and tooling have made this formulation the de facto back-end of modern localisation stacks: iSAM2 introduced incremental smoothing via the Bayes tree, and GTSAM and related libraries provide reusable factor abstractions \cite{kaess2012_isam2,dellaert2017_factor_graphs}. % [July 2026 pass] This subsection previously cited nothing; added the two canonical factor-graph references.
 
 \section{Fusion based on Multi-Criteria Decision-Making}
 
@@ -2441,5 +2448,133 @@ A further issue is robustness. Pairwise comparisons are subjective and can be af
 MCDM can also be integrated with evidence-theoretic fusion. For example, each sensor can be assessed according to several reliability criteria: current measurement quality, historical false-alarm rate, conflict with other sensors, environmental suitability, latency, and calibration residual. The resulting MCDM score can define a discount factor \(\alpha_i\) for the BBA of sensor \(i\), after which the discounted evidence is combined using Dempster's rule, Smets' rule, or a weighted evidence rule. This type of approach has been studied in multi-sensor fusion based on belief functions, where AHP is used to weight uncertain and conflicting sensor readings before combination \cite{frikha_ahp_2015}.
 
 In autonomous driving, MCDM-based fusion is most appropriate when the decision problem is explicit and the criteria are interpretable. Examples include selecting the most reliable modality under degraded sensing, ranking candidate sensor suites during system design, choosing whether to trust an online map prior, selecting a fallback perception pipeline under compute constraints, or prioritising collision-warning responses. Its main advantages are transparency and auditability: the system can explain why a sensor was down-weighted or why a conservative action was selected. Its limitations are the subjectivity of criterion weights, sensitivity to normalisation choices, possible rank changes under perturbations, and the need to validate expert-driven rules under rare safety-critical scenarios.
+
+\begin{addedblock}
+\problemsection
+Solutions are collected at the end of the book. Every number used below was obtained with the scripts of the companion repository, \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak }, which also contains the problem statements in machine-readable form and the Jupyter notebooks of the computational problems.
+
+\begin{prob}\label{prob:ch03:1}
+\textbf{(Least squares versus weighted least squares.)} A radar and a camera both report the longitudinal distance $x$ to a lead vehicle: $y_1=41.6$\,m with $\sigma_1=0.30$\,m and $y_2=43.4$\,m with $\sigma_2=1.50$\,m, the two errors being zero-mean and independent.
+\begin{enumerate}
+\item[(a)] Write the stacked linear model \eqref{eq:linear-measurement-model}, i.e.\ $\mathbf{G}=\begin{bmatrix}1&1\end{bmatrix}^{\mathsf T}$ and $\mathbf{R}=\diag(\sigma_1^{2},\sigma_2^{2})$, and compute the ordinary least-squares estimate $\widehat{x}_{\mathrm{LS}}$ together with its variance $\operatorname{cov}(\widehat{x}_{\mathrm{LS}})=(\mathbf{G}^{\mathsf T}\mathbf{G})^{-1}\mathbf{G}^{\mathsf T}\mathbf{R}\mathbf{G}(\mathbf{G}^{\mathsf T}\mathbf{G})^{-1}$.
+\item[(b)] Compute the information $\mathbf{\Lambda}=\mathbf{G}^{\mathsf T}\mathbf{R}^{-1}\mathbf{G}$, the WLS estimate $\widehat{x}_{\mathrm{WLS}}$ and its variance $\mathbf{\Lambda}^{-1}$.
+\item[(c)] Show that, in general, $\widehat{x}_{\mathrm{WLS}}=(\sigma_1^{-2}y_1+\sigma_2^{-2}y_2)/(\sigma_1^{-2}+\sigma_2^{-2})$, i.e.\ the fused estimate is the information-weighted average of the two readings, and that its variance never exceeds the variance of the better sensor alone.
+\item[(d)] By which factor does ordinary least squares inflate the variance in this example, and why is the WLS estimate so close to the radar reading?
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:2}
+\textbf{(Regularised least squares as prior-plus-measurement fusion.)} A tracker predicts the range and range rate of the same lead vehicle as $\mathbf{m}=\begin{bmatrix}42.0 & -5.0\end{bmatrix}^{\mathsf T}$ (m, m/s) with prior covariance
+$\mathbf{P}=\begin{bmatrix}1.0&0.3\\0.3&0.25\end{bmatrix}$.
+The radar of Problem~\ref{prob:ch03:1} then measures the range only, $y=41.6$\,m with $\mathbf{R}=0.09$\,m$^{2}$, so that $\mathbf{G}=\begin{bmatrix}1&0\end{bmatrix}$.
+\begin{enumerate}
+\item[(a)] Compute $\mathbf{P}^{-1}$, the posterior information matrix $\mathbf{\Lambda}_{\mathrm{post}}=\mathbf{G}^{\mathsf T}\mathbf{R}^{-1}\mathbf{G}+\mathbf{P}^{-1}$ and the posterior covariance $\mathbf{P}^{+}$.
+\item[(b)] Compute $\widehat{\mathbf{x}}_{\mathrm{ReLS}}=\widehat{\mathbf{x}}_{\mathrm{MAP}}$.
+\item[(c)] Verify the result through the correction form of Section~\ref{subsubsec:sequential_least_squares}, $\mathbf{K}=\mathbf{P}\mathbf{G}^{\mathsf T}(\mathbf{G}\mathbf{P}\mathbf{G}^{\mathsf T}+\mathbf{R})^{-1}$, $\widehat{\mathbf{x}}=\mathbf{m}+\mathbf{K}(y-\mathbf{G}\mathbf{m})$, $\mathbf{P}^{+}=(\mathbf{I}-\mathbf{K}\mathbf{G})\mathbf{P}$.
+\item[(d)] The range rate is not measured, yet it is corrected. Explain why, and state what happens when the off-diagonal entry of $\mathbf{P}$ is set to zero.
+\item[(e)] Discuss the limits $\mathbf{P}^{-1}\to\mathbf{0}$ (no prior information) and $\mathbf{R}^{-1}\to\mathbf{0}$ (useless measurement).
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:3}
+\textbf{(Sequential least squares is batch least squares.)} Two measurements $\mathbf{y}_1=\mathbf{G}_1\mathbf{x}+\mathbf{r}_1$ and $\mathbf{y}_2=\mathbf{G}_2\mathbf{x}+\mathbf{r}_2$, with independent zero-mean noises of covariances $\mathbf{R}_1$ and $\mathbf{R}_2$, are available together with a prior $(\mathbf{m},\mathbf{P}_0)$ on the static unknown $\mathbf{x}$.
+\begin{enumerate}
+\item[(a)] Apply the information-form update of Section~\ref{subsubsec:sequential_least_squares} twice and show that the resulting estimate and covariance coincide with the batch regularised estimate obtained from the stacked matrix $\mathbf{G}=\begin{bmatrix}\mathbf{G}_1^{\mathsf T}&\mathbf{G}_2^{\mathsf T}\end{bmatrix}^{\mathsf T}$ and the block-diagonal covariance $\mathbf{R}=\diag(\mathbf{R}_1,\mathbf{R}_2)$.
+\item[(b)] Deduce that the result does not depend on the order in which the two measurements are processed.
+\item[(c)] Take the radar of Problem~\ref{prob:ch03:1} as the starting point ($\widehat{x}_1=41.6$, $P_1=0.09$) and process the camera reading with the gain form; check numerically that the WLS values of Problem~\ref{prob:ch03:1} are recovered.
+\item[(d)] Identify the step of the derivation that fails when $\mathbf{r}_1$ and $\mathbf{r}_2$ are correlated, and relate it to the discussion of double counting in Section~\ref{subsec:track-fusion}.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:4}
+\textbf{(One Kalman-filter step by hand.)} A lead vehicle is tracked along one dimension with the state $\mathbf{x}=\begin{bmatrix}p&v\end{bmatrix}^{\mathsf T}$ (relative position and velocity), the constant-velocity model $\mathbf{F}=\begin{bmatrix}1&T\\0&1\end{bmatrix}$ with $T=0.5$\,s and the discretised white-noise-acceleration covariance $\mathbf{Q}=\sigma_a^{2}\begin{bmatrix}T^{4}/4&T^{3}/2\\T^{3}/2&T^{2}\end{bmatrix}$ with $\sigma_a=0.8$\,m/s$^{2}$, as in Example~\ref{ex:ekf-radar-cutin}. At time $k-1$ the posterior is $\widehat{\mathbf{x}}_{k-1|k-1}=\begin{bmatrix}50.0&-4.0\end{bmatrix}^{\mathsf T}$, $\mathbf{P}_{k-1|k-1}=\diag(0.25,0.16)$. At time $k$ a range-only measurement $y_k=47.4$\,m arrives, with $\mathbf{H}=\begin{bmatrix}1&0\end{bmatrix}$ and $\mathbf{R}=0.09$\,m$^{2}$.
+\begin{enumerate}
+\item[(a)] Compute $\mathbf{Q}$.
+\item[(b)] Compute the prediction \eqref{eq:kf_state_prediction}--\eqref{eq:kf_cov_prediction}.
+\item[(c)] Compute the innovation \eqref{eq:kf_innovation}, its covariance \eqref{eq:kf_innovation_covariance} and the gain \eqref{eq:kf_gain}.
+\item[(d)] Compute the posterior \eqref{eq:kf_state_update}--\eqref{eq:kf_cov_update} and verify that the Joseph form of Section~\ref{subsubsec:sequential_least_squares} gives the same covariance.
+\item[(e)] Compute the NIS \eqref{eq:nis} and compare it with the two-sided $95\,\%$ interval of the $\chi^{2}_{1}$ distribution, $[0.00098,\,5.02]$.
+\item[(f)] Only the position is measured, yet the velocity is corrected and the position standard deviation drops from $0.55$\,m (predicted) to $0.26$\,m. Explain both facts in terms of the entries of $\mathbf{P}_{k|k-1}$.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:5}
+\textbf{(EKF Jacobian of a range--bearing sensor and azimuth wrapping.)} A sensor observes $\mathbf{g}(\mathbf{x})=\begin{bmatrix}\sqrt{p_x^{2}+p_y^{2}} & \operatorname{atan2}(p_y,p_x)\end{bmatrix}^{\mathsf T}$ of the state $\mathbf{x}=\begin{bmatrix}p_x&p_y&v_x&v_y\end{bmatrix}^{\mathsf T}$, with $\sigma_\theta=0.5^{\circ}$.
+\begin{enumerate}
+\item[(a)] Derive the Jacobian $\mathbf{H}=\partial\mathbf{g}/\partial\mathbf{x}$ and check that it coincides with the first two rows of \eqref{eq:ekf-radar-jacobian}.
+\item[(b)] Evaluate it at $\widehat{\mathbf{x}}_{k|k-1}=\begin{bmatrix}40&3&-5&0\end{bmatrix}^{\mathsf T}$.
+\item[(c)] The bearing row scales as $1/d$. Explain the consequence for the lateral position information and compute the lateral standard deviation implied by $\sigma_\theta$ at $60$\,m and at $10$\,m.
+\item[(d)] The predicted bearing is $3.135$\,rad and the sensor returns $-3.140$\,rad. Compute the raw difference and the innovation wrapped to $(-\pi,\pi]$. Assuming that the innovation covariance is dominated by the sensor noise, $S\approx\sigma_\theta^{2}$, compute the NIS in both cases and state what a $\chi^{2}_{1}$ gate at the $97.5\,\%$ quantile ($5.02$) would do with the detection.
+\item[(e)] Explain why the wrapping must be applied to the innovation and cannot be replaced by wrapping the predicted measurement or the state.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:6}
+\textbf{(Zonotope propagation and a single-strip correction.)} A scalar position and velocity are enclosed at time $k$ by the zonotope $\mathcal{X}_k=p\oplus H\mathbb{B}_{\infty}^{2}$ with
+$p=\begin{bmatrix}1\\0\end{bmatrix}$, $H=\begin{bmatrix}1&0.5\\0&1\end{bmatrix}$.
+The dynamics are the constant-velocity model $F=\begin{bmatrix}1&1\\0&1\end{bmatrix}$ ($T=1$\,s) driven by an unknown acceleration bounded by $\bar a=0.2$\,m/s$^{2}$, which maps onto the generator $\bar a\begin{bmatrix}T^{2}/2&T\end{bmatrix}^{\mathsf T}$ as in Example~\ref{ex:zono-radar-cutin}.
+\begin{enumerate}
+\item[(a)] Compute the predicted zonotope $\widetilde{\mathcal{X}}_{k+1}=\tilde p\oplus\tilde H\mathbb{B}_{\infty}^{3}$ and its interval hull.
+\item[(b)] The position is then measured as $y=1.4$ with a bounded error $|\Delta y|\le\bar\phi=0.3$. Write the strip $\mathcal{S}$ with normal $c=\begin{bmatrix}1&0\end{bmatrix}^{\mathsf T}$.
+\item[(c)] Compute the gain $\lambda^{\star}$ of \eqref{eq:zono-optimal-gain} (the strip gain $\gamma$ of Table~\ref{tab:notation}), the corrected centre $\hat p$, the corrected generator matrix $\hat H$ (four columns) and the resulting interval hull.
+\item[(d)] Repeat with the choice $\lambda=c$ used in Example~\ref{ex:zonotope-strip}, and compare the two enclosures through their interval hulls and through $\|\hat H\|_{F}^{2}$. Which quantity does each choice minimise?
+\item[(e)] Compute the exact interval hull of $\widetilde{\mathcal{X}}_{k+1}\cap\mathcal{S}$ (two linear programmes over $\xi\in[-1,1]^{3}$ suffice) and comment on the conservatism of both zonotopic enclosures.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:7}
+\textbf{(Dempster's rule versus Smets' rule.)} Let $\Omega=\{P,V,S\}$ (pedestrian, vehicle, static obstacle). A camera classifier and a LiDAR shape classifier return the BBAs
+\begin{equation*}
+\begin{array}{c|ccccc}
+ & P & V & S & \{P,V\} & \Omega\\
+\hline
+m_C & 0.5 & 0 & 0 & 0.3 & 0.2\\
+m_L & 0 & 0.4 & 0.1 & 0.4 & 0.1
+\end{array}
+\end{equation*}
+\begin{enumerate}
+\item[(a)] Compute the conflict mass $K$.
+\item[(b)] Compute the fused BBA under Dempster's rule \eqref{eq:dempster}.
+\item[(c)] Compute $\mathrm{Bel}$, $\mathrm{Pl}$ and the pignistic probability \eqref{eq:pignistic-transform} of each singleton.
+\item[(d)] Compute the fused BBA under Smets' rule \eqref{eq:smets}, including $m(\emptyset)$, and explain in one sentence what the two rules do differently with the same products.
+\item[(e)] Two other sources return $m_1(P)=0.99$, $m_1(S)=0.01$ and $m_2(V)=0.99$, $m_2(S)=0.01$. Compute $K$ and the two combinations, and explain why the Dempster result is unsafe for a planner.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:8}
+\textbf{(Covariance intersection.)} Two tracks $(\widehat{\mathbf{x}}_1,\mathbf{P}_1)$ and $(\widehat{\mathbf{x}}_2,\mathbf{P}_2)$ of the same object are consistent, i.e.\ their true error covariances $\bar{\mathbf{P}}_1$ and $\bar{\mathbf{P}}_2$ satisfy $\bar{\mathbf{P}}_i\preceq\mathbf{P}_i$, but their cross-covariance $\bar{\mathbf{P}}_{12}$ is unknown.
+\begin{enumerate}
+\item[(a)] Prove that the CI estimate \eqref{eq:ci-cov}--\eqref{eq:ci-est} is consistent for \emph{every} $\omega\in[0,1]$ and every $\bar{\mathbf{P}}_{12}$ for which the joint error covariance is positive semidefinite. \emph{Hint:} write the CI error as $\mathbf{e}=\mathbf{P}_{\mathrm{CI}}\left(\omega\mathbf{P}_1^{-1}\mathbf{e}_1+(1-\omega)\mathbf{P}_2^{-1}\mathbf{e}_2\right)$ and show first that
+\begin{equation*}
+\begin{bmatrix}\bar{\mathbf{P}}_1&\bar{\mathbf{P}}_{12}\\ \bar{\mathbf{P}}_{12}^{\mathsf T}&\bar{\mathbf{P}}_2\end{bmatrix}\preceq\begin{bmatrix}\bar{\mathbf{P}}_1/\omega&\mathbf{0}\\ \mathbf{0}&\bar{\mathbf{P}}_2/(1-\omega)\end{bmatrix}.
+\end{equation*}
+\item[(b)] Let $\mathbf{P}_1=\diag(0.25,\,1.0)$ (radar track, precise longitudinally) and $\mathbf{P}_2=\diag(1.0,\,0.16)$ (camera track, precise laterally). Write $\tr\mathbf{P}_{\mathrm{CI}}(\omega)$ in closed form, find the weight $\omega^{\star}$ that minimises it by solving the stationarity condition, and compute $\mathbf{P}_{\mathrm{CI}}(\omega^{\star})$.
+\item[(c)] Compare with the covariance of the independent-track fusion rule of Section~\ref{subsec:track-fusion}, $\mathbf{P}_{\mathrm{f}}^{-1}=\mathbf{P}_1^{-1}+\mathbf{P}_2^{-1}$, and explain why the CI result remains direction dependent although $\omega$ is a scalar.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:9}
+\textbf{(Incomplete AHP by logarithmic least squares.)} A single expert compares four reliability criteria, labelled $1$ to $4$, but only on the pairs
+$A_{12}=3$, $A_{23}=2$, $A_{13}=4$, $A_{34}=2$.
+\begin{enumerate}
+\item[(a)] Draw the comparison graph. Is it connected? Is the cycle $1\!-\!2\!-\!3$ consistent?
+\item[(b)] Show that the normal equations of \eqref{eq:lls-ahp} read $\mathbf{L}\bm{y}=\bm{b}$, where $\mathbf{L}$ is the Laplacian of the undirected comparison graph and $b_i=\sum_{j}\ln A_{ij}$ over the neighbours of $i$, with $A_{ji}=1/A_{ij}$; write $\mathbf{L}$ and $\bm{b}$ explicitly.
+\item[(c)] Solve with the gauge $\sum_i y_i=0$ and normalise the priorities $x_i^{*}$.
+\item[(d)] Compute the fitted ratios $x_i^{*}/x_j^{*}$ and the residuals on the four edges. How is the cycle inconsistency $\ln(A_{12}A_{23}/A_{13})$ distributed, and why is the edge $(3,4)$ fitted exactly?
+\item[(e)] Predict the missing comparisons $A_{14}$ and $A_{24}$.
+\item[(f)] What changes if the comparison $A_{13}$ is removed?
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:10}
+\textbf{(Computational: process noise and innovation consistency.)} Reproduce the radar cut-in scenario of Example~\ref{ex:ekf-radar-cutin} (ego vehicle at $27$\,m/s, target at $22$\,m/s initially $60$\,m ahead in the adjacent lane, lane change from $3.5$\,m to $0$\,m between $t=5$\,s and $t=8$\,s, radar at $20$\,Hz with $\sigma_r=0.30$\,m, $\sigma_\theta=0.5^{\circ}$, $\sigma_{\dot r}=0.10$\,m/s) and run the constant-velocity EKF on one and the same detection sequence for $\sigma_a\in\{0.1,0.2,0.4,0.8,1.6,3.2,6.4\}$\,m/s$^{2}$. For each value report the position RMSE, the mean NIS \eqref{eq:nis} and the fraction of samples inside the two-sided $95\,\%$ interval of $\chi^{2}_{3}$, separately on the constant-velocity segments and inside the lane-change window.
+\begin{enumerate}
+\item[(a)] For which values is the filter overconfident, and for which is it underconfident? Use the NIS, not the RMSE, to answer.
+\item[(b)] Explain why the RMSE on the constant-velocity segments first decreases and then increases with $\sigma_a$, whereas the RMSE inside the lane change decreases monotonically.
+\item[(c)] Is there a value of $\sigma_a$ for which the NIS is consistent in both segments? Relate your answer to the closing remark of Example~\ref{ex:ekf-radar-cutin} on interacting multiple-model filters.
+\end{enumerate}
+A self-contained script and notebook are provided in the companion repository, in \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak solutions/}.
+\end{prob}
+\end{addedblock}
 
 % ============================================

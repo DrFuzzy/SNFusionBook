@@ -1,0 +1,18 @@
+edges: [(1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (2, 3), (2, 4), (2, 7), (3, 4), (3, 5), (4, 5), (4, 6), (5, 6), (5, 7), (6, 7)]
+degrees: [6 4 4 5 5 4 4]  Laplacian eigenvalues: [-0.      3.2679  4.      5.      6.      6.7321  7.    ]
+average of all seven initial values (honest case): 12.2857
+average of the six correct initial values: 12.2667
+the graph is r-robust for r <= 3 (W-MSR with F=1 needs r >= 2F+1 = 3)
+path graph on 4 nodes: r-robust for r <= 1
+k= 1  plain: [15.04 14.7  11.9  12.54 15.04 15.24]   W-MSR: [12.04 12.3  11.45 13.29 12.94 13.02]
+k= 5  plain: [19.88 19.76 17.45 18.   19.9  20.45]   W-MSR: [12.75 12.61 12.53 12.72 12.82 12.89]
+k=10  plain: [23.79 23.7  22.29 22.63 23.8  24.15]   W-MSR: [12.76 12.72 12.72 12.74 12.77 12.79]
+k=20  plain: [27.66 27.63 27.09 27.22 27.66 27.79]   W-MSR: [12.76 12.76 12.76 12.76 12.76 12.76]
+k=40  plain: [29.67 29.66 29.59 29.61 29.67 29.69]   W-MSR: [12.76 12.76 12.76 12.76 12.76 12.76]
+plain consensus, mean of correct agents at k=40: 29.646 (spread 0.100)
+W-MSR, mean of correct agents at k=40: 12.7583 (spread 2.01e-05), inside [10.0, 15.0]
+W-MSR limit versus average of the six correct values: 12.7583 vs 12.2667
+wrote /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/companion_repo/examples/ch06_resilient_consensus/output/resilient_consensus.csv (41, 15)
+wrote /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/companion_repo/examples/ch06_resilient_consensus/output/resilient_consensus.pdf
+copied resilient_consensus.csv -> /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/data/ch06
+copied resilient_consensus.pdf -> /Users/huangpo/Downloads/Beast #2 - Sensor Fusion/SN_book_complete/figures/ch06

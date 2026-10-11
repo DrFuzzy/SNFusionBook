@@ -1,0 +1,5 @@
+code,label,priority
+C,camera semantics,0.091452
+L,LiDAR geometry,0.182904
+R,radar range-rate,0.441480
+M,map/IMU lane prior,0.284163
