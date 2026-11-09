@@ -1,7 +1,6 @@
 % Solutions to the problems of Chapter 3 (Classical Sensor Fusion Techniques).
 % All numbers are reproduced by companion_repo/exercises/ch03/solutions/ch03_hand_computations.py
 % (Problems 3.1-3.9) and ch03_prob10_ekf_process_noise.py (Problem 3.10).
-\begin{addedblock}
 
 \begin{sol}{prob:ch03:1}
 (a) With $\mathbf{G}=\begin{bmatrix}1&1\end{bmatrix}^{\mathsf T}$, $\mathbf{G}^{\mathsf T}\mathbf{G}=2$ and $\widehat{x}_{\mathrm{LS}}=\tfrac12(y_1+y_2)=42.50$\,m. The covariance formula gives $\operatorname{cov}(\widehat{x}_{\mathrm{LS}})=\tfrac14(\sigma_1^{2}+\sigma_2^{2})=\tfrac14(0.09+2.25)=0.585$\,m$^{2}$, i.e.\ a standard deviation of $0.765$\,m, worse than the radar alone.
@@ -114,4 +113,3 @@ $6.4$ & $0.181$ & $0.123$ & $1.88$ & $1.66$ & $93\,\%$ & $95\,\%$\\
 (c) No. The value $\sigma_a=0.8$ used in the chapter is consistent during the manoeuvre ($3.05$) but already underconfident on the CV segments ($2.78$), and the NIS peak ($12$) exceeds the interval for every $\sigma_a$: the mismatch is structural, since one $\mathbf{Q}$ is asked to describe two motion regimes. This is the argument for an interacting multiple-model filter, which switches the process noise with the detected regime, and for monitoring the NIS as a signal in its own right, as the closing remark of Example~\ref{ex:ekf-radar-cutin} anticipates.
 \end{sol}
 
-\end{addedblock}

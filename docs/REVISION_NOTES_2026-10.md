@@ -128,3 +128,66 @@ key take-aways per part of the book; "how to use this book" (reading paths, prob
 - Companion repository: `make test` → 38 tests passed; `tools/run_all_examples.py` → 14/14 example scripts run;
   the Chapter 3 scripts regenerate `data/ch03/*.csv` byte-identically; initial git commit created.
 - Manuscript size: ≈33,000 → ≈74,000 words (LaTeX source word count, chapters only).
+
+---
+
+# Round 2 — 16 October 2026 (feedback of R. Setola)
+
+**Before this round** all the blue/red markup of the 11 October round was accepted (blue text kept, red text
+removed). The marked-up sources of round 1 are archived in `SN_book_20261016_round1_markup.zip`. In the current
+sources, blue marks only the additions of this round.
+
+**Motivation.** Feedback from R. Setola (11 October): in AI the term *multimodal* names the fusion of heterogeneous
+data and should be visible; the book should also be readable by computer scientists, whereas the mathematics is
+written in the language of control and estimation. Agreed policy: additive changes only, no change to the outline,
+no rewriting of Chapter 3.
+
+| Where | Addition (blue) |
+|---|---|
+| Ch. 1 abstract | one sentence announcing the terminological note |
+| Ch. 1, Motivation | one sentence: in ML/AI the same problem is called multimodal fusion or multimodal learning |
+| Ch. 1, new Subsect. 1.3.1 "A Note on Terminology" | Table 1.2 aligning sensor fusion, data/information fusion (JDL), robotics, multimodal learning, data fusion / truth discovery in databases; definition of *modality*; two remarks (multimodal densities vs modalities; fusion levels vs early/intermediate/late fusion) |
+| Ch. 2, after the paragraph on representation and fusion levels | one paragraph on the classical taxonomies: Dasarathy (input/output abstraction), Durrant-Whyte (complementary, competitive, cooperative), the JDL levels 0–4, and early/intermediate/late fusion |
+| Ch. 3, after the notation table | one paragraph and Table 3.2, a dictionary between estimation and the vocabulary of machine learning and computer science (latent variable, HMM inference, ridge regression, Fisher information, sequential Monte Carlo, abstract domains, HodgeRank/Bradley–Terry, gossip, Byzantine-robust aggregation, ...). Invisible `\label`s were added to the seven sections of Chapter 3 so that the table can point to them; no text of Chapter 3 was changed. |
+| Ch. 5, feature-level fusion sentence | "that is, the multimodal fusion networks of Chapter 4" |
+| Book abstract keywords | "data fusion", "multimodal fusion" |
+| Bibliography | 14 entries: steinberg1999_jdl, dasarathy1997_fusion, durrantwhyte1988_sensor, bleiholder2009_datafusion, li2016_truthdiscovery, koller2009_pgm, kschischang2001_factor, ghorbal2009_zonotope, gehr2018_ai2, jiang2011_hodgerank, bradley1952_paired, boyd2006_gossip, yin2018_byzantine, sensoy2018_edl |
+
+Also fixed: `scripts/check_chapter.sh` now excludes the `build/` folder (it was copying itself) and the archives.
+
+**Verification.** Full build: 0 LaTeX errors, 0 undefined citations or references, 217 pages.
+
+**Deliberately not done** (to discuss): pseudocode and complexity table for Chapter 3; learned filters
+(KalmanNet, deep state-space models) in the hybrid section of Chapter 4; digital-twin material and observer
+theory (Luenberger, UIO), which stay in the course notes.
+
+## Round 2, part B — errata (16 October 2026)
+
+An independent review of Chapters 4–9 found objective errors in material added on 11 October. Each was checked
+against the shipped data files or recomputed before correction; every visible change is marked in red/blue.
+
+| Chapter | Correction |
+|---|---|
+| 3 | "this survey" → "this book"; notation row for the factor information matrix $\mathbf{\Omega}_i$ |
+| 4 | pinhole example: the point 1 m below the axis projects to (740, 410), not (740, 310) |
+| 4 | IMU integration equation (4.18): velocity and gravity were counted twice in $\mathbf{p}_j$ |
+| 4 | wrong cross-reference to the occupancy-mapping subsection; logistic σ(·) vs standard deviations σ_i clarified |
+| 4 | "dominant industrial pattern" qualified, with a pointer to the end-to-end challenge of Chapter 8 |
+| 5 | gyro bias of the tunnel example reconciled with the sensor table (turn-on offset vs bias instability); $\mathbf{G}_k$ disambiguated; 4D imaging radar measures elevation; Seeing Through Fog row (12k real-world samples in mixed weather plus 1.5k fog-chamber samples) |
+| 4/5 | duplicate label `eq:ece` (Chapter 5 copy renamed `eq:ece-metric`) |
+| 5/6 | duplicate label `eq:nees` (Chapter 6 copy renamed `eq:nees-mas`) |
+| 6 | caption of Fig. 6.1 rewritten to match the plotted data; "too small by two thirds" → "about 60 % of the actual covariance"; consensus needs positive self-weights; direction of the KL divergence stated; CI does not protect against a sender that declares a small covariance; late-fusion bandwidth "some tens of kbit/s"; CPM content made consistent with Chapter 8 |
+| 7 | AIS reporting interval 14–23 kn is 6 s (ITU-R M.1371), not 3⅓ s; "long before" claim for the window test softened; damping ratio consistent with the modal model |
+| 7 | cable example and Fig. 7.2: the per-step NIS does exceed its threshold at t = 60.5 s (102.6 > 32); text and caption rewritten: the window test gives a sustained and specific alarm, not an earlier one |
+| 8 | weather and glare are not events "far below 10⁻⁶ per hour"; $h_i$ → $\mathbf{g}_i$; standards dated (ISO 26262:2018, ISO 21448:2022, ISO/PAS 8800:2024) and no longer "emerging"; CPM specified in ETSI TS 103 324, SAE J3224 added; CPM content consistent with Chapter 6 |
+| 9 | "this survey" → "this book" (3×); one sentence acknowledging the end-to-end counter-thesis |
+
+Full build after the errata: 0 errors, 0 undefined references, 0 multiply-defined labels, 217 pages.
+
+**Left for the authors** (judgement calls, not errors):
+- the cable strain model of Chapter 7 (axial strain taken proportional to ∂w/∂x for transverse motion; to first order transverse motion gives no axial strain) and the magnitude of the impulse and drag force: please check against the model of the cable paper;
+- CenterPoint 60.3/67.3 in Table 4.1 is the leaderboard entry with test-time augmentation; the CVPR paper reports 58.0/65.5 (to verify);
+- Lyft Level 5 and ApolloScape are named in Chapter 5 but neither cited nor in the datasets table;
+- recency of the autonomous-driving literature (no driving paper after 2023 in Chapters 4–5), safety content in Chapter 8 (ODD, degraded modes, minimal-risk manoeuvre), learned V2X cooperative perception, 3D multi-object tracking, online mapping, 4D radar;
+- repeated "embedded/FPGA perspective" paragraphs in Chapter 4 and the MUEAVI/YOLOv3 detail in Chapter 5 (co-author material);
+- leftover editorial comments in the sources (`% [July 2026 pass]`, `% Addressed ...`).

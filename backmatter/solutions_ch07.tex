@@ -1,5 +1,4 @@
 % Solutions to the problems of Chapter 7 (Applications Beyond Autonomous Vehicles)
-\begin{addedblock}
 \begin{sol}{prob:ch07:1}
 The only conflicting products are $m_1(\{N\})\,m_2(\{T\})=0.28$ and $m_1(\{N\})\,m_2(\{L,T\})=0.28$, so $K=0.56$. The surviving products are $m_1(\{N\})m_2(\Omega)=0.14\to\{N\}$, $m_1(\Omega)m_2(\{T\})=0.12\to\{T\}$, $m_1(\Omega)m_2(\{L,T\})=0.12\to\{L,T\}$ and $m_1(\Omega)m_2(\Omega)=0.06\to\Omega$; dividing by $1-K=0.44$ gives $m(\{N\})=0.318$, $m(\{T\})=0.273$, $m(\{L,T\})=0.273$, $m(\Omega)=0.136$. Hence $\mathrm{Bel}(T)=0.273$, $\mathrm{Pl}(T)=0.273+0.273+0.136=0.682$, and $\mathrm{BetP}(N)=0.318+0.136/3=0.364$, $\mathrm{BetP}(L)=0.273/2+0.136/3=0.182$, $\mathrm{BetP}(T)=0.273+0.273/2+0.136/3=0.455$. With $\alpha_1=0.5$ the AIS BBA becomes $m_1^{\alpha}(\{N\})=0.35$, $m_1^{\alpha}(\Omega)=0.65$; then $K=0.35\times0.8=0.28$, and the combined masses are $m(\{N\})=0.07/0.72=0.097$, $m(\{T\})=0.26/0.72=0.361$, $m(\{L,T\})=0.361$, $m(\Omega)=0.13/0.72=0.181$, so $\mathrm{BetP}(T)=0.361+0.181+0.060=0.602$. Discounting the less reliable source lowers the conflict and moves the decision towards the radar cue, which is the intended effect of reliability-aware discounting.
 \end{sol}
@@ -21,4 +20,3 @@ See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch07
 \begin{sol}{prob:ch07:7}
 See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch07/\allowbreak solutions/\allowbreak prob07\_\allowbreak cable\_\allowbreak sweep.py}. The detection delay is one to three samples (longer with only three modes, whose strain response to a point load is weaker); the centroid error drops markedly from three to five modes (the modal resolution $L/(2n_m)$ shrinks) and then saturates at a few tens of metres, fluctuating with the channel geometry, with the largest errors for strikes near the ends, where the antisymmetric residual pattern is truncated by the boundary. A wrong coupling factor produces a residual excess confined to the affected channels for the whole record, whereas a mechanical event is transient and spreads over neighbouring channels.
 \end{sol}
-\end{addedblock}

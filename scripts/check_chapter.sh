@@ -9,7 +9,7 @@ CH="${1:-all}"
 SCRATCH="${SCRATCH_BASE:-$HERE/build}"
 BUILD="$SCRATCH/build_$CH"
 mkdir -p "$BUILD"
-rsync -a --delete --exclude companion_repo --exclude 'main.pdf' --exclude '.git' "$HERE/" "$BUILD/"
+rsync -a --delete --exclude build --exclude companion_repo --exclude 'main.pdf' --exclude '.git' --exclude '*.zip' --exclude relevant_papers --exclude original_source --exclude ieee_access_early_versions "$HERE/" "$BUILD/"
 cd "$BUILD"
 if [ "$CH" = "all" ]; then
   ONLY=""

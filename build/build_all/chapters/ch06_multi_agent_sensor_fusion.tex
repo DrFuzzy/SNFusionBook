@@ -1,0 +1,455 @@
+\chapter{Sensor Fusion in Multi-Agent Systems}
+\label{sec:MAS}
+% ============================================
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+\abstract{This chapter extends the single-platform view of sensor fusion to networks of vehicles, robots, and infrastructure nodes that observe a common environment and exchange information over a communication graph. We first classify multi-agent architectures as centralised, decentralised, or hybrid, and we discuss the levels at which information can be exchanged, from raw data to decisions. We then recall the graph-theoretic tools that make decentralised fusion tractable: the Laplacian and Metropolis forms of the averaging iteration, the role of the algebraic connectivity in the convergence rate, and the extensions to directed and time-varying topologies. Building on the Kalman filter of Chapter~\ref{sec:classicalSF}, we present the Kalman-consensus filter, consensus on information, and covariance-intersection fusion, and we explain why naive averaging of neighbouring estimates double-counts common information and yields overconfident covariances. Communication constraints (packet loss, delays, quantisation, event-triggered transmission) and resilience against faulty or malicious agents (trimmed consensus, consistency checks, trust) are treated next, followed by cooperative perception in connected vehicles and by validation guidelines. Two runnable worked examples compare centralised, naive, consensus-based, and covariance-intersection tracking on a five-node network, and demonstrate resilient consensus in the presence of a misbehaving agent.}
+\suppressfloats[t]
+
+% % Addressed: graph-theoretic setting and consensus references added below, together with a worked numerical example.
+Multi-agent sensor fusion extends the single-platform view by allowing several vehicles, robots, infrastructure nodes, or monitoring stations to share information about a common environment. The fused state may describe the pose of each agent, the state of external objects, a shared map, a risk field, or the health of a distributed infrastructure. This setting is increasingly important in autonomous driving, aerial robotics, smart-city monitoring, maritime surveillance, and critical-infrastructure protection, where a single agent may be occluded, communication-limited, or unable to observe the whole scene.
+
+The main benefit of multi-agent fusion is complementary viewpoint diversity. In cooperative driving, for example, a roadside camera or another connected vehicle may observe a pedestrian hidden behind a parked truck from the ego vehicle's perspective. In aerial robotics, several drones can jointly localise themselves and map an environment while individual GNSS, vision, or range measurements are intermittent. In maritime monitoring, AIS, coastal radar, satellite imagery, and cable-based sensing form a distributed observation network rather than a single colocated sensor suite. These examples show that multi-agent fusion is not merely more data; it changes the observability, latency, trust, and coordination structure of the estimation problem.
+
+\section{Architectures and Information-Exchange Levels}
+\label{sec:mas-architectures}
+
+Architecturally, multi-agent fusion can be centralised, decentralised, or hybrid. In a centralised architecture, agents transmit measurements, features, tracks, or local maps to a fusion centre, which performs association, estimation, and decision-making. This can produce a globally consistent estimate, but it requires communication bandwidth, low enough latency, and a trusted computational node. In a decentralised architecture, each agent maintains its own estimate and exchanges selected information with neighbours. Consensus filters, distributed Kalman filters, distributed particle filters, covariance-intersection methods, and belief-function frameworks are representative tools when no single node has all information or when cross-correlations are unknown \cite{khaleghi_multisensor_2013,foglietta_networked_2012}.
+
+Three questions determine which architecture is appropriate: who holds the global model, what is transmitted, and what is assumed about the dependence between what is received and what is already known. In a centralised scheme the fusion centre receives raw measurements that are conditionally independent given the state, so the information form of the Kalman filter of Section~\ref{sec:classicalSF} applies directly and the fused information matrix is the sum of the local contributions, as made explicit in \eqref{eq:dkf-central-info} below. In a decentralised scheme the exchanged objects are estimates, each of which already contains the common prior, the effect of the common process noise, and possibly information previously received from the same neighbours. The correlation between what an agent receives and what it already knows is therefore structural rather than accidental, and the central theme of this chapter is how to fuse correctly, or at least consistently, under this correlation.
+
+\subsection{Communication Graphs and the Consensus Primitive}
+\label{subsec:mas-graph-primitive}
+
+%
+The natural abstraction for decentralised fusion is a communication graph $\mathcal{G}=(\mathcal{V},\mathcal{E})$, where the node set $\mathcal{V}=\{1,\dots,N\}$ collects the agents and an edge $(i,j)\in\mathcal{E}$ indicates that agents $i$ and $j$ can exchange information directly, for example over a V2V or V2I link. The \emph{neighbour set} $\mathcal{N}_i=\{j:(i,j)\in\mathcal{E}\}$ of agent $i$ therefore contains exactly the agents it can hear at a given time; no agent needs global knowledge of the network. Classical results show that if the graph is connected (or, for time-varying and directed networks, suitably jointly connected), simple local averaging rules drive all agents to agreement, with convergence speed governed by the algebraic connectivity of the graph \cite{olfatisaber2007_consensus,ren2005_consensus}.
+
+The simplest decentralised mechanism is the consensus filter, in which each agent $i$ repeatedly averages its local estimate with those of its communication neighbours,
+\begin{equation}
+\widehat{\mathbf{x}}_i(k+1)=\widehat{\mathbf{x}}_i(k)+\epsilon\sum_{j\in\mathcal{N}_i}\left(\widehat{\mathbf{x}}_j(k)-\widehat{\mathbf{x}}_i(k)\right),
+\label{eq:consensus-filter}
+\end{equation}
+where $\mathcal{N}_i$ is the neighbour set of agent $i$ and $\epsilon>0$ is a step size bounded by the inverse of the maximum node degree. Under mild connectivity assumptions, all local estimates converge to a common value, so a network can agree on a fused state using only local exchanges. In practice, consensus iterations are interleaved with local measurement updates (consensus-on-information or consensus-on-measurement filters), and when the cross-correlations between agents' estimates are unknown, the covariance-intersection rule of \eqref{eq:ci-cov}--\eqref{eq:ci-est} in Section~\ref{subsec:track-fusion} provides the consistent way to merge the exchanged estimates.
+
+
+
+\begin{example}
+\label{ex:mas-path-consensus}
+Consider four vehicles on a path graph $1$--$2$--$3$--$4$ (each vehicle communicates only with its immediate neighbours), holding local range estimates to a common obstacle of $\widehat{x}_1(0)=10$, $\widehat{x}_2(0)=12$, $\widehat{x}_3(0)=11$, and $\widehat{x}_4(0)=15$ metres. The maximum node degree is $2$, so any step size $\epsilon<1/2$ is admissible; take $\epsilon=0.3$. One application of \eqref{eq:consensus-filter} yields
+\begin{equation*}
+\widehat{x}_1(1)=10.6,\,
+\widehat{x}_2(1)=11.1,\,
+\widehat{x}_3(1)=12.5,\,
+\widehat{x}_4(1)=13.8.
+\end{equation*}
+Note that the sum (and hence the average, $12$) is preserved at every iteration; continued iterations contract the spread geometrically, and all four estimates converge to the network average $12$~m without any vehicle ever communicating beyond its neighbours. The outlier estimate of vehicle~4 is thus absorbed gradually, which also illustrates the main operational caveats: consensus requires several communication rounds per fused value, and a faulty or malicious agent biases the entire network unless it is detected and discounted.
+\end{example}
+
+\subsection{Hybrid Architectures and Information-Exchange Levels}
+\label{subsec:mas-levels}
+
+Hybrid architectures are often the most practical: local edge nodes perform fast preprocessing and tracking, while a regional or cloud-level node performs slower map update, validation, learning, or fleet-level coordination \cite{deng_edge_2021,lim_federated_2020}.
+
+The information exchanged between agents strongly affects both performance and deployability. Raw-data sharing can preserve the most information but is expensive and sensitive to synchronisation, calibration, and privacy constraints. Feature-level sharing reduces bandwidth and can support learned cooperative perception, but it requires compatible representations and careful uncertainty calibration. Object- or track-level sharing is efficient and interpretable, but it depends on reliable local detection, association, and covariance or confidence estimates. Decision-level sharing is the lightest option and is useful for warnings, alerts, or manoeuvre coordination, but it may hide the uncertainty and conflict that generated the decision. The choice of communication level is therefore a fusion-design decision, not only a networking detail. The four levels also differ in what the receiver can assume about statistical dependence: raw measurements from different platforms are conditionally independent given the state and may be summed in information form, whereas features, tracks, and decisions are outputs of local estimators that already contain shared prior knowledge. The estimation-theoretic consequences of this distinction are developed in Sections~\ref{sec:mas-dkf} and~\ref{sec:mas-unknown-corr}, and its practical embodiment in connected vehicles, where the levels are usually called early, intermediate, and late fusion, is discussed in Section~\ref{sec:mas-cooperative-perception}.
+
+\section{Graph-Theoretic Preliminaries and Consensus}
+\label{sec:mas-graph-theory}
+
+The consensus iteration \eqref{eq:consensus-filter} is the building block of every decentralised method in this chapter, and its behaviour is governed entirely by the spectrum of a matrix associated with the communication graph. This section collects the facts needed later; comprehensive treatments can be found in \cite{olfatisaber2007_consensus,ren2005_consensus}.
+
+\subsection{Laplacian Form, Average Preservation, and Convergence Rate}
+\label{subsec:mas-laplacian}
+
+Let $\mathbf{A}\in\{0,1\}^{N\times N}$ be the adjacency matrix of an undirected graph, with $a_{ij}=1$ if $(i,j)\in\mathcal{E}$ and $a_{ij}=0$ otherwise, let $d_i=|\mathcal{N}_i|$ be the degree of node $i$, and let $\mathbf{D}=\diag(d_1,\dots,d_N)$. The graph Laplacian is $\mathbf{L}=\mathbf{D}-\mathbf{A}$. For scalar quantities, stacking the local values in $\mathbf{z}(k)=[\widehat{x}_1(k),\dots,\widehat{x}_N(k)]^{\mathsf T}$ turns \eqref{eq:consensus-filter} into the linear iteration
+\begin{equation}
+\mathbf{z}(k+1)=(\mathbf{I}-\epsilon\mathbf{L})\,\mathbf{z}(k)=\mathbf{W}\mathbf{z}(k),
+\label{eq:consensus-laplacian}
+\end{equation}
+and vector-valued estimates are handled component-wise, i.e., with $\mathbf{W}\otimes\mathbf{I}$. Two properties of the Laplacian explain the behaviour observed in Example~\ref{ex:mas-path-consensus}. First, every row of $\mathbf{L}$ sums to zero, $\mathbf{L}\mathbf{1}=\mathbf{0}$, so a configuration in which all agents hold the same value is an equilibrium. Second, for an undirected graph $\mathbf{L}$ is symmetric, hence $\mathbf{1}^{\mathsf T}\mathbf{L}=\mathbf{0}^{\mathsf T}$ and
+\begin{equation}
+\mathbf{1}^{\mathsf T}\mathbf{z}(k+1)=\mathbf{1}^{\mathsf T}\mathbf{z}(k)-\epsilon\,\mathbf{1}^{\mathsf T}\mathbf{L}\mathbf{z}(k)=\mathbf{1}^{\mathsf T}\mathbf{z}(k),
+\label{eq:consensus-average-preserved}
+\end{equation}
+so the network average $\bar{z}=\mathbf{1}^{\mathsf T}\mathbf{z}(0)/N$ is an invariant of the iteration. The Laplacian is positive semidefinite with eigenvalues $0=\lambda_1\le\lambda_2\le\dots\le\lambda_N\le 2d_{\max}$, and $\lambda_2>0$ if and only if the graph is connected; $\lambda_2$ is the \emph{algebraic connectivity}. Decomposing $\mathbf{z}(k)$ along the eigenvectors of $\mathbf{L}$ shows that the disagreement vector $\boldsymbol{\delta}(k)=\mathbf{z}(k)-\bar{z}\mathbf{1}$ satisfies
+\begin{equation}
+\|\boldsymbol{\delta}(k)\|\le\rho^{k}\|\boldsymbol{\delta}(0)\|,\qquad
+\rho=\max\{|1-\epsilon\lambda_2|,\,|1-\epsilon\lambda_N|\},
+\label{eq:consensus-rate}
+\end{equation}
+so the iteration converges for every $0<\epsilon<2/\lambda_N$, and since $\lambda_N\le 2d_{\max}$ the condition $\epsilon<1/d_{\max}$ quoted after \eqref{eq:consensus-filter} is a sufficient condition that requires only local degree information. The fastest constant step is $\epsilon^{\star}=2/(\lambda_2+\lambda_N)$, for which $\rho^{\star}=(\lambda_N-\lambda_2)/(\lambda_N+\lambda_2)$ \cite{xiao2004_fast_averaging}. For the path graph of Example~\ref{ex:mas-path-consensus} the Laplacian eigenvalues are $0$, $2-\sqrt{2}\approx0.586$, $2$, and $2+\sqrt{2}\approx3.414$; with $\epsilon=0.3$ the contraction factor is $\rho=0.824$ per round, so reducing the initial disagreement by a factor of $100$ takes about $24$ rounds, whereas $\epsilon^{\star}=0.5$ gives $\rho^{\star}=0.707$ and roughly $14$ rounds (Problem~\ref{prob:ch06:1}). The practical message is that sparse, elongated networks (small $\lambda_2$) agree slowly, and that each fused value costs a number of communication rounds that grows with $1/\lambda_2$.
+
+\subsection{Metropolis Weights}
+\label{subsec:mas-metropolis}
+
+The uniform step $\epsilon$ in \eqref{eq:consensus-laplacian} is not the only choice. Any iteration of the form
+\begin{equation}
+\widehat{\mathbf{x}}_i(k+1)=\sum_{j\in\mathcal{N}_i\cup\{i\}}w_{ij}\,\widehat{\mathbf{x}}_j(k),\qquad w_{ij}\ge0,\quad \sum_{j}w_{ij}=1,
+\label{eq:consensus-weighted}
+\end{equation}
+with a row-stochastic weight matrix $\mathbf{W}$ \added{whose self-weights $w_{ii}$ are positive} reaches agreement on a connected graph, and preserves the average if $\mathbf{W}$ is also column-stochastic (doubly stochastic). A convenient doubly stochastic choice that each agent can compute from the degrees of its neighbours only is given by the \emph{Metropolis weights} \cite{xiao2005_distributed_fusion}
+\begin{equation}
+w_{ij}=\frac{1}{1+\max\{d_i,d_j\}}\quad\text{for } j\in\mathcal{N}_i,\qquad
+w_{ii}=1-\sum_{j\in\mathcal{N}_i}w_{ij}.
+\label{eq:metropolis-weights}
+\end{equation}
+The convergence rate is then the second largest eigenvalue modulus of $\mathbf{W}$. For the five-node graph of Example~\ref{ex:mas-distributed-tracking} below (a ring $1$--$2$--$3$--$4$--$5$--$1$ with the chord $1$--$3$) the Laplacian eigenvalues are $0$, $1.382$, $2.382$, $3.618$, and $4.618$, and the Metropolis matrix has rows $(0.25,0.25,0.25,0,0.25)$, $(0.25,0.5,0.25,0,0)$, $(0.25,0.25,0.25,0.25,0)$, $(0,0,0.25,0.4167,0.3333)$, and $(0.25,0,0,0.3333,0.4167)$, whose second largest eigenvalue modulus is $0.6545$. Since \eqref{eq:consensus-weighted} is a convex combination of neighbouring values, we will see in Section~\ref{sec:mas-dkf} that it is also exactly the operation needed to average information matrices without double counting.
+
+\subsection{Directed and Time-Varying Graphs}
+\label{subsec:mas-directed}
+
+Wireless links are frequently asymmetric (different transmit powers, antenna patterns, or interference), so that $\mathcal{N}_i$ must be read as the set of \emph{in-neighbours} whose messages agent $i$ receives. For a directed graph the row-stochastic iteration \eqref{eq:consensus-weighted} still reaches agreement provided that the graph contains a directed spanning tree, i.e., a root from which every agent can be reached \cite{ren2005_consensus}, but the limit is in general the weighted average $\boldsymbol{\pi}^{\mathsf T}\mathbf{z}(0)$, where $\boldsymbol{\pi}$ is the left Perron eigenvector of $\mathbf{W}$; the plain average is recovered only when $\mathbf{W}$ is doubly stochastic, which for the Laplacian form requires the digraph to be weight-balanced \cite{olfatisaber2007_consensus}. When balancing is impossible, the \emph{push-sum} or \emph{ratio-consensus} iteration runs two coupled averaging processes, one on the values and one on a vector of weights initialised at $\mathbf{1}$, and takes their ratio; the ratio converges to the exact average on any strongly connected digraph \cite{kempe2003_gossip}, and the scheme can be made robust to bounded link delays \cite{hadjicostis2014_delays}. Finally, when the topology changes with time, as happens whenever vehicles move in and out of radio range, agreement is still guaranteed if the union of the graphs over any bounded time window contains a spanning tree \cite{jadbabaie2003_coordination,ren2005_consensus}. In all these cases the price of a weaker topology is a slower rate, and in the worked examples below we quantify how many consensus rounds per sampling interval are needed before the distributed filter approaches the centralised one.
+
+\section{Distributed Kalman Filtering}
+\label{sec:mas-dkf}
+
+We now combine the consensus primitive with the Kalman filter of Chapter~\ref{sec:classicalSF}. Consider the linear model \eqref{eq:kf_linear_process} with transition matrix $\mathbf{F}$ and process covariance $\mathbf{Q}$, observed by $N$ nodes through
+\begin{equation}
+\mathbf{y}_{i,k}=\mathbf{H}_i\mathbf{x}_k+\mathbf{r}_{i,k},\qquad \mathbf{r}_{i,k}\sim\mathcal{N}(\mathbf{0},\mathbf{R}_i),\qquad i=1,\dots,N,
+\label{eq:dkf-local-measurement}
+\end{equation}
+with measurement noises independent across nodes and time. Individual nodes need not observe the whole state: a node may measure only one coordinate, only a range, or only a bearing, so that the pair $(\mathbf{F},\mathbf{H}_i)$ is not observable, whereas the pair $(\mathbf{F},[\mathbf{H}_1^{\mathsf T}\cdots\mathbf{H}_N^{\mathsf T}]^{\mathsf T})$ is. This situation, called \emph{collective observability}, is the typical motivation for cooperation.
+
+\subsection{Centralised Information Form and Consensus on Measurements}
+\label{subsec:mas-central-info}
+
+Writing the Kalman update \eqref{eq:kf_state_update}--\eqref{eq:kf_cov_update} in terms of the information matrix $\mathbf{\Lambda}=\mathbf{P}^{-1}$ and the information vector $\mathbf{q}=\mathbf{\Lambda}\widehat{\mathbf{x}}$, the centralised filter that receives all $N$ measurements performs
+\begin{equation}
+\mathbf{\Lambda}_{k|k}=\mathbf{\Lambda}_{k|k-1}+\sum_{i=1}^{N}\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{H}_i,\qquad
+\mathbf{q}_{k|k}=\mathbf{q}_{k|k-1}+\sum_{i=1}^{N}\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{y}_{i,k},
+\label{eq:dkf-central-info}
+\end{equation}
+followed by the usual prediction \eqref{eq:kf_state_prediction}--\eqref{eq:kf_cov_prediction}. The sums in \eqref{eq:dkf-central-info} are $N$ times the network averages of the local pairs $(\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{H}_i,\ \mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{y}_{i,k})$. A consensus iteration can therefore compute them: if every node runs $L$ rounds of \eqref{eq:consensus-weighted} on its local pair and multiplies the result by $N$, the centralised update is recovered exactly as $L\to\infty$, and every node ends with the centralised estimate. This is the \emph{consensus on measurements} scheme \cite{olfatisaber2005_dkf_embedded}. Its weakness is that for finite $L$ the multiplication by $N$ amplifies residual disagreement, so that the local covariances no longer bound the local errors, and it requires $N$ to be known.
+
+\subsection{The Kalman-Consensus Filter}
+\label{subsec:mas-kcf}
+
+The Kalman-consensus filter (KCF) of Olfati-Saber \cite{olfatisaber2007_dkf} avoids multiple consensus rounds by combining a one-hop exchange of measurement information with a one-hop consensus on the predicted states. At time $k$ node $i$ forms its information contributions $\mathbf{u}_i=\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{y}_{i,k}$ and $\mathbf{U}_i=\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{H}_i$, broadcasts the message $(\mathbf{u}_i,\mathbf{U}_i,\bar{\mathbf{x}}_i)$, where $\bar{\mathbf{x}}_i$ is its predicted state, and aggregates the messages of the closed neighbourhood $\mathcal{J}_i=\mathcal{N}_i\cup\{i\}$,
+\begin{equation}
+\mathbf{u}_{\mathcal{J}_i}=\sum_{j\in\mathcal{J}_i}\mathbf{u}_j,\qquad
+\mathbf{U}_{\mathcal{J}_i}=\sum_{j\in\mathcal{J}_i}\mathbf{U}_j .
+\label{eq:kcf-aggregate}
+\end{equation}
+The estimate and covariance are then updated as
+\begin{align}
+\mathbf{M}_i&=\left(\mathbf{P}_i^{-1}+\mathbf{U}_{\mathcal{J}_i}\right)^{-1},\label{eq:kcf-cov}\\
+\widehat{\mathbf{x}}_i&=\bar{\mathbf{x}}_i+\mathbf{M}_i\left(\mathbf{u}_{\mathcal{J}_i}-\mathbf{U}_{\mathcal{J}_i}\bar{\mathbf{x}}_i\right)+\gamma_i\,\mathbf{M}_i\sum_{j\in\mathcal{N}_i}\left(\bar{\mathbf{x}}_j-\bar{\mathbf{x}}_i\right),\qquad \gamma_i=\frac{\epsilon}{1+\|\mathbf{M}_i\|_{F}},\label{eq:kcf-state}\\
+\mathbf{P}_i&\leftarrow\mathbf{F}\mathbf{M}_i\mathbf{F}^{\mathsf T}+\mathbf{Q},\qquad \bar{\mathbf{x}}_i\leftarrow\mathbf{F}\widehat{\mathbf{x}}_i .\label{eq:kcf-predict}
+\end{align}
+The first correction term in \eqref{eq:kcf-state} is an ordinary Kalman update with the measurements of the whole neighbourhood, which is legitimate because measurements, unlike estimates, are independent across nodes. The second term is one step of \eqref{eq:consensus-filter} applied to the predicted states, scaled by the covariance so that uncertain nodes are pulled more strongly towards their neighbours. Olfati-Saber shows that with the gain $\gamma_i$ in \eqref{eq:kcf-state} the collective error dynamics are stable and the local estimates asymptotically agree \cite{olfatisaber2007_dkf}. Note, however, that $\mathbf{M}_i$ accounts only for the measurement information and not for the consensus term, so $\mathbf{P}_i$ is not the exact error covariance of $\widehat{\mathbf{x}}_i$; in Example~\ref{ex:mas-distributed-tracking} this approximation turns out to be mildly conservative.
+
+\subsection{Consensus on Information and Kullback--Leibler Averaging}
+\label{subsec:mas-coi}
+
+Battistelli and Chisci \cite{battistelli2014_kl_consensus} take a different route, called \emph{consensus on information} (CI filter in their terminology; we write CoI to avoid confusion with covariance intersection). Each node first performs its local correction in information form,
+\begin{equation}
+\mathbf{\Lambda}_i^{(0)}=\mathbf{\Lambda}_{i,k|k-1}+\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{H}_i,\qquad
+\mathbf{q}_i^{(0)}=\mathbf{q}_{i,k|k-1}+\mathbf{H}_i^{\mathsf T}\mathbf{R}_i^{-1}\mathbf{y}_{i,k},
+\label{eq:coi-local}
+\end{equation}
+and then runs $L$ rounds of weighted averaging on the \emph{posterior} information pairs,
+\begin{equation}
+\mathbf{\Lambda}_i^{(\ell+1)}=\sum_{j\in\mathcal{J}_i}w_{ij}\mathbf{\Lambda}_j^{(\ell)},\qquad
+\mathbf{q}_i^{(\ell+1)}=\sum_{j\in\mathcal{J}_i}w_{ij}\mathbf{q}_j^{(\ell)},\qquad \ell=0,\dots,L-1,
+\label{eq:coi-consensus}
+\end{equation}
+with doubly stochastic weights such as \eqref{eq:metropolis-weights}, after which $\mathbf{P}_{i,k|k}=(\mathbf{\Lambda}_i^{(L)})^{-1}$, $\widehat{\mathbf{x}}_{i,k|k}=\mathbf{P}_{i,k|k}\mathbf{q}_i^{(L)}$, and the prediction step follows. The key observation is that one round of \eqref{eq:coi-consensus} is exactly the covariance-intersection rule \eqref{eq:ci-cov}--\eqref{eq:ci-est} with weights $w_{ij}$, generalised to several sources, and that for Gaussian densities this is the density that minimises the weighted sum of Kullback--Leibler divergences from the local posteriors\added{, $\sum_{j}w_{ij}\,D_{\mathrm{KL}}(p\,\|\,p_j)$ over the fused density $p$} (the \emph{Kullback--Leibler average}). Because the information is averaged rather than summed, no piece of information is ever counted more than once, whatever the value of $L$ and whatever the correlation between the local posteriors: the resulting covariances are guaranteed consistent. Battistelli and Chisci further prove that the error dynamics are stable for any $L\ge1$ under collective observability and a connected graph \cite{battistelli2014_kl_consensus}. The price is conservatism: averaging $N$ information matrices gives roughly $1/N$ of the information that summing would give, so CoI underestimates the available information. Hybrid schemes that combine consensus on measurements and on information \cite{battistelli2015_cmci}, and the information-weighted consensus filter, which divides the prior information by $N$ before averaging so that only the prior, not the measurements, is discounted \cite{kamal2013_icf}, recover centralised performance as $L$ grows while keeping the double-counting problem under control.
+
+\subsection{Double Counting and Overconfidence}
+\label{subsec:mas-double-counting}
+
+The most common mistake in decentralised fusion is to apply the independent-track rule \eqref{eq:independent-track-fusion-state}, i.e., to add the information matrices of the estimates received from the neighbours, as if they were independent measurements. They are not: all local estimates descend from the same prior, respond to the same process noise, and, once fusion has been performed at least once, contain information that has already travelled through the network. Adding their information matrices counts the common part once per neighbour (\emph{double counting}, also known as \emph{data incest} or \emph{rumour propagation}). If the fused result is fed back into the local filter, the information matrix is multiplied by roughly $|\mathcal{J}_i|$ at every step, the Kalman gain collapses to zero, the filter stops responding to measurements, and the reported covariance becomes meaningless. Without feedback the effect is milder but still present, because the common process noise alone correlates the local errors \cite{barshalom2011tracking}. The diagnostic of choice is the normalised estimation error squared (NEES),
+\begin{equation}
+\varepsilon_{i,k}=(\mathbf{x}_k-\widehat{\mathbf{x}}_{i,k})^{\mathsf T}\mathbf{P}_{i,k}^{-1}(\mathbf{x}_k-\widehat{\mathbf{x}}_{i,k}),
+\label{eq:nees-mas}
+\end{equation}
+the state-space counterpart of the NIS \eqref{eq:nis}: for a consistent Gaussian estimator of an $n_x$-dimensional state, $\varepsilon_{i,k}\sim\chi^{2}_{n_x}$ with mean $n_x$, and a mean NEES well above $n_x$ reveals an overconfident filter, while a mean well below $n_x$ reveals a conservative one. Unlike the NIS, the NEES requires ground truth and is therefore a design-time and validation tool, which is how we use it next.
+
+\begin{example}[Distributed tracking of a constant-velocity target]
+\label{ex:mas-distributed-tracking}
+Five sensing nodes track a target with state $\mathbf{x}=[p_x\ p_y\ v_x\ v_y]^{\mathsf T}$ that moves according to the constant-velocity model of Example~\ref{ex:ekf-radar-cutin} with $T=0.1$\,s and $\sigma_a=0.5$\,m/s$^2$, starting from $\mathbf{x}_0=[0\ 0\ 8\ 3]^{\mathsf T}$ (metres and metres per second) for $100$ steps. The nodes form the ring $1$--$2$--$3$--$4$--$5$--$1$ with the chord $1$--$3$ of Section~\ref{subsec:mas-metropolis}. Every node observes the target only partially: nodes $1$ and $4$ measure $p_x$ only, with standard deviations $2$\,m and $3$\,m; nodes $2$ and $5$ measure $p_y$ only, with $2$\,m and $3$\,m; node $3$ measures both coordinates but with a standard deviation of $6$\,m. No single node can observe the state, but every closed neighbourhood can. All nodes start from the same prior with $\mathbf{P}_0=\diag(25,25,4,4)$, a common initial estimate being the typical situation when the track was initialised by one node and broadcast. We compare the centralised filter \eqref{eq:dkf-central-info}; isolated local filters; naive neighbourhood fusion, in which each node adds the information of the posteriors of its closed neighbourhood as if independent, either without feedback (the local filters keep running on their own) or with feedback (the fused result replaces the local posterior); CoI with $L=3$ rounds of Metropolis averaging per sampling interval; the KCF with $\epsilon=0.05$; and covariance intersection, in which each node fuses its posterior sequentially with those of its neighbours using \eqref{eq:ci-cov}--\eqref{eq:ci-est} with the trace-minimising weight. Table~\ref{tab:mas-distributed-tracking} reports the position RMSE, the mean NEES, and the fraction of NEES samples inside the two-sided $95\,\%$ interval $[0.48,\,11.14]$ of $\chi^{2}_{4}$, averaged over the five nodes, the $100$ steps, and $50$ Monte Carlo runs; Fig.~\ref{fig:mas-distributed-tracking} shows one run.
+
+Three observations carry the lesson. First, the isolated filters are consistent (mean NEES $4.08$) but useless, with a position RMSE of $11.6$\,m: nodes $1$, $2$, $4$, and $5$ never observe one coordinate, and their covariance honestly reports it. Second, naive fusion is fast to implement and catastrophic. With feedback the information matrix explodes, the mean NEES reaches $4.3\times10^{7}$, and the estimate, frozen after a few steps while the target moves on, ends with an RMSE of $16.1$\,m, worse than no cooperation at all. Without feedback the RMSE is a reasonable $1.10$\,m, which is precisely what makes the method dangerous: the mean NEES of $6.70$ and the $83.6\,\%$ coverage show that \deleted{the covariance is too small by about two thirds}\added{the reported covariance is only about 60\,\% of the actual error covariance}, and a downstream consumer such as a gating test or a collision-risk estimate would be misled. Third, the three principled schemes all reach the neighbourhood of the centralised performance ($0.80$\,m) without ever summing correlated information: CoI attains $0.92$\,m with a mean NEES of $2.02$ (conservative, as predicted by the averaging argument), the KCF $0.97$\,m with a mean NEES of $3.94$, and covariance intersection $1.02$\,m with a mean NEES of $2.87$ and a mean weight $\omega=0.54$. In steady state ($t\ge5$\,s) the gap narrows further ($0.65$\,m centralised versus $0.68$\,m for CoI, $0.75$\,m for the KCF, and $0.79$\,m for CI). Increasing the number of consensus rounds helps CoI only marginally here ($0.96$\,m for $L=1$ and $0.91$\,m for $L=10$), because the second largest eigenvalue modulus $0.6545$ of the Metropolis matrix already makes three rounds sufficient on this small, well-connected graph; on a sparser network the dependence on $L$ would be much stronger (Problem~\ref{prob:ch06:5}). The code is in \repopath{companion\_\allowbreak repo/\allowbreak examples/\allowbreak ch06\_\allowbreak distributed\_\allowbreak tracking/\allowbreak }.
+\end{example}
+
+\begin{table}[!t]
+\centering
+\small
+\caption{Distributed tracking of Example~\ref{ex:mas-distributed-tracking}: position RMSE, mean NEES \eqref{eq:nees-mas} (expected value $4$ for a consistent filter), and fraction of NEES samples inside the $95\,\%$ interval of $\chi^{2}_{4}$, averaged over nodes, time, and $50$ Monte Carlo runs.}
+\label{tab:mas-distributed-tracking}
+\begin{tabular}{lrrr}
+\hline
+\textbf{Method} & \textbf{Position RMSE [m]} & \textbf{Mean NEES} & \textbf{In 95\,\% band} \\
+\hline
+Centralised Kalman filter \eqref{eq:dkf-central-info} & 0.80 & 4.25 & 95.0\,\% \\
+Isolated local filters & 11.65 & 4.08 & 94.4\,\% \\
+Naive neighbourhood fusion, no feedback & 1.10 & 6.70 & 83.6\,\% \\
+Naive neighbourhood fusion, with feedback & 16.11 & $4.3\times10^{7}$ & 0.9\,\% \\
+Consensus on information, $L=3$ \eqref{eq:coi-consensus} & 0.92 & 2.02 & 87.3\,\% \\
+Kalman-consensus filter \eqref{eq:kcf-state} & 0.97 & 3.94 & 95.0\,\% \\
+Covariance intersection \eqref{eq:ci-cov}--\eqref{eq:ci-est} & 1.02 & 2.87 & 94.6\,\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\resizebox{0.99\columnwidth}{!}{
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=1 by 2, vertical sep=17mm},
+    width=0.95\columnwidth,
+    scale only axis,
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    legend style={font=\scriptsize, draw=none, fill=white, fill opacity=0.85,
+                  text opacity=1},
+    grid=major,
+    grid style={line width=0.2pt, draw=gray!25},
+    axis line style={line width=0.5pt},
+    tick align=outside,
+    title style={font=\scriptsize, yshift=0.5mm},
+]
+%% ---------------- panel (a): bird's-eye view ----------------
+\nextgroupplot[
+    height=3.3cm,
+    xlabel={$p_x$ [m]},
+    ylabel={$p_y$ [m]},
+    xmin=-12, xmax=95,
+    ymin=-15, ymax=45,
+    legend pos=north west,
+    legend cell align=left,
+    legend columns=2,
+    title={(a) bird's-eye view, one run},
+]
+\addplot[only marks, mark=*, mark size=0.5pt, draw=MeasGrey, fill=MeasGrey]
+    table[x=px_meas3, y=py_meas3, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{node-3 detections}
+\addplot[TruthBlack, line width=1.0pt]
+    table[x=px_true, y=py_true, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{ground truth}
+\addplot[EkfBlue, line width=0.9pt, densely dashed]
+    table[x=px_cen, y=py_cen, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{centralised}
+\addplot[ZonoGreen, line width=0.9pt]
+    table[x=px_coi, y=py_coi, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{node 1, CoI}
+%% ---------------- panel (b): NEES of node 1 ----------------
+\nextgroupplot[
+    height=3.3cm,
+    xlabel={time $t$ [s]},
+    ylabel={NEES $\varepsilon_{1,k}$},
+    xmin=0, xmax=10,
+    ymode=log,
+    ymin=0.05, ymax=1e9,
+    ytick={0.1,10,1000,1e5,1e7,1e9},
+    legend pos=north west,
+    legend cell align=left,
+    legend columns=3,
+    title={(b) NEES of node 1 against the $\chi^{2}_{4}$ interval},
+]
+% two-sided 95% interval of chi^2_4: [0.484, 11.143]
+\addplot[draw=none, fill=BandGrey, forget plot]
+    coordinates {(0,0.484) (10,0.484) (10,11.143) (0,11.143)} \closedcycle;
+\addplot[draw=gray!70, line width=0.5pt, densely dotted, forget plot]
+    coordinates {(0,4) (10,4)};
+\addplot[ManoeuvreOrange, line width=0.8pt]
+    table[x=t, y=nees1_naive, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{naive, feedback}
+\addplot[MeasGrey, line width=0.6pt]
+    table[x=t, y=nees1_naive_nf, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{naive, no feedback}
+\addplot[ZonoGreen, line width=0.6pt]
+    table[x=t, y=nees1_coi, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{CoI}
+\addplot[EkfBlue, line width=0.6pt]
+    table[x=t, y=nees1_ci, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{CI}
+\addplot[TruthBlack, line width=0.4pt, densely dashed]
+    table[x=t, y=nees1_central, col sep=comma] {data/ch06/distributed_tracking.csv};
+\addlegendentry{centralised}
+\end{groupplot}
+\end{tikzpicture}
+}
+\caption{Distributed tracking of a constant-velocity target by five partially observing nodes (Example~\ref{ex:mas-distributed-tracking}). (a)~Detections of the noisy node~$3$, ground truth, centralised estimate, and the estimate of node~$1$ obtained by consensus on information (CoI), although node~$1$ itself measures only $p_x$. (b)~NEES of node~$1$ on a logarithmic scale against the two-sided $95\,\%$ interval of $\chi^{2}_{4}$ (shaded) and its mean $4$ (dotted). \deleted{Naive information fusion with feedback drives the NEES to $10^{7}$ and beyond within a second: the covariance has collapsed while the error has not. Naive fusion without feedback stays near the band but systematically above it, whereas CoI, covariance intersection (CI), and the centralised filter remain inside.}\added{Naive information fusion with feedback drives the NEES above $10^{5}$ within one second and beyond $10^{7}$ after about four seconds: the covariance has collapsed while the error has not. In this single run the other schemes stay mostly inside the band; CoI falls below it in about half of the samples, which shows that it is conservative, and the overconfidence of naive fusion without feedback emerges only in the Monte Carlo averages of Table~\ref{tab:mas-distributed-tracking}.}}
+\label{fig:mas-distributed-tracking}
+\end{figure}
+
+\section{Fusion Under Unknown Correlations}
+\label{sec:mas-unknown-corr}
+
+Example~\ref{ex:mas-distributed-tracking} illustrates that correlation between the estimates circulating in a network is the rule rather than the exception. It arises from at least four sources: a common prior (track initialisation broadcast to all nodes); a common process noise, which correlates the errors of any two filters tracking the same target even if they never communicate \cite{barshalom2011tracking}; cyclic information flow, whereby a piece of information returns to its originator after travelling around a loop of the graph; and shared auxiliary estimates such as ego-pose, calibration, or map priors in cooperative perception. Keeping track of the exact cross-covariances, as in \eqref{eq:correlated-track-fusion-state}--\eqref{eq:correlated-track-fusion-cov}, would require every node to know the complete information-sharing history of every other node, which is impractical in a dynamic network.
+
+Covariance intersection \eqref{eq:ci-cov}--\eqref{eq:ci-est} \cite{julier1997nondivergent} resolves this by renouncing knowledge of the cross-covariance altogether: for any true cross-covariance, the fused covariance $\mathbf{P}_{\mathrm{CI}}$ upper-bounds the true error covariance of $\widehat{\mathbf{x}}_{\mathrm{CI}}$. The multi-source form, which is what one round of \eqref{eq:coi-consensus} implements, reads
+\begin{equation}
+\mathbf{P}_{\mathrm{CI}}^{-1}=\sum_{j\in\mathcal{J}_i}\omega_j\mathbf{P}_j^{-1},\qquad
+\widehat{\mathbf{x}}_{\mathrm{CI}}=\mathbf{P}_{\mathrm{CI}}\sum_{j\in\mathcal{J}_i}\omega_j\mathbf{P}_j^{-1}\widehat{\mathbf{x}}_j,\qquad
+\sum_{j\in\mathcal{J}_i}\omega_j=1,\ \ \omega_j\ge0,
+\label{eq:ci-multi}
+\end{equation}
+and the weights may be optimised as in \eqref{eq:ci-weight} or fixed a priori, e.g., to the Metropolis weights, which trades optimality for the guarantee that all nodes converge to the same value. Problem~\ref{prob:ch06:3} works through the scalar and diagonal cases and shows that CI never claims more information than the most informative source along any direction.
+
+When part of the error is known to be independent, CI is unnecessarily conservative. \emph{Split covariance intersection} \cite{julier2001_split_ci} decomposes each covariance into a possibly correlated part and an independent part, $\mathbf{P}_j=\mathbf{P}_j^{\mathrm{d}}+\mathbf{P}_j^{\mathrm{i}}$, inflates only the correlated part, and fuses
+\begin{equation}
+\mathbf{P}_{\mathrm{SCI}}^{-1}=\mathbf{\Lambda}_1(\omega)+\mathbf{\Lambda}_2(\omega),\qquad
+\widehat{\mathbf{x}}_{\mathrm{SCI}}=\mathbf{P}_{\mathrm{SCI}}\left[\mathbf{\Lambda}_1(\omega)\widehat{\mathbf{x}}_1+\mathbf{\Lambda}_2(\omega)\widehat{\mathbf{x}}_2\right],
+\label{eq:split-ci}
+\end{equation}
+where
+\begin{equation}
+\mathbf{\Lambda}_1(\omega)=\left(\tfrac{1}{\omega}\mathbf{P}_1^{\mathrm{d}}+\mathbf{P}_1^{\mathrm{i}}\right)^{-1},\qquad
+\mathbf{\Lambda}_2(\omega)=\left(\tfrac{1}{1-\omega}\mathbf{P}_2^{\mathrm{d}}+\mathbf{P}_2^{\mathrm{i}}\right)^{-1},
+\label{eq:split-ci-terms}
+\end{equation}
+and $\omega\in(0,1)$ is again chosen by minimising a scalar criterion of $\mathbf{P}_{\mathrm{SCI}}$.
+In cooperative vehicle localisation the independent part is typically the fresh measurement noise of the local sensors and the correlated part is the propagated pose error, and split CI has been shown to retain most of the accuracy of optimal fusion while remaining consistent \cite{li2013_split_ci_vehicles}. Other bounds exist that are tighter than CI under additional assumptions, notably the inverse covariance intersection \cite{noack2017_ici}, which exploits the fact that the common information cannot exceed what either source knows. For the purposes of this book, the operational rule is simple: sum information only for quantities known to be independent (raw measurements of different sensors), use CI or its refinements for everything that has passed through an estimator, and verify with the NEES in simulation that the implemented scheme is consistent before trusting its covariances on the road.
+
+\section{Communication Constraints}
+\label{sec:mas-communication}
+
+The filters of Section~\ref{sec:mas-dkf} assume that every message is delivered within the sampling interval. Real V2X and robotic links lose packets, deliver them late, and carry a limited number of bits. Each imperfection has an estimation-theoretic counterpart.
+
+\paragraph{Packet loss and intermittent observations.}
+Let $\gamma_k\in\{0,1\}$ indicate whether the measurement (or the message carrying it) arrives at time $k$, with $\Pr(\gamma_k=1)=\bar{\gamma}$ independently over time. The Kalman update is simply skipped when $\gamma_k=0$,
+\begin{equation}
+\mathbf{P}_{k|k}=\mathbf{P}_{k|k-1}-\gamma_k\mathbf{K}_k\mathbf{H}_k\mathbf{P}_{k|k-1},
+\label{eq:intermittent-update}
+\end{equation}
+so that the covariance becomes a random quantity. Sinopoli et al.\ \cite{sinopoli2004_intermittent} showed that there exists a critical arrival probability $\gamma_c$ such that the expected covariance remains bounded if $\bar{\gamma}>\gamma_c$ and diverges otherwise, with $\gamma_c\ge1-1/\alpha^{2}$, where $\alpha$ is the largest modulus of the unstable eigenvalues of $\mathbf{F}$. For the constant-velocity model all eigenvalues of $\mathbf{F}$ lie on the unit circle, so the bound degenerates to $\gamma_c=0$ and the covariance stays bounded for any positive arrival rate, although the attainable accuracy degrades with $1-\bar{\gamma}$; for unstable target dynamics, or for a filter that must track an integrator chain with large $\mathbf{Q}$, the loss rate becomes a hard design limit. In the consensus iterations \eqref{eq:consensus-weighted} and \eqref{eq:coi-consensus}, a lost message is handled by renormalising the weights over the messages actually received; the iteration then becomes a time-varying one, convergence follows from the joint-connectivity results of Section~\ref{subsec:mas-directed}, but average preservation is lost unless a push-sum correction is used (Problem~\ref{prob:ch06:6}).
+
+\paragraph{Delays and out-of-sequence measurements.}
+A message that arrives with a timestamp $\tau$ earlier than the current filter time $t_k$ is an \emph{out-of-sequence measurement}. Discarding it wastes information; processing it as if it referred to $t_k$ introduces a bias of the order of the target velocity times the delay. The exact solution retrodicts the state to $\tau$, accounting for the process noise accumulated in $[\tau,t_k]$, and updates the current estimate through the resulting cross-covariance \cite{barshalom2002_oosm}. At track level, the time alignment of \eqref{eq:track-time-alignment-state}--\eqref{eq:track-time-alignment-cov} must be performed before association and fusion, and the age of every received track should be propagated to the consumer, as recommended in Section~\ref{sec:mas-validation}.
+
+\paragraph{Event-triggered transmission.}
+Bandwidth is saved by transmitting only when the information content is high. A natural innovation-based trigger sends the local measurement or estimate only when the NIS \eqref{eq:nis} exceeds a threshold $\delta$, or, in the variance-based variant, when the receiver's predicted covariance would otherwise exceed a tolerance \cite{trimpe2014_event_based}. The absence of a message is itself informative (the innovation was small), and a receiver that knows the trigger can exploit this implicit information; ignoring it yields a consistent but conservative filter. The trade-off between the transmission rate and the estimation error is tuned through $\delta$.
+
+\paragraph{Quantisation.}
+A uniform quantiser with step $\Delta$ adds an error of variance $\Delta^{2}/12$ that is approximately uniform and uncorrelated when dithering is used, and can be absorbed into $\mathbf{R}$. For consensus the situation is subtler, because quantised averaging no longer preserves the exact average and may cycle rather than converge; the quantised-consensus schemes of \cite{kashyap2007_quantized} guarantee convergence to a neighbourhood of the average whose size scales with $\Delta$.
+
+\paragraph{Message size.}
+Finally, the message size determines the scalability of a scheme. For a state of dimension $n_x$, the KCF message $(\mathbf{u}_i,\mathbf{U}_i,\bar{\mathbf{x}}_i)$ contains $2n_x+n_x(n_x+1)/2$ scalars once per sampling interval, and each CoI round exchanges $n_x+n_x(n_x+1)/2$ scalars, $L$ times per interval; for $n_x=4$ this is $18$ and $14L$ scalars, respectively, against the $n_y$ scalars of a raw measurement. Object-level cooperative perception messages are of the same order per object, which is why they scale to dense traffic, whereas raw point clouds do not.
+
+\section{Resilience, Trust, and Security}
+\label{sec:mas-resilience}
+
+Multi-agent fusion also introduces failure modes that are less visible in single-agent systems. Communication delays can make received information stale; packet losses can create intermittent measurements; inconsistent coordinate frames can corrupt cooperative tracks; duplicated information can cause overconfident estimates; and compromised or faulty agents can inject misleading evidence. Conservative fusion methods, including covariance intersection, evidence-theoretic conflict measures, innovation monitoring, and set-membership consistency checks, are therefore valuable when cross-agent dependencies or trust levels are uncertain. In connected automated vehicles, set-membership methods have been used to support shared situational awareness under occlusion, while evidence-distance and Dempster--Shafer approaches have been applied to real-time inter-vehicle data fusion \cite{narri2021_set_membership_shared_awareness,cho_realtime_2020}.
+
+\subsection{Fault Models and Trimmed Consensus}
+\label{subsec:mas-wmsr}
+
+Example~\ref{ex:mas-path-consensus} ended with the remark that a faulty agent biases the entire network. The consensus iteration \eqref{eq:consensus-filter} is in fact maximally fragile: a single agent that keeps broadcasting a constant value, whether through a stuck sensor, a stale buffer, or malice, acts as a \emph{stubborn} node, and since the average is preserved only among compliant agents, all compliant agents converge to the stubborn value. Fault models are usually classified by the behaviour of the misbehaving agents, from crash faults (no messages) and biased or stubborn values to \emph{Byzantine} agents that may send different, arbitrary values to different neighbours, and by their number: in the $F$-\emph{total} model at most $F$ agents misbehave in the whole network, while in the $F$-\emph{local} model at most $F$ misbehave in the neighbourhood of every compliant agent.
+
+The \emph{weighted mean-subsequence-reduced} (W-MSR) algorithm of LeBlanc et al.\ \cite{leblanc2013_wmsr} makes the averaging rule resilient at the cost of exactness. At each round, a compliant agent $i$ sorts the values received from its neighbours, discards the (at most) $F$ values that are larger than its own and the (at most) $F$ values that are smaller than its own, obtaining a reduced neighbour set $\mathcal{R}_i(k)\subseteq\mathcal{N}_i$, and then applies \eqref{eq:consensus-filter} to the survivors,
+\begin{equation}
+\widehat{x}_i(k+1)=\widehat{x}_i(k)+\epsilon\sum_{j\in\mathcal{R}_i(k)}\left(\widehat{x}_j(k)-\widehat{x}_i(k)\right).
+\label{eq:wmsr}
+\end{equation}
+Because every surviving value lies between the own value and a discarded one, no compliant agent can ever be pulled outside the interval spanned by the compliant initial values, whatever the misbehaving agents transmit. Agreement among the compliant agents is guaranteed under the $F$-local model if the graph is $(2F+1)$-\emph{robust}, where a graph is $r$-robust if for every pair of non-empty disjoint subsets of nodes at least one of the two contains a node with at least $r$ neighbours outside its own subset \cite{leblanc2013_wmsr}. Robustness is a stronger requirement than connectivity (an $r$-robust graph is $r$-connected, but not conversely), and the price of resilience is twofold: the network must be denser, and the limit is some convex combination of the compliant initial values rather than their average. Related results for linear iterative strategies in the presence of malicious agents are given in \cite{sundaram2011_malicious}.
+
+\begin{example}[Plain versus trimmed consensus with a misbehaving agent]
+\label{ex:mas-resilient-consensus}
+Seven agents hold range estimates to a common obstacle, $\widehat{x}_i(0)=10,\ 12,\ 11,\ 15,\ 13,\ 12.6,\ 12.4$\,m, on the graph obtained from the circulant graph in which each agent talks to its two nearest neighbours on each side by adding the chords $1$--$4$ and $1$--$5$ (edge set $\{1\text{--}2,1\text{--}3,1\text{--}4,1\text{--}5,1\text{--}6,1\text{--}7,2\text{--}3,2\text{--}4,2\text{--}7,3\text{--}4,3\text{--}5,4\text{--}5,4\text{--}6,5\text{--}6,5\text{--}7,6\text{--}7\}$, maximum degree $6$). A brute-force check over all pairs of disjoint subsets confirms that this graph is $3$-robust, the condition required by W-MSR with $F=1$, whereas the circulant graph without the chords is only $2$-robust and the path graph of Example~\ref{ex:mas-path-consensus} is only $1$-robust. Agent~$7$ is faulty: from the first round it ignores the protocol and broadcasts the constant value $30$\,m. The step size is $\epsilon=0.15<1/6$. The honest average would have been $12.29$\,m, and the average of the six compliant agents is $12.27$\,m.
+
+Under plain consensus \eqref{eq:consensus-filter} the compliant agents are dragged steadily towards the fault: their values are $15.04$, $14.70$, $11.90$, $12.54$, $15.04$, and $15.24$\,m after one round, between $22.3$ and $24.2$\,m after $10$ rounds, and between $29.59$ and $29.69$\,m after $40$ rounds, on their way to $30$\,m. Under W-MSR \eqref{eq:wmsr} with $F=1$, the compliant agents move to $12.04$, $12.30$, $11.45$, $13.29$, $12.94$, and $13.02$\,m after one round and agree to within $2\times10^{-5}$\,m on $12.76$\,m after $40$ rounds, a value inside the interval $[10,15]$ of the compliant initial values. Agent~$7$ is never identified, no agent knows which neighbour is faulty, and the only price paid is that the limit $12.76$\,m differs from the compliant average $12.27$\,m. Fig.~\ref{fig:mas-resilient-consensus} shows both iterations; the code, including the robustness check, is in \repopath{companion\_\allowbreak repo/\allowbreak examples/\allowbreak ch06\_\allowbreak resilient\_\allowbreak consensus/\allowbreak }.
+\end{example}
+
+\begin{figure}[!t]
+\centering
+\resizebox{0.99\columnwidth}{!}{
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=14mm},
+    width=0.46\columnwidth,
+    height=3.4cm,
+    scale only axis,
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    legend style={font=\scriptsize, draw=none, fill=white, fill opacity=0.85, text opacity=1},
+    grid=major,
+    grid style={line width=0.2pt, draw=gray!25},
+    axis line style={line width=0.5pt},
+    tick align=outside,
+    title style={font=\scriptsize, yshift=0.5mm},
+    xmin=0, xmax=40, ymin=8, ymax=32,
+    xlabel={round $k$},
+]
+\nextgroupplot[ylabel={range estimate [m]}, title={(a) plain consensus \eqref{eq:consensus-filter}}, legend pos=south east]
+\addplot[draw=gray!70, line width=0.5pt, densely dotted, forget plot] coordinates {(0,12.2667) (40,12.2667)};
+\addplot[ManoeuvreOrange, line width=1.0pt] table[x=k, y=plain7, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addlegendentry{agent 7 (faulty)}
+\addplot[EkfBlue, line width=0.6pt] table[x=k, y=plain1, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addlegendentry{compliant agents}
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=plain2, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=plain3, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=plain4, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=plain5, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=plain6, col sep=comma] {data/ch06/resilient_consensus.csv};
+\nextgroupplot[title={(b) W-MSR \eqref{eq:wmsr} with $F=1$}]
+\addplot[draw=gray!70, line width=0.5pt, densely dotted, forget plot] coordinates {(0,12.2667) (40,12.2667)};
+\addplot[ManoeuvreOrange, line width=1.0pt, forget plot] table[x=k, y=wmsr7, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr1, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr2, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr3, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr4, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr5, col sep=comma] {data/ch06/resilient_consensus.csv};
+\addplot[EkfBlue, line width=0.6pt, forget plot] table[x=k, y=wmsr6, col sep=comma] {data/ch06/resilient_consensus.csv};
+\end{groupplot}
+\end{tikzpicture}
+}
+\caption{Resilient consensus (Example~\ref{ex:mas-resilient-consensus}). Six compliant agents and one faulty agent that keeps broadcasting $30$\,m on a $3$-robust graph of seven nodes. (a)~Plain consensus: the compliant agents converge to the faulty value. (b)~W-MSR with $F=1$: the compliant agents agree on $12.76$\,m, inside the range of their initial values; the dotted line is their initial average $12.27$\,m.}
+\label{fig:mas-resilient-consensus}
+\end{figure}
+
+\subsection{Consistency Checks and Trust}
+\label{subsec:mas-trust}
+
+Trimmed consensus protects scalar agreement, but most of the information exchanged in multi-agent fusion consists of tracks with covariances, for which the natural defence is a consistency check before fusion. A received estimate $(\widehat{\mathbf{x}}_j,\mathbf{P}_j)$ is compared with the local prediction $(\widehat{\mathbf{x}}_{i,k|k-1},\mathbf{P}_{i,k|k-1})$ through the Mahalanobis distance of \eqref{eq:track-mahalanobis}; under the hypothesis that both refer to the same object and that both are consistent, the distance is $\chi^{2}_{n_x}$-distributed, and a value beyond the $99\,\%$ quantile flags the received track as suspicious. The same statistic, applied to the measurement innovation, underlies the innovation-based detection of stealthy disturbance attacks in \cite{oliva_innovation_2026}. A single rejection is not evidence of malice, because the test also fires on honest association errors and manoeuvres (Example~\ref{ex:ekf-radar-cutin}), so the outcomes are accumulated into a trust score per neighbour, for instance $\tau_j(k+1)=\alpha\tau_j(k)+(1-\alpha)\,\mathbb{1}[\text{check passed at }k]$ with a forgetting factor $\alpha\in(0,1)$, and the trust is used to modulate the fusion weights, e.g., $\omega_j\propto\tau_j$ in \eqref{eq:ci-multi}, or to exclude a neighbour altogether. Evidence theory offers a complementary route: the conflict $K$ of Dempster's rule \eqref{eq:dempster} between the basic belief assignment received from a neighbour and the local one measures how incompatible the two sources are, and evidence-distance-based discounting of conflicting sources has been applied to real-time inter-vehicle fusion in \cite{cho_realtime_2020}. Whatever the mechanism, three principles apply: the check must be performed on the information actually received, not on a self-reported quality flag; a conservative fusion rule such as CI limits the damage of an undetected fault\deleted{, because a malicious track can at most shift the fused estimate by an amount bounded by its own covariance} \added{only if the received covariance is honest: CI weights each source by the information it declares, so a malicious sender that declares a small covariance can still dominate the fused estimate, which is why the consistency check on the received information must come first}; and the system should degrade to the local estimate, never below it, when trust is lost.
+
+\section{Cooperative Perception in Connected Vehicles}
+\label{sec:mas-cooperative-perception}
+
+Connected and automated vehicles are the most active application of the ideas of this chapter. Through vehicle-to-vehicle (V2V) and vehicle-to-infrastructure (V2I) links, collectively V2X, a vehicle can receive information about objects outside its own field of view, which is the occlusion scenario of the introduction. The exchange levels of Section~\ref{subsec:mas-levels} appear here as \emph{early} fusion (raw point clouds or images), \emph{intermediate} fusion (learned feature maps, typically in a bird's-eye-view representation, projected into the receiver's frame), and \emph{late} fusion (object lists with positions, velocities, classes, and \deleted{covariances}\added{confidences from which covariances can be built}, as carried by standardised collective perception messages). Early fusion is the most accurate in principle but requires bandwidths of the order of tens of megabits per second per vehicle and sub-decimetre, sub-millisecond spatio-temporal alignment; late fusion requires \deleted{a few kilobits}\added{some tens of kilobits} per second and is directly compatible with the track-to-track association and fusion machinery of Section~\ref{subsec:track-fusion}; intermediate fusion, popular in the learning-based literature, lies in between and depends on the sharing of a common feature representation across vehicle fleets. Public benchmarks have made the comparison systematic: OPV2V provides simulated multi-vehicle LiDAR and camera data with a fusion pipeline covering the three levels \cite{xu2022_opv2v}, V2X-Sim adds roadside units and multiple perception tasks \cite{li2022_v2xsim}, and DAIR-V2X is a large real-world vehicle--infrastructure dataset with synchronised annotations \cite{yu2022_dairv2x}.
+
+From the estimation viewpoint, cooperative perception adds three difficulties to the single-vehicle pipeline of Chapter~\ref{sec:application}. First, the relative pose between sender and receiver is itself uncertain: a $0.5^{\circ}$ heading error at $50$\,m displaces a received object by $0.44$\,m, so received tracks must be transformed with the covariance of the relative pose included, and the pose error is a common, correlated component across all objects from the same sender, which is exactly the situation that split CI \eqref{eq:split-ci} was designed for. Second, clocks must be aligned and the latency of every message converted into a prediction step before association. Third, the same physical object is frequently seen by several senders and by the ego vehicle, so received tracks must be associated with local tracks before fusion and, once fused, the resulting track is correlated with everything that produced it; this is where late fusion with CI, rather than information addition, is mandatory, and where set-membership and zonotope-based approaches offer guaranteed, as opposed to probabilistic, consistency \cite{narri2021_set_membership_shared_awareness,narri2025_set_based_awareness}. Learning-based cooperative perception is beyond the scope of this chapter, but the message of Chapter~\ref{sec:learning} applies unchanged: a learned fusion module must still output calibrated uncertainty, and the NEES-style validation of Example~\ref{ex:mas-distributed-tracking} is the test to apply.
+
+\section{Validation}
+\label{sec:mas-validation}
+
+Validation is particularly demanding because the relevant scenarios involve both sensing and communication. A convincing evaluation should vary not only weather, occlusion, object density, and sensor degradation, but also network latency, packet loss, agent density, viewpoint overlap, calibration error, clock offset, malicious data, and inconsistent local maps. For safety-critical deployment, multi-agent fusion should expose the provenance of fused information, the age of received data, the assumed trust in each source, and the remaining uncertainty after cooperation. The open research challenge is to obtain the robustness benefits of cooperation without allowing communication constraints, correlation errors, or untrusted agents to make the fused estimate less reliable than a well-designed local estimate.
+
+The two worked examples of this chapter suggest a minimal quantitative protocol. For every candidate scheme, report the accuracy (RMSE per node), the consistency (mean NEES and the fraction of samples inside the $\chi^{2}$ interval, averaged over Monte Carlo runs so that the expectation is meaningful), the disagreement between nodes, $\sum_{i}\|\widehat{\mathbf{x}}_i-\bar{\mathbf{x}}\|^{2}$ with $\bar{\mathbf{x}}$ the network average, and the communication cost in messages and scalars per sampling interval; then repeat the measurements along a scenario matrix that includes at least one topology with small algebraic connectivity, one packet-loss rate above the design value, one delay above the sampling interval, and one misbehaving agent. A scheme whose NEES is acceptable in the nominal case but not along the matrix is not validated. The companion repository provides the simulation harness used here so that the matrix can be populated with modest effort.
+
+\problemsection
+
+\begin{prob}\label{prob:ch06:1}
+(Convergence rate of consensus on a path.) Write the Laplacian $\mathbf{L}$ of the path graph $1$--$2$--$3$--$4$ of Example~\ref{ex:mas-path-consensus} and verify that its eigenvalues are $0$, $2-\sqrt{2}$, $2$, and $2+\sqrt{2}$. Using \eqref{eq:consensus-rate}, compute the contraction factor $\rho$ for $\epsilon=0.3$ and the number of rounds needed to reduce the initial disagreement $\|\boldsymbol{\delta}(0)\|$ by a factor of $100$. Compute the optimal constant step $\epsilon^{\star}$ and the corresponding $\rho^{\star}$, and explain why $\epsilon^{\star}$ violates the sufficient condition $\epsilon<1/d_{\max}$ without compromising convergence.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:2}
+(Average preservation on directed graphs.) Show that for an undirected graph the iteration \eqref{eq:consensus-laplacian} preserves the network average, and that the weighted iteration \eqref{eq:consensus-weighted} preserves it if and only if $\mathbf{W}$ is column-stochastic. Then consider three agents with the row-stochastic weight matrix
+\begin{equation*}
+\mathbf{W}=\begin{bmatrix}1/2&1/2&0\\ 1/3&1/3&1/3\\ 0&1/2&1/2\end{bmatrix}
+\end{equation*}
+and initial values $\mathbf{z}(0)=[10\ 12\ 11]^{\mathsf T}$. Compute the left Perron eigenvector $\boldsymbol{\pi}$ of $\mathbf{W}$ (normalised so that $\boldsymbol{\pi}^{\mathsf T}\mathbf{1}=1$), the consensus value $\boldsymbol{\pi}^{\mathsf T}\mathbf{z}(0)$, and compare it with the average $11$.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:3}
+(Covariance-intersection weight.) Two estimates of a scalar quantity have variances $P_1=1$ and $P_2=4$. Write $P_{\mathrm{CI}}(\omega)$ from \eqref{eq:ci-cov}, find the weight that minimises it, and interpret the result. Repeat for the two-dimensional case $\mathbf{P}_1=\diag(1,4)$ and $\mathbf{P}_2=\diag(4,1)$ with the trace criterion of \eqref{eq:ci-weight}: find $\omega^{\star}$ and $\mathbf{P}_{\mathrm{CI}}$ and compare them with the independent-fusion covariance of \eqref{eq:independent-track-fusion-state}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:4}
+(Double counting of a common prior.) Two nodes share a scalar prior with variance $1$ and each measures the same quantity once with noise variance $1$. Compute the posterior variance of each node, the variance claimed by the naive sum of the two posterior information values, the correct centralised posterior variance, and the \emph{actual} error variance of the naive estimate. Deduce the expected NEES of the naive estimate and comment on the result in the light of Example~\ref{ex:mas-distributed-tracking}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:5}
+(Computational: consensus rounds and topology.) Using the script of Example~\ref{ex:mas-distributed-tracking}, rerun the consensus-on-information filter with $L\in\{1,3,10\}$ rounds, first on the original graph and then on the path graph $1$--$2$--$3$--$4$--$5$ (ring and chord removed), and report RMSE and mean NEES. Explain the dependence on $L$ through the second largest eigenvalue modulus of the Metropolis matrix of each graph. See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch06/\allowbreak }.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:6}
+(Computational: packet loss.) Modify the consensus-on-information filter of Example~\ref{ex:mas-distributed-tracking} so that each message is lost independently with probability $p\in\{0,0.3,0.6\}$ and each node renormalises its Metropolis weights over the messages actually received. Report RMSE and mean NEES for each $p$ and verify numerically whether consistency is preserved. See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch06/\allowbreak }.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:7}
+(Robustness of the path graph.) Show that the path graph of Example~\ref{ex:mas-path-consensus} is $1$-robust but not $2$-robust, so that W-MSR with $F=1$ comes with no guarantee on it. Then (computationally, see \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch06/\allowbreak }) run W-MSR with $F=1$ and $\epsilon=0.3$ on the path with agent~$4$ broadcasting the constant value $30$\,m and describe what happens to the compliant agents.
+\end{prob}
+
+% ============================================

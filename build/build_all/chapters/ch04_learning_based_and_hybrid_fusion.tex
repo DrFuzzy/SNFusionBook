@@ -1,0 +1,705 @@
+\chapter{Learning-Based and Hybrid Sensor Fusion Techniques}
+\label{sec:learning}
+% ============================================
+
+% Springer Nature: each chapter should have a 10--15 line online abstract.
+% This chapter abstract has not yet been written in the uploaded manuscript.
+\abstract{This chapter surveys learning-based and hybrid sensor-fusion techniques and places them on the same footing as the classical estimators of Chapter~\ref{sec:classicalSF}. Classical machine learning is first presented as a set of concrete combiners: stacked and weighted ensembles, mixture-of-experts gating driven by quality indicators, learned reliability models that feed weighted least squares, heteroscedastic noise models, Gaussian-process residual models, and the calibration of predicted uncertainties. Deep multimodal fusion is then organised around a taxonomy of fusion operators (concatenation, weighted sums, gating, cross-attention), the early/mid/late trade-off, robustness training, and learned uncertainty heads. Bird's-eye-view and occupancy-based fusion are treated with the explicit view-transformation geometry, probabilistic log-odds mapping, and occupancy metrics. Multi-sensor localisation and SLAM are revisited through IMU preintegration, a worked pose-graph example solved by weighted least squares, and the multi-state constraint Kalman filter. Reliability-aware, fuzzy, and explainable fusion are completed with Mamdani and Sugeno inference, centroid defuzzification, and the link between learned reliability and evidence discounting. The chapter closes with hybrid classical--learning architectures and a runnable worked example in which a detector with learned heteroscedastic noise feeds a Kalman tracker, showing that a learned measurement covariance restores innovation consistency and lowers tracking error under degraded visibility. End-of-chapter problems and companion code are provided.}
+\suppressfloats[t]
+
+Classical and learning-based fusion are best viewed as complementary layers rather than separate pipelines. Learned models turn camera, LiDAR, radar, and temporal data into detections, depth estimates, semantic masks, occupancy scores, associations, or learned uncertainties; classical estimators then use these outputs as measurements, priors, factors, or reliability weights while enforcing temporal, geometric, and uncertainty consistency. In the reverse direction, Kalman filters, factor graphs, evidence-theoretic rules, and set-membership or zonotopic estimators provide residuals, innovation tests, covariance checks, bounded reachable sets, and outlier labels that can calibrate confidence, detect domain shift, reject implausible detections, and trigger conservative fallbacks. This interface is especially useful under fog, glare, occlusion, sensor degradation, and other distribution shifts: learning supplies flexible perception, while classical estimation supplies auditability and safety-relevant consistency checks \cite{khaleghi_multisensor_2013,baltrusaitis_multimodal_2019,li2022_gp_zkf}.
+
+
+\section{Machine Learning for Sensor Fusion}
+%
+Machine learning methods provide data-driven mechanisms for modelling complex relationships between heterogeneous sensor inputs and driving-scene outputs. Earlier approaches used hand-crafted features combined with classifiers or regressors such as support vector machines~\cite{cortes1995_svm}, decision trees, random forests~\cite{breiman2001_rf}, or probabilistic graphical models. These methods remain useful in settings where training data are limited, interpretability is important, or the fusion task is relatively structured.
+
+In autonomous driving, machine learning can be used to estimate sensor reliability, classify objects from fused features, detect abnormal sensor behaviour, or select between alternative fusion strategies. For example, a reliability model may learn to reduce the contribution of camera features under glare or darkness, while increasing the relative weight of radar velocity measurements under poor visibility. Such methods bridge purely rule-based fusion and end-to-end deep multimodal fusion.
+
+In terms of where learning enters the fusion pipeline, three recurring patterns can be distinguished. In \emph{fusion of learned outputs}, each modality is first processed by its own model and a classical combiner merges the resulting detections, classes, or confidence scores; stacking, boosting-style weighting, and mixture-of-experts gating are typical realisations \cite{breiman2001_rf,khaleghi_multisensor_2013}. In \emph{learning on fused features}, hand-crafted or learned descriptors from several sensors are concatenated into a joint feature vector that a single classifier or regressor maps to the task output, an approach widely used in multimodal recognition before end-to-end training became dominant \cite{atrey_multimodal_2010,gao_survey_2020}. In \emph{learning about the sensors themselves}, models are trained to predict quality indicators --- visibility, blockage, calibration residuals, expected noise level --- that parameterise a downstream classical fusion rule, for instance by scaling measurement covariances in a Kalman filter or by supplying the reliability weights and discounting factors used in the fuzzy and evidence-theoretic schemes of Chapter~\ref{sec:classicalSF}. Comparable designs appear outside the driving domain as well, for example in fuzzy-based fusion of physiological sensors \cite{testa_fuzzyfusion_2025}, underlining that the pattern is generic rather than domain-specific.
+
+Compared with the deep multimodal architectures discussed next, these approaches require far less annotated data, train in minutes rather than days, expose feature importances that support auditing, and degrade more predictably; their price is limited representational power on raw high-dimensional inputs such as images and point clouds, for which deep feature extractors \cite{guo_deep_2019} are now the standard front end. A pragmatic guideline is therefore to reserve classical machine learning for low-dimensional, structured fusion decisions --- reliability estimation, track-quality scoring, fault and anomaly flags, fusion-strategy selection --- and to employ deep networks where perception from raw sensor data is required.
+The remainder of this section makes the three patterns concrete: ensembles and gated mixtures realise \emph{fusion of learned outputs}, learned reliability and heteroscedastic noise models realise \emph{learning about the sensors}, and calibration ensures that whatever a learned component reports as uncertainty can be consumed by the classical estimators of Chapter~\ref{sec:classicalSF}.
+
+\subsection{Ensembles and Mixture-of-Experts Gating}
+\label{subsec:ensembles-moe}
+Let $\widehat{\mathbf{x}}_i$, $i=1,\ldots,N$, be the estimates (or class-score vectors) produced by $N$ modality-specific models for the same quantity. The simplest learned combiner is the \emph{weighted ensemble}
+\begin{equation}
+\widehat{\mathbf{x}}=\sum_{i=1}^{N} w_i\,\widehat{\mathbf{x}}_i,\qquad w_i\ge 0,\quad \sum_{i=1}^{N}w_i=1,
+\label{eq:weighted-ensemble}
+\end{equation}
+whose weights are fitted on held-out data by minimising a loss such as the squared error $\sum_k\|\mathbf{x}_k-\widehat{\mathbf{x}}_k\|^2$. \emph{Stacked generalisation} \cite{wolpert1992_stacking} generalises the linear rule by training a second-level model $\mathbf{h}(\cdot)$ on the concatenated first-level outputs, $\widehat{\mathbf{x}}=\mathbf{h}(\widehat{\mathbf{x}}_1,\ldots,\widehat{\mathbf{x}}_N)$, and is the formal counterpart of the ``fusion of learned outputs'' pattern; random forests \cite{breiman2001_rf} are the usual choice for $\mathbf{h}$ because they are robust to the scale differences between modalities. When the weights of \eqref{eq:weighted-ensemble} are constant, the ensemble cannot react to context. A \emph{mixture of experts} \cite{jacobs1991_moe} makes the weights a function of a context or quality vector $\mathbf{q}$ through a softmax gate,
+\begin{equation}
+g_i(\mathbf{q})=\frac{\exp\!\big(\mathbf{w}_i^{\mathsf T}\mathbf{q}+b_i\big)}{\sum_{j=1}^{N}\exp\!\big(\mathbf{w}_j^{\mathsf T}\mathbf{q}+b_j\big)},\qquad
+\widehat{\mathbf{x}}=\sum_{i=1}^{N} g_i(\mathbf{q})\,\widehat{\mathbf{x}}_i ,
+\label{eq:moe-gate}
+\end{equation}
+where $\mathbf{q}$ collects quality indicators such as image contrast, LiDAR point density, or radar signal-to-noise ratio (the symbol $q$ of Table~\ref{tab:notation}). The gate parameters $(\mathbf{w}_i,b_i)$ and the experts are trained jointly, or the experts are frozen and only the gate is fitted, which is the data-efficient option in practice. With a scalar indicator per modality and a shared slope $\beta$, i.e.\ $g_i\propto\exp(\beta q_i)$, the quality triple $(q_{\mathrm{cam}},q_{\mathrm{lid}},q_{\mathrm{rad}})=(0.3,0.5,0.9)$ used in the fuzzy example later in this chapter yields, for $\beta=4$, the gate $(0.070,\,0.156,\,0.774)$: the softmax is sharper than the proportional weights $(0.18,0.29,0.53)$ of the fuzzy rule, and in the limit $\beta\to\infty$ it reduces to hard selection of the best-quality modality. The slope $\beta$ is therefore a design knob that interpolates between averaging and switching.
+
+\subsection{Learned Reliability as an Input to Weighted Least Squares}
+\label{subsec:learned-reliability}
+The reliability-aware schemes of Chapter~\ref{sec:classicalSF} need a weight $w_i$ or a discount $\alpha_i$ per source. Instead of hand-tuning membership functions, one can learn the probability that source $i$ is currently \emph{valid} (unbiased, within its nominal noise) from its quality indicators by logistic regression,
+\begin{equation}
+p_i=\sigma\!\big(\boldsymbol{\beta}^{\mathsf T}\mathbf{q}_i\big)=\frac{1}{1+\exp(-\boldsymbol{\beta}^{\mathsf T}\mathbf{q}_i)},
+\label{eq:logistic-reliability}
+\end{equation}
+\added{where $\sigma(\cdot)$ denotes the logistic function, not to be confused with the standard deviations $\sigma_i$ used below, }with the parameters $\boldsymbol{\beta}$ fitted on logged data in which validity labels are obtained offline from ground truth or from innovation tests \cite{bishop2006_prml}. The learned reliability enters the weighted least-squares estimator of Chapter~\ref{sec:classicalSF} by inflating the nominal measurement covariance of each source, $\mathbf{R}_i\mapsto\mathbf{R}_i/p_i$, so that for scalar measurements the information-weighted fusion becomes
+\begin{equation}
+\widehat{x}=\frac{\sum_i (p_i/\sigma_i^{2})\,\widehat{x}_i}{\sum_i p_i/\sigma_i^{2}},\qquad
+\operatorname{var}(\widehat{x})=\Big(\sum_i p_i/\sigma_i^{2}\Big)^{-1}.
+\label{eq:wls-reliability}
+\end{equation}
+This is the ``learning about the sensors'' pattern in its simplest form: the learned component is a scalar per source, the fusion rule itself remains the classical one, and both the weights and their justification (the indicators that drove them) are available for audit.
+
+\begin{example}[Logistic reliability feeding weighted least squares]
+\label{ex:logistic-wls}
+Take the dusk-and-fog range estimates used later in the fuzzy example, $\widehat{x}_{\mathrm{cam}}=41.8$~m, $\widehat{x}_{\mathrm{lid}}=42.6$~m, $\widehat{x}_{\mathrm{rad}}=43.1$~m, with nominal standard deviations $\sigma=(1.0,\,0.5,\,0.8)$~m, quality indicators $q=(0.3,\,0.5,\,0.9)$, and a learned reliability model $p_i=\sigma(-2+5q_i)$. The reliabilities are $p=(0.378,\,0.623,\,0.924)$ and the information weights $p_i/\sigma_i^{2}=(0.378,\,2.490,\,1.444)$, summing to $4.311$. Equation~\eqref{eq:wls-reliability} gives $\widehat{x}=42.70$~m with standard deviation $1/\sqrt{4.311}=0.48$~m. Plain weighted least squares without reliability ($p_i=1$) gives $42.60$~m with a nominal standard deviation of $0.39$~m: it leans more on the LiDAR because of its small nominal $\sigma$, and it reports an uncertainty that ignores the reduced point density. The learned reliabilities shift the estimate towards the radar and, equally important, inflate the reported uncertainty to a value consistent with the degraded conditions.
+\end{example}
+
+\subsection{Heteroscedastic Noise Models}
+\label{subsec:heteroscedastic}
+A finer alternative to a scalar reliability is to learn the measurement covariance itself as a function of the input. In a \emph{heteroscedastic} regression model the network (or any regressor) outputs both a mean and a variance, $\boldsymbol{\mu}_{\boldsymbol{\theta}}(\mathbf{u})$ and $\sigma_{\boldsymbol{\theta}}^{2}(\mathbf{u})$, and is trained by minimising the Gaussian negative log-likelihood \cite{nix1994_heteroscedastic,kendall2017_uncertainties}
+\begin{equation}
+\mathcal{L}_{\mathrm{NLL}}(\boldsymbol{\theta})=\frac{1}{M}\sum_{k=1}^{M}\left[\frac{\|\mathbf{y}_k-\boldsymbol{\mu}_{\boldsymbol{\theta}}(\mathbf{u}_k)\|^{2}}{2\sigma_{\boldsymbol{\theta}}^{2}(\mathbf{u}_k)}+\frac{d_y}{2}\log\sigma_{\boldsymbol{\theta}}^{2}(\mathbf{u}_k)\right],
+\label{eq:gaussian-nll}
+\end{equation}
+where $\mathbf{u}_k$ is the raw input (image crop, point cluster) or a vector of quality indicators and $d_y$ the measurement dimension. The first term penalises errors in proportion to the predicted precision, the second prevents the trivial solution $\sigma^{2}\to\infty$; at the optimum the predicted variance matches the local mean squared error. A detector trained with \eqref{eq:gaussian-nll} reports, with every box, a covariance $\mathbf{R}_k=\diag(\sigma_{\boldsymbol{\theta}}^{2}(\mathbf{u}_k))$ that can be used directly in the Kalman update of Chapter~\ref{sec:classicalSF}, which is the mechanism exploited by the worked example of Sect.~\ref{subsec:hybrid-worked-example}. The simplest heteroscedastic model is linear in the indicators, $\sigma(\mathbf{q})=\theta_0+\theta_1 r+\theta_2(1-v)$ for range $r$ and visibility $v$; because $\mathbb{E}|e|=\sigma\sqrt{2/\pi}$ for a zero-mean Gaussian error $e$, such a model can even be fitted by ordinary least squares on scaled absolute residuals, which is what the companion script of that example does.
+
+\subsection{Gaussian-Process Measurement and Residual Models}
+\label{subsec:gp-models}
+When the measurement function $\mathbf{g}(\cdot)$ of Chapter~\ref{sec:classicalSF} is only partially known, a Gaussian process (GP) \cite{rasmussen2006_gp} can learn the unknown part together with its uncertainty. Write the measurement as $\mathbf{y}=\mathbf{g}_0(\mathbf{x})+\delta(\mathbf{x})+\mathbf{r}$, where $\mathbf{g}_0$ is the physical model and $\delta(\cdot)\sim\mathcal{GP}(0,k(\cdot,\cdot))$ a residual with kernel $k$. Given training pairs $\{(\mathbf{x}_j,\mathbf{y}_j-\mathbf{g}_0(\mathbf{x}_j))\}_{j=1}^{M}$ collected with ground truth, the posterior of the residual at a test state $\mathbf{x}_*$ is Gaussian with
+\begin{equation}
+\bar{\delta}(\mathbf{x}_*)=\mathbf{k}_*^{\mathsf T}(\mathbf{K}_{M}+\sigma_r^{2}\mathbf{I})^{-1}\mathbf{d},\qquad
+\operatorname{var}[\delta(\mathbf{x}_*)]=k(\mathbf{x}_*,\mathbf{x}_*)-\mathbf{k}_*^{\mathsf T}(\mathbf{K}_{M}+\sigma_r^{2}\mathbf{I})^{-1}\mathbf{k}_*,
+\label{eq:gp-posterior}
+\end{equation}
+where $\mathbf{K}_{M}$ is the kernel matrix of the training inputs, $\mathbf{k}_*$ the vector of kernel values between the training inputs and $\mathbf{x}_*$, and $\mathbf{d}$ the stacked training residuals. The corrected measurement function $\mathbf{g}_0+\bar{\delta}$ and the inflated covariance $\mathbf{R}+\operatorname{var}[\delta]$ are then used in any of the filters of Chapter~\ref{sec:classicalSF}; the GP variance grows automatically away from the training data, which is precisely the ``do not trust what you have not seen'' behaviour that a safety monitor needs. The same construction yields a learned \emph{process} model when applied to the state transition, and GP-based corrections have been combined with set-membership estimators so that the learned residual bound enters a zonotopic update \cite{li2022_gp_zkf}. The $\mathcal{O}(M^{3})$ cost of \eqref{eq:gp-posterior} is the practical limitation, addressed by sparse approximations or by fitting the GP offline and tabulating it.
+
+\subsection{Calibration of Learned Uncertainties}
+\label{subsec:calibration}
+A learned confidence or covariance is only useful to a classical estimator if it is \emph{calibrated}: among all detections reported with confidence $0.8$, about $80\,\%$ should be correct, and among all measurements reported with standard deviation $\sigma$, the errors should have standard deviation $\sigma$. Modern networks are typically over-confident \cite{guo2017_calibration}. For classification, calibration is measured by binning the predictions into $B$ confidence bins and computing the \emph{expected calibration error}
+\begin{equation}
+\mathrm{ECE}=\sum_{b=1}^{B}\frac{n_b}{M}\,\big|\mathrm{acc}(b)-\mathrm{conf}(b)\big| ,
+\label{eq:ece}
+\end{equation}
+where $n_b$ is the number of predictions in bin $b$, $\mathrm{acc}(b)$ their empirical accuracy, and $\mathrm{conf}(b)$ their mean confidence. For instance, with four bins containing $200$, $300$, $400$, and $100$ predictions, mean confidences $(0.55,0.70,0.85,0.95)$ and accuracies $(0.50,0.60,0.80,0.97)$, \eqref{eq:ece} gives $\mathrm{ECE}=(10+30+20+2)/1000=0.062$. The standard remedy is \emph{temperature scaling}: the logits $\mathbf{z}$ are divided by a scalar $T>0$ fitted on a validation set by minimising the cross-entropy, $p_c=\exp(z_c/T)/\sum_j\exp(z_j/T)$. A temperature $T>1$ softens the distribution without changing the arg-max; for logits $(2.0,0.5,-1.0)$ the top probability drops from $0.786$ at $T=1$ to $0.665$ at $T=1.5$ and $0.590$ at $T=2$. For regression outputs the analogous check is the normalised innovation squared of Chapter~\ref{sec:classicalSF}, \eqref{eq:nis}: a filter fed with calibrated covariances yields NIS values that follow the $\chi^{2}_{n_y}$ distribution, and a constant scaling $c$ of the predicted standard deviations can be fitted so that the average NIS equals $n_y$. The worked example of Sect.~\ref{subsec:hybrid-worked-example} uses exactly this diagnostic.
+
+\section{Deep Multimodal Fusion}
+%
+Deep learning has become central to autonomous-driving perception because it can learn rich representations from high-dimensional sensor data. Camera networks extract semantic and appearance features from images, LiDAR networks process point clouds or voxelised representations, and radar networks process sparse detections, point clouds, or range--Doppler representations. Multimodal fusion networks combine these representations to improve 3D object detection, segmentation, tracking, occupancy prediction, and scene understanding.
+
+% [July 2026 pass] The following four paragraphs and the equation were marked in green (an ad-hoc
+% colour from an earlier revision round with no legend entry). They have been reviewed, accepted,
+% and normalised to standard text so that only the documented blue/red/olive markup remains.
+Deep multimodal fusion generally consists of four stages: sensor-specific feature extraction, spatial or temporal alignment, feature fusion, and task-specific prediction. Let $\mathbf{f}_c$, $\mathbf{f}_l$, and $\mathbf{f}_r$ denote feature representations extracted from camera, LiDAR, and radar, respectively. A generic multimodal fusion operation may be expressed as
+\begin{equation}
+\mathbf{f}_{\mathrm{fusion}}
+=
+\mathcal{F}
+\left(
+\mathbf{f}_c,
+\mathbf{f}_l,
+\mathbf{f}_r
+\right),
+\label{eq:deep_fusion}
+\end{equation}
+where $\mathcal{F}(\cdot)$ denotes the fusion operator, which may correspond to feature concatenation, weighted summation, attention, gating, or transformer-based cross-modal interaction. The fused representation is subsequently processed by task-specific prediction heads for object detection, semantic segmentation, occupancy estimation, or tracking. The operators are written out explicitly in Sect.~\ref{subsec:fusion-operators}.
+
+Algorithm~\ref{alg:deep_fusion} summarises the generic processing pipeline adopted by many contemporary multimodal perception systems.
+
+\begin{algorithm}[t]
+\caption{Generic Deep Multimodal Fusion Pipeline}
+\label{alg:deep_fusion}
+\begin{algorithmic}[1]
+\State Acquire synchronised multi-sensor measurements
+\State Extract modality-specific features
+\State Align features in a common spatial representation
+\State Fuse features using concatenation, attention, or cross-modal interaction
+\State Predict objects, occupancy, or semantic classes
+\State Optionally refine predictions using temporal information
+\end{algorithmic}
+\end{algorithm}
+
+Single-modality LiDAR detectors form the backbone of many fusion architectures. VoxelNet introduced end-to-end learning on voxelised point clouds \cite{zhou2018_voxelnet}, SECOND accelerated it with sparse convolutions \cite{yan2018_second}, PointPillars organised points into vertical columns for fast embedded-friendly inference \cite{lang2019_pointpillars}, and CenterPoint reformulated detection and tracking around object centres \cite{yin2021_centerpoint}. These detectors are the typical starting point on top of which multimodal fusion is added.
+
+Camera--LiDAR fusion is one of the most widely studied forms of deep fusion. Early-fusion methods project LiDAR points into the image plane or enrich point clouds with image features; representative examples are PointPainting, which decorates each LiDAR point with image-segmentation scores before applying a standard LiDAR detector \cite{vora2020_pointpainting}, and MVX-Net, which injects image features into a VoxelNet-style pipeline at point or voxel level \cite{sindagi2019_mvxnet}. Feature-level methods extract modality-specific features and combine them through concatenation, attention, gating, or cross-modal transformers, as in TransFusion, whose transformer decoder queries image features only where LiDAR evidence is ambiguous, yielding robustness to degraded image quality \cite{bai2022_transfusion}. Late-fusion methods combine separate detections or confidence scores. Bird's-eye-view fusion has become especially important because it provides a common spatial representation for camera, LiDAR, and radar information; BEVFusion is a representative architecture that unifies camera and LiDAR features in a shared BEV grid and supports detection and segmentation from the same fused representation \cite{liu2023_bevfusion}.
+
+Camera--radar fusion is also important because radar provides long-range detection and relative velocity, while cameras provide semantic detail. The complementary nature of these sensors is valuable in adverse weather and low-visibility conditions. However, radar fusion is challenging because radar measurements are sparse, noisy, and lower in angular resolution than images or LiDAR point clouds. Learning-based radar fusion must therefore handle uncertain associations, ghost detections, and different radar signal representations. CenterFusion associates radar detections with image-based object centres using a frustum-based mechanism and uses radar range and velocity to improve 3D localisation \cite{nabati2021_centerfusion}, while CRN builds a radar-assisted view transformation so that camera features are placed in BEV at radar-confirmed depths \cite{kim2023_crn}.
+
+LiDAR--radar fusion combines accurate geometry with velocity and weather robustness. It is particularly useful for object tracking and dynamic-scene understanding. More recent architectures also fuse temporal information across frames, allowing the system to accumulate evidence, compensate for ego-motion, and improve detection stability. Table~\ref{tab:deep-fusion-methods} summarises representative deep fusion architectures together with their modalities, fusion level, key idea, and indicative published benchmark results.
+
+\begin{table}[!t]
+    \centering
+    
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \caption{Representative deep multimodal fusion methods for autonomous-driving perception. Benchmark figures are indicative published results on the nuScenes \emph{test} split (detection mAP~/~NDS, in \%); ``--'' indicates that the method targets a different task or benchmark.}
+    \label{tab:deep-fusion-methods}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{l c l l p{0.30\linewidth} c}
+        \hline
+        \textbf{Method} & \textbf{Year} & \textbf{Modalities} & \textbf{Fusion level} & \textbf{Key idea} & \textbf{mAP / NDS} \\
+        \hline
+        PointPillars \cite{lang2019_pointpillars} & 2019 & LiDAR & -- (single modality) & Pillar-based point-cloud encoding for fast detection & 30.5 / 45.3 \\
+        CenterPoint \cite{yin2021_centerpoint} & 2021 & LiDAR & -- (single modality) & Centre-based detection and tracking heads & 60.3 / 67.3 \\
+        PointPainting \cite{vora2020_pointpainting} & 2020 & Camera + LiDAR & Data (early) & Decorates LiDAR points with image segmentation scores & 46.4 / 58.1 \\
+        MVX-Net \cite{sindagi2019_mvxnet} & 2019 & Camera + LiDAR & Data / feature & Image features injected at point or voxel level & -- \\
+        TransFusion \cite{bai2022_transfusion} & 2022 & Camera + LiDAR & Feature (transformer) & Soft-association queries robust to image degradation & 68.9 / 71.7 \\
+        BEVFusion \cite{liu2023_bevfusion} & 2023 & Camera + LiDAR & Feature (BEV) & Task-agnostic shared BEV representation & 70.2 / 72.9 \\
+        Lift-Splat-Shoot \cite{philion2020_lss} & 2020 & Camera (multi-view) & Feature (BEV) & Latent-depth ``lifting'' of image features into BEV & -- \\
+        BEVFormer \cite{li2022_bevformer} & 2022 & Camera (multi-view) & Feature (BEV, temporal) & Spatiotemporal transformer over learned BEV queries & 48.1 / 56.9 \\
+        CenterFusion \cite{nabati2021_centerfusion} & 2021 & Camera + Radar & Feature (mid) & Frustum association of radar detections with image centres & 32.6 / 44.9 \\
+        CRN \cite{kim2023_crn} & 2023 & Camera + Radar & Feature (BEV) & Radar-assisted view transformation and cross-attention & 57.5 / 62.4 \\
+        SurroundOcc \cite{wei2023_surroundocc} & 2023 & Camera (multi-view) & Feature (3D volume) & Multi-scale 3D semantic occupancy prediction & -- \\
+        TPVFormer \cite{huang2023_tpvformer} & 2023 & Camera (multi-view) & Feature (tri-plane) & Tri-perspective-view representation for occupancy & -- \\
+        \hline
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+% [July 2026 pass] Green paragraph below reviewed, accepted, and normalised to standard text.
+From an embedded-systems perspective, deep multimodal fusion consists of both highly parallel and data-dependent computations. Feature extraction using convolutional neural networks or vision transformers is dominated by dense tensor operations and is therefore well suited to GPU and FPGA acceleration. In contrast, cross-modal feature alignment, sparse point-cloud processing, attention mechanisms, and non-maximum suppression exhibit irregular memory access patterns and varying computational loads. Consequently, practical embedded implementations frequently adopt heterogeneous architectures in which dedicated hardware accelerates computationally intensive neural-network inference, while software manages sensor synchronisation, feature association, and high-level decision making.
+
+\subsection{A Taxonomy of Fusion Operators}
+\label{subsec:fusion-operators}
+The operator $\mathcal{F}$ of \eqref{eq:deep_fusion} takes a small number of canonical forms, which we write for two modalities with aligned feature vectors $\mathbf{f}_c,\mathbf{f}_l\in\mathbb{R}^{d}$ (per BEV cell, per voxel, or per proposal); extension to three or more modalities is immediate.
+\begin{list4a}
+    \item \emph{Concatenation} followed by a learned projection: $\mathbf{f}=\mathbf{W}[\mathbf{f}_c;\mathbf{f}_l]+\mathbf{b}$, with $\mathbf{W}\in\mathbb{R}^{d\times 2d}$. It is the most expressive linear operator and the default in BEVFusion-style architectures \cite{liu2023_bevfusion}, but it cannot by itself re-weight a modality that has become unreliable: the same $\mathbf{W}$ is applied in clear weather and in fog.
+    \item \emph{Weighted sum}: $\mathbf{f}=w_c\mathbf{f}_c+w_l\mathbf{f}_l$ with fixed or learned scalars $w_c,w_l$; it is the deep counterpart of \eqref{eq:weighted-ensemble} and requires the feature spaces to be commensurate, which is enforced by training the two encoders jointly.
+    \item \emph{Gated fusion}: a sigmoid gate computed from both features selects, per channel, how much of each modality to pass,
+    \begin{equation}
+    \mathbf{g}=\sigma\!\big(\mathbf{W}_g[\mathbf{f}_c;\mathbf{f}_l]+\mathbf{b}_g\big),\qquad
+    \mathbf{f}=\mathbf{g}\odot\mathbf{f}_c+(\mathbf{1}-\mathbf{g})\odot\mathbf{f}_l ,
+    \label{eq:gated-fusion}
+    \end{equation}
+    where $\odot$ is the element-wise product. The gate is the learned analogue of the reliability weight $w$ of Table~\ref{tab:notation}: it can close the camera channel when the image features carry the signature of glare or darkness, and it is directly inspectable, which makes gated fusion a natural bridge to the explainable schemes discussed later in this chapter.
+    \item \emph{Cross-attention} \cite{vaswani2017_attention}: one modality provides queries and the other keys and values,
+    \begin{equation}
+    \mathbf{Q}=\mathbf{F}_l\mathbf{W}_Q,\quad \mathbf{K}=\mathbf{F}_c\mathbf{W}_K,\quad \mathbf{V}=\mathbf{F}_c\mathbf{W}_V,\qquad
+    \mathrm{Attn}(\mathbf{Q},\mathbf{K},\mathbf{V})=\mathrm{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^{\mathsf T}}{\sqrt{d_k}}\right)\mathbf{V},
+    \label{eq:cross-attention}
+    \end{equation}
+    where the rows of $\mathbf{F}_l$ are, for example, LiDAR object queries and the rows of $\mathbf{F}_c$ image tokens. Each query gathers a convex combination of image features, with weights that depend on the data rather than on a fixed spatial correspondence; this is how TransFusion \cite{bai2022_transfusion} and CRN \cite{kim2023_crn} consult the image only where the LiDAR or radar evidence is ambiguous. A tiny instance makes the mechanism tangible: with $d_k=2$, a query $\mathbf{q}=(1,0)$, keys $(1,0)$, $(0,1)$, $(-1,0)$ and scalar values $2$, $0$, $-2$, the scaled scores are $(0.707,0,-0.707)$, the softmax weights $(0.576,0.284,0.140)$, and the output $0.872$: the query is pulled towards the value whose key resembles it, but never ignores the others entirely, which is why attention degrades gracefully rather than switching.
+\end{list4a}
+Attention costs $\mathcal{O}(n_q n_k d)$ for $n_q$ queries and $n_k$ keys, concatenation and gating $\mathcal{O}(n d^{2})$ per location; the choice therefore also depends on the number of tokens, which is why dense BEV grids favour concatenation and gating while sparse object-centric pipelines favour attention.
+
+\subsubsection*{Early, mid, and late fusion}
+Where in the network $\mathcal{F}$ is applied changes what can be learned and what can fail. Table~\ref{tab:fusion-level-tradeoff} summarises the trade-off. Early (data-level) fusion, as in PointPainting \cite{vora2020_pointpainting}, exposes the raw cross-modal correlations to the network but inherits every calibration and synchronisation error and degrades as soon as one input is missing. Late (decision-level) fusion keeps the modalities independent until the detection or track level, which is exactly the setting of the track-level fusion of Chapter~\ref{sec:classicalSF} (Sect.~\ref{subsec:track-fusion}) and allows the classical rules --- covariance intersection \eqref{eq:ci-cov}--\eqref{eq:ci-est}, evidence combination \eqref{eq:dempster}, reliability weighting --- to do the combining; it is the most robust and auditable option but cannot recover an object that neither modality detects alone. Mid-level (feature) fusion is the compromise adopted by most current detectors.
+\begin{table}[!t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \caption{Trade-offs between fusion levels in deep multimodal perception.}
+    \label{tab:fusion-level-tradeoff}
+    \begin{tabular}{p{0.17\linewidth} p{0.25\linewidth} p{0.25\linewidth} p{0.25\linewidth}}
+        \hline
+        \textbf{Criterion} & \textbf{Early (data)} & \textbf{Mid (feature)} & \textbf{Late (decision)} \\
+        \hline
+        Cross-modal detail & full & high & limited to outputs \\
+        Calibration sensitivity & high & medium & low \\
+        Missing-modality behaviour & fails unless retrained & degrades (gating helps) & graceful \\
+        Compute per frame & single backbone, dense input & two backbones + fusion block & two full pipelines \\
+        Interpretability & low & medium (gates, attention maps) & high (weights, conflict) \\
+        Classical counterpart & stacked measurement model (Chapter~\ref{sec:classicalSF}) & -- & track-level fusion, CI, evidence theory \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Robustness Training and Learned Uncertainty Heads}
+\label{subsec:robustness-uncertainty-heads}
+Two training-time devices make deep fusion networks usable inside the hybrid architectures of this chapter. The first is \emph{modality dropout} \cite{neverova2016_moddrop}: during training, each modality's feature tensor is replaced by zeros (or by a learned ``missing'' token) with probability $p_{\mathrm{drop}}$, independently per sample, so that the network learns a fused representation that remains valid when a sensor is blinded or absent. Together with the simulation of fog, rain, and sensor noise in the training data, this is the main learned counterpart of the redundancy arguments made in Chapter~\ref{sec:classicalSF}; datasets with adverse-weather splits and corruption benchmarks exist precisely to measure the effect \cite{bijelic2020_stf,dong2023_robobev}. The second device is a \emph{learned uncertainty head}: in addition to the box parameters $\boldsymbol{\mu}$, the detection head outputs a log-variance per regressed quantity and is trained with the Gaussian negative log-likelihood \eqref{eq:gaussian-nll}. Classification confidences are calibrated by temperature scaling. The output of such a network is no longer a bare detection but a measurement $\mathbf{y}_k$ with covariance $\mathbf{R}_k$ in the sense of Table~\ref{tab:notation}, and the whole machinery of Chapter~\ref{sec:classicalSF} --- gating \eqref{eq:mahalanobis_gate}, innovation tests \eqref{eq:nis}, track fusion --- becomes applicable without modification. Deep ensembles \cite{lakshminarayanan2017_ensembles}, which average several independently trained networks and use their spread as an epistemic uncertainty, serve the same purpose at a higher computational cost. Reviews of probabilistic object detection in driving \cite{feng2021_probabilistic_od} document that the predicted covariances are often mis-scaled by a constant factor, which is why the calibration step of Sect.~\ref{subsec:calibration} must precede their use in a filter.
+
+\section{Bird's-Eye-View and Occupancy-Based Fusion}
+
+%
+
+Bird's-eye-view (BEV) fusion converts heterogeneous sensor observations into a common top-down spatial representation, typically defined on the ground plane or in a local ego-centric map. This representation is particularly suitable for autonomous driving because downstream prediction, planning, and control are usually expressed in road-aligned or map-based coordinates rather than in individual camera image planes. Instead of reasoning independently over several perspective images, BEV fusion provides a unified spatial layout in which lanes, vehicles, pedestrians, free space, and static obstacles can be represented consistently across sensors.
+
+The main challenge in camera-based BEV construction is that image measurements are perspective projections and do not directly provide metric three-dimensional structure. Camera features must therefore be lifted into 3D or BEV space using estimated depth, geometric calibration, or learned view transformations. Lift-Splat-Shoot introduced the widely used latent-depth ``lifting'' of multi-camera features into BEV, followed by feature splatting onto a top-down grid \cite{philion2020_lss}. BEVFormer instead avoids explicit dense depth prediction by using learned BEV queries that attend to multi-camera image features and previous BEV states, enabling both spatial and temporal fusion \cite{li2022_bevformer}. LiDAR and radar can be incorporated more directly because their measurements already contain range information. LiDAR provides accurate geometry and object shape, while radar contributes long-range velocity cues and improved robustness under adverse weather conditions. In practice, BEV fusion may be performed at the raw-measurement, feature, or decision level, with feature-level fusion being particularly attractive because it preserves rich semantic and geometric information before final detection or segmentation.
+
+Occupancy-based fusion extends BEV reasoning from object-centric detection to space-centric scene understanding. Instead of representing the environment solely as a collection of detected objects, occupancy methods estimate whether each spatial cell or voxel is free, occupied, unknown, or dynamically occupied. Semantic occupancy further assigns class labels to occupied regions, including vehicles, pedestrians, cyclists, vegetation, road boundaries, and static infrastructure. Such representations naturally describe irregular obstacles, partially visible objects, construction zones, and occluded regions that cannot easily be approximated by bounding boxes. Moreover, occupancy grids provide a direct interface to motion planning, enabling planners to reason explicitly about traversable, blocked, and uncertain regions.
+
+\subsection{View Transformation: From Image Plane to Ground Plane}
+\label{subsec:view-transformation}
+The geometry underlying every camera-to-BEV method is the pinhole projection \cite{hartley2003_mvg}. A point $\mathbf{p}^{w}=(X,Y,Z)$ in the ego frame is mapped to homogeneous pixel coordinates by
+\begin{equation}
+\lambda\begin{bmatrix}u\\ v\\ 1\end{bmatrix}
+=\mathbf{K}_{\mathrm{cam}}\big[\mathbf{R}_{\mathrm{cw}}\;|\;\mathbf{t}_{\mathrm{cw}}\big]
+\begin{bmatrix}\mathbf{p}^{w}\\ 1\end{bmatrix},\qquad
+\mathbf{K}_{\mathrm{cam}}=\begin{bmatrix}f_u & 0 & c_u\\ 0 & f_v & c_v\\ 0&0&1\end{bmatrix},
+\label{eq:pinhole}
+\end{equation}
+where $(\mathbf{R}_{\mathrm{cw}},\mathbf{t}_{\mathrm{cw}})$ are the extrinsic calibration, $\mathbf{K}_{\mathrm{cam}}$ the intrinsic matrix, and $\lambda$ the depth of the point along the optical axis. (The calibration matrix $\mathbf{K}_{\mathrm{cam}}$ is unrelated to the Kalman gain $\mathbf{K}$ of Table~\ref{tab:notation}.) For a camera aligned with the ego frame, $f_u=f_v=1000$~px and principal point $(640,360)$, a point at $2$~m lateral offset, $1$~m below the optical axis and $20$~m ahead projects to \deleted{$(u,v)=(740,310)$}\added{$(u,v)=(740,410)$, the image $v$ axis pointing downwards}; the inverse problem, recovering $(X,Y,Z)$ from $(u,v)$, is under-determined by exactly one degree of freedom, the depth $\lambda$. This is the reason camera-only BEV construction must either estimate depth, assume the ground plane ($Y=h$, which is sufficient for lane markings and road surface), or learn the lifting.
+
+Lift-Splat-Shoot \cite{philion2020_lss} resolves the ambiguity probabilistically. For each pixel (or feature-map location) $(u,v)$ with context feature $\mathbf{c}_{uv}\in\mathbb{R}^{C}$, the network predicts a categorical distribution $\boldsymbol{\alpha}_{uv}\in\Delta^{D-1}$ over $D$ discrete depth bins $\{\lambda_1,\ldots,\lambda_D\}$, and the ``lifted'' feature at depth bin $d$ is the outer product
+\begin{equation}
+\mathbf{c}_{uvd}=\alpha_{uvd}\,\mathbf{c}_{uv},\qquad d=1,\ldots,D,
+\qquad\text{i.e.}\qquad
+\mathbf{C}_{uv}=\boldsymbol{\alpha}_{uv}\mathbf{c}_{uv}^{\mathsf T}\in\mathbb{R}^{D\times C}.
+\label{eq:lss-lift}
+\end{equation}
+Each of the $D$ copies is placed at the 3D point obtained by back-projecting $(u,v)$ with \eqref{eq:pinhole} at depth $\lambda_d$, and the ``splat'' step sums all points falling into the same BEV cell (sum pooling), $\mathbf{f}^{\mathrm{BEV}}_{ij}=\sum_{(u,v,d)\in\mathrm{cell}(i,j)}\mathbf{c}_{uvd}$. With $\boldsymbol{\alpha}_{uv}=(0.1,0.6,0.3)$ over three bins and $\mathbf{c}_{uv}=(1,2)$, the outer product places $(0.1,0.2)$, $(0.6,1.2)$, and $(0.3,0.6)$ at the three candidate depths: most of the feature mass lands at the most probable depth, but a sharp depth error does not erase the feature, it merely spreads it. The depth distribution is learned end-to-end from the detection loss, or supervised from projected LiDAR when available, which is where LiDAR enters camera-centric BEV methods even if it is not a run-time input. BEVFormer \cite{li2022_bevformer} replaces the explicit lift by learned BEV queries that sample image features at the projections of a few reference heights per cell through deformable attention, i.e.\ \eqref{eq:cross-attention} with a sparse, geometry-guided key set. LiDAR and radar features are placed in BEV by \eqref{eq:pinhole}'s inverse without ambiguity, since the range is measured; the modalities are then combined by the operators of Sect.~\ref{subsec:fusion-operators}.
+
+\subsection{Probabilistic Occupancy Mapping}
+\label{subsec:occupancy-mapping}
+
+Classical occupancy mapping formulates environment reconstruction as a probabilistic estimation problem in which every spatial cell stores the belief that the corresponding region of space is occupied. One of the most influential implementations is OctoMap, which represents occupancy using an adaptive probabilistic octree \cite{hornung2013_octomap}. Instead of storing a dense voxel grid, the environment is recursively subdivided into eight child nodes only where higher spatial resolution is required. Consequently, homogeneous regions can be represented compactly while preserving fine geometric detail around obstacles, resulting in substantially lower memory consumption than dense volumetric grids.
+
+Occupancy estimation is commonly performed using Bayesian inference. Rather than storing probabilities directly, OctoMap maintains the log-odds representation of occupancy because it allows recursive Bayesian updates to be expressed as simple additions. Let $m_i$ denote the occupancy state of voxel $i$, and let $z_{1:t}$ represent all sensor measurements acquired up to time $t$. The occupancy estimate is represented as
+
+\begin{equation}
+L_t(m_i)
+=
+\log
+\frac{P(m_i|z_{1:t})}
+     {1-P(m_i|z_{1:t})},
+\label{eq:octomap_logodds}
+\end{equation}
+
+which is recursively updated according to
+
+\begin{equation}
+L_t(m_i)
+=
+L_{t-1}(m_i)
++
+\log
+\frac{P(m_i|z_t)}
+     {1-P(m_i|z_t)}
+-
+L_0,
+\label{eq:octomap_update}
+\end{equation}
+
+where $L_0$ denotes the prior log-odds occupancy. Positive values correspond to occupied space, negative values represent free space, while values near zero indicate unknown regions. This additive formulation avoids repeated Bayesian normalisation and naturally supports incremental map construction as new sensor observations become available.
+
+The inverse sensor model $P(m_i\mid z_t)$ is usually reduced to two constants, $p_{\mathrm{hit}}$ for the cell containing the measured endpoint and $p_{\mathrm{miss}}$ for the cells traversed by the ray before it, so that \eqref{eq:octomap_update} adds $l_{\mathrm{occ}}=\log\frac{p_{\mathrm{hit}}}{1-p_{\mathrm{hit}}}$ or $l_{\mathrm{free}}=\log\frac{p_{\mathrm{miss}}}{1-p_{\mathrm{miss}}}$ to the cell; the probability is recovered as $P=1/(1+e^{-L})$. The idea goes back to the sonar grids of Moravec and Elfes \cite{moravec1985_grid} and is covered in depth in \cite{thrun_probabilistic_2005}.
+\begin{example}[Three rays, two cells]
+\label{ex:logodds}
+Take $p_{\mathrm{hit}}=0.7$, $p_{\mathrm{miss}}=0.4$, and an uninformative prior $L_0=0$, so that $l_{\mathrm{occ}}=\log(0.7/0.3)=0.847$ and $l_{\mathrm{free}}=\log(0.4/0.6)=-0.405$. Cell~A is the endpoint of three consecutive LiDAR returns: $L=3\times0.847=2.542$, i.e.\ $P(\text{occupied})=0.927$. Cell~B is traversed by two rays that end beyond it and is the endpoint of one: $L=2\times(-0.405)+0.847=0.036$, $P=0.509$, essentially unknown, which is the correct verdict for a cell that may contain a thin or intermittently visible object. A cell traversed by four rays without a return reaches $L=-1.622$, $P=0.165$. OctoMap clamps $L$ to $[l_{\min},l_{\max}]$ (typically $[-2,3.5]$) so that a cell occupied for a long time can still be freed by a bounded number of contradicting observations; without clamping, a parked vehicle observed for a minute would need hundreds of free rays to disappear from the map.
+\end{example}
+
+Algorithm~\ref{alg:octomap_update} summarises the basic occupancy update procedure. Each sensor ray traverses the octree, updating intermediate voxels as free space while marking the measured endpoint as occupied. After processing all measurements, neighbouring child nodes sharing identical occupancy states may be recursively merged into their parent node, preserving the compact hierarchical representation.
+
+\begin{algorithm}[t]
+\caption{Incremental Probabilistic OctoMap Update}
+\label{alg:octomap_update}
+\begin{algorithmic}[1]
+\ForAll{sensor rays}
+    \State Traverse the octree along the ray
+    \ForAll{voxels before the endpoint}
+        \State Update free-space log-odds using (\ref{eq:octomap_update})
+    \EndFor
+    \State Update endpoint voxel as occupied
+\EndFor
+\State Prune child nodes with identical occupancy states
+\end{algorithmic}
+\end{algorithm}
+
+From a hardware perspective, probabilistic occupancy mapping exposes several opportunities for acceleration. Sensor-ray processing, voxel indexing, and occupancy updates exhibit substantial data parallelism and can therefore be efficiently implemented using streaming pipelines. In contrast, octree traversal, dynamic node allocation, and tree maintenance involve irregular memory accesses and pointer-based data structures, making them considerably more challenging to accelerate efficiently on FPGA platforms. Consequently, heterogeneous architectures are often adopted, where dedicated hardware accelerates ray processing and occupancy updates, while a host processor manages octree construction, dynamic memory allocation, and tree maintenance. Since octree traversal is typically memory-bound rather than compute-bound, compressed node representations, locality-aware memory organisations, and hierarchical caching generally provide greater performance improvements than simply increasing arithmetic parallelism \cite{jia2022_omu}.
+
+\subsection{Semantic Occupancy Networks}
+
+Recent research has extended classical occupancy mapping towards learned semantic occupancy estimation, where the environment is represented as a dense three-dimensional semantic volume surrounding the ego vehicle. Rather than relying on explicit Bayesian occupancy updates, deep neural networks learn to infer occupancy directly from multimodal sensor observations while simultaneously assigning semantic labels to occupied regions.
+
+SurroundOcc predicts multi-scale three-dimensional semantic occupancy from surround-view cameras, demonstrating that dense occupancy estimation can recover scene geometry beyond explicit object detections \cite{wei2023_surroundocc}. TPVFormer reduces the computational complexity associated with dense voxel reasoning by replacing full volumetric processing with a tri-perspective-view representation that jointly reasons over top, front, and side projections \cite{huang2023_tpvformer}. These approaches illustrate the ongoing transition from sparse object-centric perception towards dense spatial representations that more closely resemble the internal world models required by autonomous driving systems.
+
+Despite replacing handcrafted Bayesian updates with learned inference, these architectures retain the same underlying objective as classical occupancy mapping: estimating the occupancy state of the surrounding three-dimensional environment while explicitly modelling spatial uncertainty.
+
+Occupancy predictions are evaluated per voxel rather than per object. For semantic occupancy with $C$ classes, the standard metric is the mean intersection over union,
+\begin{equation}
+\mathrm{mIoU}=\frac{1}{C}\sum_{c=1}^{C}\frac{\mathrm{TP}_c}{\mathrm{TP}_c+\mathrm{FP}_c+\mathrm{FN}_c},
+\label{eq:miou}
+\end{equation}
+computed over the voxels of the evaluation volume, with the \emph{unknown} (never observed) voxels excluded from the counts so that a network is not penalised for guessing behind occluders. Binary occupancy is scored by the IoU of the occupied class alone. The metric is dominated by the large classes unless averaged per class as in \eqref{eq:miou}: with three classes having $\mathrm{IoU}=(0.80,0.50,0.30)$ (road, vehicle, pedestrian, say) the mIoU is $0.533$, although the road alone would score $0.80$. Reported values on nuScenes-derived occupancy benchmarks are in the $20$--$30\,\%$ mIoU range for camera-only methods \cite{wei2023_surroundocc,huang2023_tpvformer}, far below the detection-level mAP of Table~\ref{tab:deep-fusion-methods}, which illustrates how much harder dense geometry is than object localisation. The probabilistic grids of \deleted{Sect.~\ref{subsec:view-transformation}}\added{Sect.~\ref{subsec:occupancy-mapping}} and the learned grids can be fused in the log-odds domain by treating the network's per-voxel probability as the inverse sensor model in \eqref{eq:octomap_update}, which is a simple and effective hybrid.
+
+\subsection{Design Trade-offs}
+
+Despite their advantages, BEV and occupancy-based representations introduce important design trade-offs. The quality of BEV features depends strongly on sensor calibration, synchronisation, depth estimation accuracy, and the selected spatial resolution. Increasing the grid or voxel resolution improves geometric fidelity but proportionally increases memory traffic and computational cost, making efficient hardware implementation particularly challenging for embedded platforms.
+
+Occupancy representations must also treat uncertainty carefully, since unobserved regions should not be interpreted as free space. Furthermore, dynamic objects require temporal reasoning to distinguish persistent static occupancy from transient motion. Consequently, modern BEV and occupancy systems increasingly integrate temporal fusion, multi-sensor redundancy, uncertainty-aware inference, and hierarchical spatial representations. These characteristics make occupancy-based perception highly attractive for autonomous driving while simultaneously motivating specialised hardware accelerators capable of sustaining real-time throughput under stringent power and memory constraints.
+
+\section{Multi-Sensor Localisation, Odometry, and SLAM}
+%
+
+% Simultaneous localisation and mapping (SLAM), odometry, and map-based localisation are essential applications of sensor fusion. Visual odometry estimates motion from camera images, visual--inertial odometry fuses camera and IMU measurements, LiDAR odometry estimates motion through point-cloud registration, and LiDAR--inertial odometry combines geometric scan matching with high-rate inertial prediction. Multi-state constraint Kalman filtering and keyframe-based optimisation are representative approaches for visual--inertial fusion \cite{mourikis_multistate_2007, leutenegger_keyframe_2015}. Widely used systems illustrate the design space: ORB-SLAM2 performs feature-based visual SLAM with loop closure \cite{murartal2017_orbslam2}; LOAM splits LiDAR odometry and mapping into fast and slow threads \cite{zhang2014_loam}; LIO-SAM couples LiDAR and IMU factors in a sliding-window factor graph \cite{shan2020_liosam}; and FAST-LIO2 performs direct LiDAR--inertial odometry with an iterated Kalman filter for real-time embedded operation \cite{xu2022_fastlio2}.
+
+% In autonomous driving, localisation often combines GNSS, IMU, wheel odometry, LiDAR, camera observations, and high-definition maps. GNSS provides global position updates when available, while IMU and odometry provide short-term motion estimates. Camera and LiDAR measurements can be matched against landmarks or map features to correct drift and achieve lane-level localisation. The fusion problem becomes particularly challenging in tunnels, dense urban environments, areas with poor map coverage, and scenes with repeated or ambiguous structures.
+
+Simultaneous localisation and mapping (SLAM), odometry, and map-based localisation are central applications of sensor fusion in autonomous systems. Odometry estimates the incremental motion of the vehicle, SLAM jointly estimates the vehicle trajectory and a map of the environment, while map-based localisation estimates the vehicle pose with respect to a previously constructed map. These tasks are closely related, but they differ in their assumptions: odometry can operate without a prior map but accumulates drift, SLAM reduces drift by building and revisiting a map, and map-based localisation can provide globally consistent pose estimates when reliable map features are available.
+
+From a probabilistic perspective, SLAM jointly estimates the vehicle trajectory and the map from a sequence of sensor observations. Let $x_{0:t}$ denote the vehicle trajectory up to time $t$, $m$ the map, $u_{1:t}$ the control or inertial inputs, and $z_{1:t}$ the sensor measurements. The SLAM objective is to estimate the posterior distribution
+
+\begin{equation}
+P(x_{0:t},m|z_{1:t},u_{1:t}),
+\label{eq:slam_posterior}
+\end{equation}
+
+which is recursively updated as new measurements become available. Practical implementations approximate this posterior using Bayesian filtering, nonlinear optimisation, or graph-based smoothing techniques depending on the computational requirements and sensor configuration.
+
+Different sensors contribute complementary information to the localisation problem. Visual odometry estimates motion from camera images using feature correspondences, direct photometric alignment, or learned image representations. Visual--inertial odometry combines camera measurements with inertial measurement unit (IMU) data, using high-rate inertial prediction to bridge gaps between image frames and improve robustness during rapid motion or partial visual degradation. Multi-state constraint Kalman filtering and keyframe-based optimisation are representative approaches for visual--inertial fusion \cite{mourikis_multistate_2007, leutenegger_keyframe_2015}. LiDAR odometry estimates motion from point-cloud registration and is generally more robust to illumination changes than vision-only methods, while LiDAR--inertial odometry combines geometric scan matching with high-rate inertial propagation.
+
+Widely used systems illustrate this design space. ORB-SLAM2 performs feature-based visual SLAM with relocalisation and loop closure, making it suitable for camera-based mapping in structured environments \cite{murartal2017_orbslam2}. LOAM separates LiDAR odometry and mapping into fast and slow processing threads, balancing real-time motion estimation with lower-rate map refinement \cite{zhang2014_loam}. LIO-SAM formulates LiDAR--inertial odometry as a factor-graph problem, combining IMU preintegration, LiDAR factors, and optional global measurements in a sliding-window optimisation framework \cite{shan2020_liosam}. FAST-LIO2 instead performs direct LiDAR--inertial odometry with an iterated Kalman filter, avoiding explicit feature extraction and supporting real-time operation on embedded platforms \cite{xu2022_fastlio2}.
+
+Many modern localisation systems formulate sensor fusion as a nonlinear factor-graph optimisation problem. Vehicle poses, landmarks, IMU states, and other variables are represented as graph nodes, while sensor observations define probabilistic constraints (factors) between them. The corresponding optimisation problem can be written as
+
+\begin{equation}
+\hat{\mathbf{x}}
+=
+\arg\min_{\mathbf{x}}
+\sum_i
+\left\|
+\mathbf{r}_i(\mathbf{x})
+\right\|_{\mathbf{\Omega}_i}^{2},
+\label{eq:factor_graph}
+\end{equation}
+
+where $\mathbf{r}_i(\mathbf{x})$ denotes the residual associated with measurement $i$, and $\mathbf{\Omega}_i$ is the corresponding information matrix that weights the confidence of each observation. Visual reprojection errors, LiDAR scan-matching constraints, IMU preintegration factors, GNSS priors, wheel odometry, and loop-closure observations naturally become different factor types within the same optimisation framework. Equation~\eqref{eq:factor_graph} is the factor-graph formulation introduced at the end of Chapter~\ref{sec:classicalSF}: with Gaussian factors, $\mathbf{\Omega}_i=\mathbf{R}_i^{-1}$, and the problem is the weighted least-squares problem of that chapter extended to a nonlinear residual, solved by Gauss--Newton or Levenberg--Marquardt iterations on the linearised system $\big(\sum_i\mathbf{J}_i^{\mathsf T}\mathbf{\Omega}_i\mathbf{J}_i\big)\delta\mathbf{x}=-\sum_i\mathbf{J}_i^{\mathsf T}\mathbf{\Omega}_i\mathbf{r}_i$, with $\mathbf{J}_i=\partial\mathbf{r}_i/\partial\mathbf{x}$ \cite{grisetti2010_graphslam,dellaert2017_factor_graphs}. Sect.~\ref{subsec:pose-graph-example} works a small instance by hand.
+
+In autonomous driving, localisation typically combines Global Navigation Satellite System (GNSS) measurements, IMU data, wheel odometry, camera observations, LiDAR scans, radar measurements, and high-definition (HD) maps. GNSS provides global position updates when satellite visibility is sufficient, but it can degrade severely in tunnels, urban canyons, under bridges, or near tall buildings. IMU and wheel odometry provide short-term motion continuity, but their errors accumulate over time. Cameras provide semantic and geometric cues such as lane markings, traffic signs, poles, and road boundaries, while LiDAR provides accurate three-dimensional structure that can be matched against point-cloud or landmark maps. Radar can further improve robustness under adverse weather and low-visibility conditions, although its lower spatial resolution makes data association more challenging. The maps produced or consumed by localisation and SLAM systems may take several forms, including sparse landmarks, point clouds, high-definition maps, or occupancy representations such as OctoMap \cite{hornung2013_octomap}.
+
+Algorithm~\ref{alg:slam_pipeline} summarises the generic processing pipeline adopted by many modern multi-sensor localisation and SLAM systems.
+
+\begin{algorithm}[t]
+\caption{Generic Multi-Sensor Localisation and SLAM Pipeline}
+\label{alg:slam_pipeline}
+\begin{algorithmic}[1]
+\State Acquire and synchronise multi-sensor measurements
+\State Predict the vehicle state using IMU and/or wheel odometry
+\State Extract visual, LiDAR, or radar features
+\State Perform data association or scan registration
+\State Estimate relative motion (odometry)
+\State Insert measurement constraints into the estimation framework
+\If{loop closure is detected}
+    \State Add loop-closure constraints
+\EndIf
+\State Optimise the trajectory estimate
+\State Update the map representation
+\end{algorithmic}
+\end{algorithm}
+
+The probabilistic formulation of localisation gives rise to different estimation architectures depending on the required accuracy, latency, and computational complexity. Filtering-based methods, such as extended Kalman filters or multi-state constraint filters, are computationally efficient and suitable for high-rate state estimation, but they may be less flexible when handling delayed measurements, loop closures, or complex constraints. Graph-based methods represent poses, landmarks, IMU factors, scan-matching constraints, GNSS priors, and map observations in a common optimisation problem, allowing more accurate smoothing and loop-closure correction at the cost of higher computational and memory requirements. Practical systems often combine both: a high-rate filter provides real-time pose estimates, while a lower-rate optimisation back-end refines the trajectory and corrects accumulated drift.
+
+Robust localisation also requires careful treatment of uncertainty and failure modes. Dynamic objects can corrupt visual feature tracking and LiDAR scan matching, repeated structures can cause ambiguous data association, and map changes can make prior maps unreliable. Weather, lighting, motion blur, sensor calibration errors, time synchronisation errors, and vibration further affect localisation accuracy. Consequently, modern localisation systems increasingly rely on redundant sensing, temporal consistency checks, semantic map features, uncertainty-aware fusion, and failure detection rather than a single dominant sensor.
+
+From an embedded-systems perspective, localisation and SLAM workloads are demanding because they combine high-rate sensor input, irregular memory access, matrix operations, nearest-neighbour search, scan matching, feature tracking, and nonlinear optimisation. Efficient hardware/software partitioning therefore requires identifying computational kernels that dominate execution time. Dense linear algebra, point-cloud filtering, feature extraction, and scan registration are well suited to parallel hardware acceleration, whereas graph optimisation, loop-closure detection, and data association remain dominated by irregular memory accesses and dynamic data structures. Consequently, heterogeneous CPU--GPU--FPGA architectures are increasingly adopted, allowing highly parallel numerical kernels to be accelerated in hardware while preserving the flexibility of software for graph management and high-level optimisation.
+
+\subsection{IMU Preintegration}
+\label{subsec:imu-preintegration}
+An IMU delivers specific force $\mathbf{a}_m$ and angular rate $\boldsymbol{\omega}_m$ at hundreds of hertz, corrupted by slowly varying biases $\mathbf{b}_a,\mathbf{b}_g$ and white noise. Integrating them between two keyframes $i$ and $j$ gives the kinematic prediction
+\begin{align}
+\mathbf{R}_j&=\mathbf{R}_i\prod_{k=i}^{j-1}\mathrm{Exp}\big((\boldsymbol{\omega}_{m,k}-\mathbf{b}_g)\Delta t\big),\qquad
+\mathbf{v}_j=\mathbf{v}_i+\mathbf{g}\,\Delta t_{ij}+\sum_{k=i}^{j-1}\mathbf{R}_k(\mathbf{a}_{m,k}-\mathbf{b}_a)\Delta t,\nonumber\\
+\mathbf{p}_j&=\mathbf{p}_i\deletedmath{+\mathbf{v}_i\Delta t_{ij}+\tfrac12\mathbf{g}\,\Delta t_{ij}^{2}}+\sum_{k=i}^{j-1}\Big[\mathbf{R}_k(\mathbf{a}_{m,k}-\mathbf{b}_a)\tfrac{\Delta t^{2}}{2}+\mathbf{v}_k\Delta t\added{+\tfrac12\mathbf{g}\,\Delta t^{2}}\Big],
+\label{eq:imu-integration}
+\end{align}
+where $\mathbf{R}$ is the orientation, $\mathrm{Exp}(\cdot)$ the exponential map of $SO(3)$, and $\mathbf{g}$ gravity. The difficulty in an optimisation back-end is that \eqref{eq:imu-integration} depends on the state at keyframe $i$, so every time the optimiser moves $\mathbf{R}_i,\mathbf{v}_i,\mathbf{p}_i$ the whole sum would have to be recomputed. \emph{Preintegration} \cite{forster2017_preintegration} rewrites the sums in the frame of keyframe $i$,
+\begin{align}
+\Delta\mathbf{R}_{ij}&=\prod_{k=i}^{j-1}\mathrm{Exp}\big((\boldsymbol{\omega}_{m,k}-\mathbf{b}_g)\Delta t\big),\qquad
+\Delta\mathbf{v}_{ij}=\sum_{k=i}^{j-1}\Delta\mathbf{R}_{ik}(\mathbf{a}_{m,k}-\mathbf{b}_a)\Delta t,\nonumber\\
+\Delta\mathbf{p}_{ij}&=\sum_{k=i}^{j-1}\Big[\Delta\mathbf{v}_{ik}\Delta t+\tfrac12\Delta\mathbf{R}_{ik}(\mathbf{a}_{m,k}-\mathbf{b}_a)\Delta t^{2}\Big],
+\label{eq:imu-preintegration}
+\end{align}
+which depend only on the raw measurements and the bias estimate, not on the state. They are computed once per keyframe interval, together with their covariance (propagated by the same recursion as \eqref{eq:kf_cov_prediction}) and with Jacobians with respect to the biases so that a small bias change can be absorbed by a first-order correction instead of re-integration. The result is a single relative-motion factor between consecutive keyframes whose residual is $\mathbf{r}_{\mathrm{IMU}}=\big[\mathrm{Log}(\Delta\mathbf{R}_{ij}^{\mathsf T}\mathbf{R}_i^{\mathsf T}\mathbf{R}_j),\;\mathbf{R}_i^{\mathsf T}(\mathbf{v}_j-\mathbf{v}_i-\mathbf{g}\Delta t_{ij})-\Delta\mathbf{v}_{ij},\;\mathbf{R}_i^{\mathsf T}(\mathbf{p}_j-\mathbf{p}_i-\mathbf{v}_i\Delta t_{ij}-\tfrac12\mathbf{g}\Delta t_{ij}^{2})-\Delta\mathbf{p}_{ij}\big]$; this is the ``IMU preintegration factor'' used by LIO-SAM \cite{shan2020_liosam} and by every modern visual--inertial back-end. Preintegration is therefore an exact algebraic rearrangement, not an approximation of the IMU model, and it is what makes hundreds of IMU samples per keyframe affordable inside \eqref{eq:factor_graph}.
+
+\subsection{A Worked Pose-Graph Example}
+\label{subsec:pose-graph-example}
+\begin{example}[Four poses, one loop closure]
+\label{ex:pose-graph-1d}
+A vehicle moves along a straight corridor and its position is estimated at four instants, $x_0,\ldots,x_3$ (one-dimensional, so that the problem is linear and every step can be checked by hand; the companion script in the folder \repopath{ch04\_\allowbreak pose\_\allowbreak graph\_\allowbreak 1d} of \repopath{companion\_\allowbreak repo/\allowbreak examples} reproduces the numbers and the exercises extend the example to planar poses). The first pose is anchored, $x_0=0$. Wheel odometry reports three displacements $x_1-x_0=1.0$, $x_2-x_1=1.0$, $x_3-x_2=1.0$~m, each with standard deviation $0.10$~m. A LiDAR place-recognition module then recognises the start of the corridor from pose 3 and provides a loop closure $x_3-x_0=2.7$~m, also with standard deviation $0.10$~m. The graph has four factors; with $\mathbf{x}=(x_1,x_2,x_3)^{\mathsf T}$ the residual vector of \eqref{eq:factor_graph} is $\mathbf{r}(\mathbf{x})=\mathbf{A}\mathbf{x}-\mathbf{b}$ with
+\begin{equation*}
+\mathbf{A}=\begin{bmatrix}1&0&0\\-1&1&0\\0&-1&1\\0&0&1\end{bmatrix},\qquad
+\mathbf{b}=\begin{bmatrix}1.0\\1.0\\1.0\\2.7\end{bmatrix},\qquad
+\mathbf{\Omega}_i=\sigma^{-2}=100\;\;\forall i .
+\end{equation*}
+Since all information weights are equal, the normal equations $\mathbf{A}^{\mathsf T}\mathbf{\Omega}\mathbf{A}\,\widehat{\mathbf{x}}=\mathbf{A}^{\mathsf T}\mathbf{\Omega}\mathbf{b}$ reduce to
+\begin{equation*}
+\begin{bmatrix}2&-1&0\\-1&2&-1\\0&-1&2\end{bmatrix}\widehat{\mathbf{x}}
+=\begin{bmatrix}0\\0\\3.7\end{bmatrix}
+\quad\Longrightarrow\quad
+\widehat{\mathbf{x}}=\frac{1}{4}\begin{bmatrix}3&2&1\\2&4&2\\1&2&3\end{bmatrix}\begin{bmatrix}0\\0\\3.7\end{bmatrix}
+=\begin{bmatrix}0.925\\1.850\\2.775\end{bmatrix}.
+\end{equation*}
+The $0.3$~m discrepancy between dead reckoning ($x_3=3.0$) and the loop closure ($2.7$) is distributed over the four equally reliable factors: each odometry residual becomes $-0.075$~m and the loop-closure residual $+0.075$~m, with a weighted cost of $4\times(0.075/0.1)^{2}=2.25$, below the $95\,\%$ bound $3.84$ of the $\chi^{2}_{1}$ distribution expected for one redundant measurement. The marginal covariance is the inverse information matrix scaled by $\sigma^{2}$: $\operatorname{var}(\widehat{x}_3)=0.01\times 3/4=0.0075$~m$^{2}$, i.e.\ a standard deviation of $0.087$~m, against $\sqrt{3}\times0.10=0.173$~m without the loop closure. This halving of the uncertainty of the most recent pose, and the back-propagation of the correction to the earlier poses $x_1$ and $x_2$, which no filter would revise, is the whole point of smoothing over a filter. If the loop-closure module overstates its precision --- say it reports $\sigma=0.02$~m for the same measurement --- the solution becomes $(0.901,\,1.803,\,2.704)$: almost all of the discrepancy is pushed into the odometry residuals ($-0.099$~m each) and a wrong loop closure would corrupt the entire trajectory. Learned place-recognition modules must therefore report calibrated confidences (Sect.~\ref{subsec:calibration}), and robust kernels or switchable constraints are used to down-weight loop closures whose residual is implausible under their declared covariance, which is the smoothing analogue of the gating test \eqref{eq:mahalanobis_gate}.
+\end{example}
+For planar or three-dimensional poses the residuals are nonlinear in the orientation and the same normal equations are solved iteratively (Gauss--Newton), relinearising $\mathbf{A}$ at every step; iSAM2 \cite{kaess2012_isam2} keeps the factorisation of the information matrix incrementally updated so that adding a factor costs far less than a full re-solve.
+
+\subsection{The Multi-State Constraint Kalman Filter}
+\label{subsec:msckf}
+Between a full smoother and a plain EKF sits the multi-state constraint Kalman filter (MSCKF) \cite{mourikis_multistate_2007}, the standard filtering solution for visual--inertial odometry. Its state augments the current IMU state $\mathbf{x}_{\mathrm{IMU}}=(\mathbf{R},\mathbf{v},\mathbf{p},\mathbf{b}_a,\mathbf{b}_g)$ with a sliding window of $N_c$ past camera poses, $\mathbf{x}=(\mathbf{x}_{\mathrm{IMU}},\boldsymbol{\pi}_1,\ldots,\boldsymbol{\pi}_{N_c})$, but \emph{not} the landmark positions. When a visual feature observed in several of these poses is lost, its 3D position $\mathbf{p}_f$ is triangulated by least squares from the current pose estimates, and the linearised reprojection residual $\mathbf{r}=\mathbf{H}_x\delta\mathbf{x}+\mathbf{H}_f\delta\mathbf{p}_f+\mathbf{n}$ is projected onto the left null space of $\mathbf{H}_f$: with $\mathbf{N}$ a basis of that null space, $\mathbf{r}_o=\mathbf{N}^{\mathsf T}\mathbf{r}=\mathbf{N}^{\mathsf T}\mathbf{H}_x\delta\mathbf{x}+\mathbf{N}^{\mathsf T}\mathbf{n}$ no longer depends on the landmark and is a measurement that constrains only the poses, which is then absorbed by the ordinary Kalman update \eqref{eq:kf_innovation}--\eqref{eq:kf_cov_update}. The cost is linear in the number of features and cubic only in the window size $N_c$ (typically $10$--$30$), which is why the MSCKF runs comfortably on embedded hardware; its limitation is that, like every filter, it cannot revisit the linearisation points of poses that have left the window, and loop closures must be handled by a separate back-end.
+
+\section{Reliability-Aware, Fuzzy, and Explainable Fusion}
+
+% % Addressed: the subsection covers reliability-aware weighting (opening paragraphs), fuzzy inference, explainable fusion, and neuro-fuzzy systems; a worked numerical example has been added below.
+
+
+Reliability-aware fusion aims to adapt the contribution of each sensing modality according to its current quality, uncertainty, and operational context. This is particularly important in autonomous driving because sensor reliability varies continuously with environmental conditions. For example, camera reliability may decrease under darkness, glare, or heavy rain; LiDAR point density may be reduced by fog, snow, or long range; and radar may remain useful for range and velocity estimation while producing lower-resolution spatial measurements. Such reliability variations motivate fusion strategies that explicitly account for uncertainty, imprecision, and context-dependent sensor quality \cite{khaleghi_multisensor_2013, hall_introduction_1997}.
+
+Fuzzy logic provides an interpretable mechanism for modelling gradual changes in sensor reliability and has long been used to represent imprecise information through degrees of membership rather than binary decisions \cite{zadeh_fuzzy_1965}. Instead of treating a sensor as either valid or invalid, fuzzy fusion represents reliability using degrees of membership. Let $q_i$ denote a quality indicator for sensor $i$, such as image brightness, visibility, signal-to-noise ratio, detection confidence, point-cloud density, radar return strength, calibration residual, or estimated measurement uncertainty. A fuzzy membership function maps this quality indicator to a linguistic reliability class:
+\begin{equation}
+    \mu_A(q_i): Q \rightarrow [0,1],
+\end{equation}
+where $A$ may represent classes such as \emph{low reliability}, \emph{medium reliability}, or \emph{high reliability}. A common triangular membership function is given by
+\begin{equation}
+    \mu_A(q_i) =
+    \max\left(0,
+    \min\left(
+    \frac{q_i-a}{b-a},
+    \frac{c-q_i}{c-b}
+    \right)\right),
+\end{equation}
+where $a$, $b$, and $c$ define the support and peak of the fuzzy set \cite{zadeh_fuzzy_1965}.
+
+Fuzzy rules can then be used to infer sensor reliability or fusion weights. For example, an autonomous-driving fusion system may encode rules such as:
+\begin{list4a}
+    \item if camera visibility is low and radar confidence is high, decrease the camera weight and increase the radar weight;
+    \item if LiDAR point density is high and calibration residual is low, assign high reliability to LiDAR geometry.
+\end{list4a}
+ Such rule-based structures are useful when fusion behaviour must remain interpretable, auditable, or adjustable by domain experts \cite{zadeh_fuzzy_1965, khaleghi_multisensor_2013}.
+
+After rule evaluation and aggregation, the fuzzy output is defuzzified into numerical weights (the inference and defuzzification steps are specified in Sect.~\ref{subsec:mamdani-sugeno}). If $\hat{x}_i$ denotes the estimate produced by sensor or modality $i$ and $w_i$ denotes its reliability weight, a simple weighted fusion estimate can be written as
+\begin{equation}
+    \hat{x} =
+    \frac{\sum_{i=1}^{N} w_i \hat{x}_i}
+    {\sum_{i=1}^{N} w_i}.
+\end{equation}
+For classification or detection tasks, the same principle can be applied to modality-specific confidence scores:
+\begin{equation}
+    s_c =
+    \frac{\sum_{i=1}^{N} w_i s_{i,c}}
+    {\sum_{i=1}^{N} w_i},
+\end{equation}
+where $s_{i,c}$ is the confidence assigned by modality $i$ to class $c$ and $s_c$ is the fused class confidence. Weighted fusion schemes of this form are commonly used as simple but effective baselines for combining uncertain or heterogeneous sensor estimates \cite{hall_introduction_1997, khaleghi_multisensor_2013}.
+
+This formulation is useful for autonomous-driving scenarios in which the fusion strategy should adapt to context. In clear daytime conditions, camera and LiDAR features may receive high weights for semantic and geometric perception. In fog, heavy rain, or night-time driving, radar may be assigned greater importance for range and velocity estimation. If calibration residuals increase or LiDAR point density decreases, the system can reduce the influence of LiDAR-derived estimates. Similarly, if camera exposure or visibility indicators degrade, the system can reduce reliance on image-based detections. These examples align with the broader requirement for robust multimodal perception in autonomous-driving systems, where camera, LiDAR, radar, inertial, and map-based information must be combined under changing environmental and operational conditions \cite{khaleghi_multisensor_2013, baltrusaitis_multimodal_2019}.
+
+
+\begin{example}
+Consider the fusion of range estimates to a leading vehicle at dusk in light fog. The quality indicators, normalised to $[0,1]$, are $q_{\mathrm{cam}}=0.3$ (low contrast), $q_{\mathrm{lid}}=0.5$ (reduced point density), and $q_{\mathrm{rad}}=0.9$ (radar largely unaffected). Using the triangular membership function with $(a,b,c)=(0,1,2)$, so that $\mu(q)=q$ on the relevant range, and taking the defuzzified weights proportional to the memberships, we obtain $w_{\mathrm{cam}}=0.3/1.7\approx0.18$, $w_{\mathrm{lid}}=0.5/1.7\approx0.29$, and $w_{\mathrm{rad}}=0.9/1.7\approx0.53$. If the modality-specific range estimates are $\hat{x}_{\mathrm{cam}}=41.8$~m, $\hat{x}_{\mathrm{lid}}=42.6$~m, and $\hat{x}_{\mathrm{rad}}=43.1$~m, the fused estimate is
+\begin{equation*}
+\hat{x} \approx 0.18\cdot41.8 + 0.29\cdot42.6 + 0.53\cdot43.1 \approx 42.7~\mathrm{m},
+\end{equation*}
+which is pulled towards the radar reading, whereas an unweighted average would return $42.5$~m. In clear daylight the same rule base would yield $q_{\mathrm{cam}}\approx0.9$ and shift the weights back towards the camera and LiDAR estimates, illustrating how the fusion behaviour adapts continuously to context while remaining fully auditable: the reported weights themselves explain why each sensor was trusted.
+\end{example}
+
+
+Explainable fusion extends this idea by making the fusion decision traceable. Instead of producing only a fused detection or trajectory, the system can report which sensors contributed most strongly, which reliability indicators affected the decision, and whether any sensor conflicts were detected. This is valuable for debugging, validation, safety monitoring, and post-incident analysis. Interpretability is particularly important when learning-based multimodal fusion models are used, since such models may achieve strong empirical performance while offering limited visibility into how different modalities contribute to the final output \cite{baltrusaitis_multimodal_2019}.
+
+Neuro-fuzzy systems combine fuzzy reasoning with learning-based parameter estimation. In such systems, membership functions, rule weights, or defuzzification parameters may be learned from data while retaining a partially interpretable rule structure. This can help model complex context-dependent reliability patterns in camera--LiDAR--radar fusion. However, because autonomous driving is safety critical, learned fuzzy or neuro-fuzzy fusion systems must be evaluated under rare events, degraded sensing, and out-of-distribution conditions rather than only on standard benchmark performance \cite{khaleghi_multisensor_2013, baltrusaitis_multimodal_2019}.
+
+\subsection{Mamdani and Sugeno Inference}
+\label{subsec:mamdani-sugeno}
+Two inference schemes dominate practice. In \emph{Mamdani} inference \cite{mamdani1975_fuzzy} both antecedents and consequents are fuzzy sets. A rule ``if $q_1$ is $A_1$ and $q_2$ is $A_2$ then $w$ is $B$'' fires with strength $\tau=\min\{\mu_{A_1}(q_1),\mu_{A_2}(q_2)\}$ (or the product, for a probabilistic reading of the conjunction), its consequent is clipped, $\mu_{B}'(w)=\min\{\tau,\mu_{B}(w)\}$, and the clipped consequents of all $J$ rules are aggregated by the maximum, $\mu_{\mathrm{out}}(w)=\max_j\mu_{B_j}'(w)$. The aggregated set is turned into a number by \emph{centroid defuzzification},
+\begin{equation}
+w^{\ast}=\frac{\displaystyle\int_{W} w\,\mu_{\mathrm{out}}(w)\,\mathrm{d}w}{\displaystyle\int_{W}\mu_{\mathrm{out}}(w)\,\mathrm{d}w}
+\;\approx\;
+\frac{\sum_{k} w_k\,\mu_{\mathrm{out}}(w_k)}{\sum_{k}\mu_{\mathrm{out}}(w_k)},
+\label{eq:centroid-defuzzification}
+\end{equation}
+evaluated on a discretisation $\{w_k\}$ of the output range $W$. In \emph{Sugeno} (Takagi--Sugeno--Kang) inference \cite{takagi1985_sugeno} the consequent of each rule is a crisp function of the inputs, typically affine, $w_j=\mathbf{a}_j^{\mathsf T}\mathbf{q}+c_j$, and the output is the firing-strength-weighted average
+\begin{equation}
+w^{\ast}=\frac{\sum_{j=1}^{J}\tau_j\,w_j}{\sum_{j=1}^{J}\tau_j},
+\label{eq:sugeno-output}
+\end{equation}
+which needs no integration and is differentiable in the consequent parameters. The worked example earlier in this section is a zero-order Sugeno system with one rule per sensor, constant consequents, and $\tau_j=\mu(q_j)$, which is why the weights came out proportional to the memberships. Mamdani systems are preferred when the rule base is written by domain experts and must read as linguistic statements; Sugeno systems are preferred when the parameters are to be learned, because \eqref{eq:sugeno-output} is exactly a mixture-of-experts gate \eqref{eq:moe-gate} with a membership-based rather than softmax gate, and the adaptive-network fuzzy inference system (ANFIS) \cite{jang1993_anfis} trains the membership and consequent parameters by gradient descent and least squares, respectively. This is the formal content of the neuro-fuzzy systems mentioned above.
+
+\subsection{From Learned Reliability to Evidence Discounting}
+\label{subsec:reliability-to-discounting}
+The three reliability devices met so far --- the defuzzified weight $w_i$ of this section, the logistic probability $p_i$ of Sect.~\ref{subsec:learned-reliability}, and the heteroscedastic variance of Sect.~\ref{subsec:heteroscedastic} --- all answer the same question, ``how much should source $i$ be trusted now?'', and all can be mapped to the discount factor $\alpha_i$ of the evidence-theoretic combination in Chapter~\ref{sec:classicalSF}. The natural choice is $\alpha_i=p_i$ (or $\alpha_i=w_i/\max_j w_j$ for defuzzified weights): the discounted basic belief assignment keeps the fraction $\alpha_i$ of the source's mass on its focal elements and transfers $1-\alpha_i$ to the frame $\Omega$, so that an unreliable source becomes vacuous rather than being switched off. Combining the discounted assignments with Dempster's rule \eqref{eq:dempster} or with the conjunctive rule \eqref{eq:smets} then yields two outputs at once: a fused belief and a conflict mass $K$ whose size measures how much the sources disagree \emph{after} their reliabilities have been accounted for. A large residual conflict is therefore evidence that the reliability model itself is wrong --- the camera is being trusted in a condition it was not trained on --- which is the most valuable signal a monitor can produce in the hybrid pipelines of the next section, where the numbers of Sect.~\ref{subsec:conflict-monitor} make the mechanism concrete. The whole chain is interpretable: an engineer can read the quality indicators, the resulting $\alpha_i$, the discounted masses, and the conflict, and trace a fused decision back to the sensor conditions that produced it.
+
+\section{Hybrid Classical--Learning Architectures}
+% % Addressed in the previous round: concrete pipeline, TikZ figure, and closed-loop discussion added below (blue block).
+
+Many practical autonomous-driving systems combine learning-based perception with classical estimation. Neural networks may produce object detections, semantic segmentation, depth estimates, or occupancy grids, while filters and optimisation methods maintain temporal consistency, estimate motion, propagate uncertainty, and perform data association. This hybrid design reflects the strengths of both paradigms: deep learning provides powerful perception features, while classical methods provide structured state estimation and uncertainty handling.
+
+Examples include neural camera--LiDAR object detectors followed by Kalman-filter tracking, learned visual features incorporated into visual--inertial odometry, learned uncertainty estimates used as measurement covariances, and occupancy networks combined with rule-based safety monitors. Hybrid systems are especially important for safety-critical deployment because they allow black-box perception components to be supported by interpretable temporal consistency checks, sensor-health monitoring, and conservative fallback mechanisms.
+
+
+A concrete pipeline illustrates how the classical tools of Chapter~\ref{sec:classicalSF} and the learned components of this section interlock; the structure is sketched in Fig.~\ref{fig:hybrid-pipeline}. A neural camera--LiDAR detector (e.g., a TransFusion- or BEVFusion-style network \cite{bai2022_transfusion,liu2023_bevfusion}) produces 3D detections with class scores and, ideally, learned covariances. A Kalman or unscented Kalman tracker consumes these detections as measurements: the learned covariance enters directly as the measurement-noise matrix $\mathbf{R}$, so that a detection reported with low confidence automatically receives a small gain, and the innovation covariance from Chapter~\ref{sec:classicalSF} supplies a principled gating distance for association. On top of the tracker, an evidence-theoretic conflict monitor converts per-modality detection confidences into basic belief assignments and tracks the conflict mass $K$: persistent conflict between camera- and LiDAR-derived evidence signals glare, miscalibration, or an out-of-distribution scene, and can down-weight the offending modality through the discounting mechanism of the evidence-theory subsection or trigger a conservative fallback. A set-membership layer can finally check that fused tracks remain inside kinematically reachable zonotopes.
+
+This closed loop addresses the two main weaknesses of each paradigm. The learned detector contributes recognition performance that no hand-designed model achieves, while the classical layer contributes exactly what deep networks lack: calibrated temporal consistency, explicit uncertainty propagation, and auditable rejection logic. Learned uncertainty feeds \emph{into} the filter as $\mathbf{R}$; filter residuals feed \emph{back} as a supervision-free health signal for the network's confidence calibration. In deployment, this \deleted{is the dominant industrial pattern}\added{has long been a common industrial pattern}: perception is learned, but tracking, association, ego-state estimation, and safety monitoring remain model-based. \added{End-to-end architectures that learn perception, prediction, and planning jointly now challenge this division of labour, as discussed in Sect.~\ref{subsec:oc-foundation}.}
+
+\begin{figure}[!t]
+    \centering
+    \begin{tikzpicture}[
+        font=\scriptsize,
+        blk/.style={draw=blue!70!black, rounded corners=2pt, fill=blue!5, align=center, text width=2.0cm, minimum height=0.95cm},
+        mon/.style={draw=blue!85!black, rounded corners=2pt, fill=blue!12, align=center, text width=2.0cm, minimum height=0.95cm},
+        >=Latex
+    ]
+        \node[blk] (det) at (0,0) {Neural detector\\(camera + LiDAR)\\boxes, scores, $\mathbf{R}$};
+        \node[blk] (kf) at (2.9,0) {Kalman tracker\\gating, association,\\innovation tests};
+        \node[mon] (ev) at (5.8,0) {Evidence monitor\\conflict $K$,\\discounting $\alpha_i$};
+        \node[blk] (plan) at (5.8,-1.6) {Planner /\\conservative\\fallback};
+        \draw[->, thick, blue!75!black] (det.east) -- (kf.west);
+        \draw[->, thick, blue!75!black] (kf.east) -- (ev.west);
+        \draw[->, thick, blue!75!black] (ev.south) -- (plan.north);
+        \draw[->, thick, blue!75!black, dashed] (kf.south) to[out=-90,in=-90] node[below]{residual feedback} (det.south);
+    \end{tikzpicture}
+    \caption{Hybrid classical--learning fusion pipeline: a neural multimodal detector supplies measurements and learned covariances to a Kalman tracker, whose residuals both feed an evidence-theoretic conflict monitor and provide calibration feedback to the detector.}
+    \label{fig:hybrid-pipeline}
+\end{figure}
+
+\subsection{Worked Example: Learned Measurement Covariance in a Kalman Tracker}
+\label{subsec:hybrid-worked-example}
+The first interface of Fig.~\ref{fig:hybrid-pipeline}, learned covariance into $\mathbf{R}_k$, is now quantified on a simulated but fully specified scenario; the companion script in the folder \repopath{ch04\_\allowbreak hybrid\_\allowbreak hetero\_\allowbreak kf} of \repopath{companion\_\allowbreak repo/\allowbreak examples} generates every number and the data of Fig.~\ref{fig:hybrid-hetero-kf}.
+\begin{example}[Heteroscedastic detector noise and tracker consistency]
+\label{ex:hybrid-hetero-kf}
+A leading vehicle starts $70$~m ahead of the ego vehicle at a lateral offset of $3.5$~m and closes at $2.5$~m/s for $20$~s while drifting laterally at $0.05$~m/s; a detector reports its position $(p_x,p_y)$ in the ego frame at $10$~Hz. The detector's error is zero-mean Gaussian but its standard deviation depends on the range $r$ and on a visibility index $v\in[0,1]$,
+\begin{equation}
+\sigma(r,v)=0.15+0.010\,r+2.0\,(1-v)\quad[\mathrm{m}],
+\label{eq:hetero-true-sigma}
+\end{equation}
+so that errors grow with range and jump when visibility drops. A fog patch lowers $v$ from $1$ to $0.30$ between $t=7$ and $t=13$~s. The law \eqref{eq:hetero-true-sigma} is unknown to the tracker. An uncertainty head of the form $\widehat{\sigma}(r,v)=\theta_0+\theta_1 r+\theta_2(1-v)$ is fitted on a training set of $4000$ detections with ground truth (ranges uniform in $[10,75]$~m, $v\in\{1,0.8,0.6,0.3\}$) by least squares on the scaled absolute residuals $|e|\sqrt{\pi/2}$ (Sect.~\ref{subsec:heteroscedastic}); the fit returns $\widehat{\boldsymbol{\theta}}=(0.146,\,0.0100,\,2.017)$, within $3\,\%$ of the true coefficients. The homoscedastic alternative, a single pooled standard deviation over the same training set, is $\sigma_{\mathrm{fix}}=1.336$~m. Two constant-velocity Kalman filters with state $(p_x,p_y,v_x,v_y)$, the process model of Chapter~\ref{sec:classicalSF} with acceleration noise $0.8$~m/s$^{2}$, and the measurement matrix selecting the positions, are run on the same detections: one with the fixed $\mathbf{R}=\sigma_{\mathrm{fix}}^{2}\mathbf{I}_2$ and one with the learned $\mathbf{R}_k=\widehat{\sigma}(r_k,v_k)^{2}\mathbf{I}_2$. A third filter uses the true $\sigma(r_k,v_k)$ as an oracle. Table~\ref{tab:hetero-kf-results} reports the position RMSE over the whole run, in clear and in fog, the average normalised innovation squared \eqref{eq:nis} (ANIS, whose expected value is $n_y=2$), and the fraction of NIS values inside the two-sided $95\,\%$ interval $[0.051,\,7.378]$ of $\chi^{2}_{2}$.
+\begin{table}[!t]
+    \centering
+    \small
+    \caption{Tracking a detector with heteroscedastic noise (Example~\ref{ex:hybrid-hetero-kf}, $201$ steps, fog between $7$ and $13$~s). RMSE in metres.}
+    \label{tab:hetero-kf-results}
+    \begin{tabular}{l c c c c c}
+        \hline
+        & \textbf{RMSE all} & \textbf{RMSE clear} & \textbf{RMSE fog} & \textbf{ANIS} & \textbf{NIS in 95\,\% band} \\
+        \hline
+        raw detections & 1.763 & 0.870 & 2.916 & -- & -- \\
+        KF, fixed $\mathbf{R}$ ($\sigma_{\mathrm{fix}}=1.336$~m) & 0.604 & 0.424 & 0.889 & 1.68 & 86.5\,\% \\
+        KF, learned $\mathbf{R}_k$ & 0.574 & 0.434 & 0.808 & 2.03 & 96.5\,\% \\
+        KF, oracle $\mathbf{R}_k$ & 0.574 & 0.433 & 0.809 & 2.00 & 96.5\,\% \\
+        \hline
+    \end{tabular}
+\end{table}
+Three observations follow. First, the learned covariance reduces the overall RMSE from $0.604$ to $0.574$~m and the RMSE in fog from $0.889$ to $0.808$~m, and it is indistinguishable from the oracle: the uncertainty head has recovered everything the tracker could use. Second, and more important for safety, the fixed-$\mathbf{R}$ filter is \emph{inconsistent}: its ANIS is $0.43$ in clear conditions (under-confident, the filter discards good detections) and $4.55$ in fog (over-confident, more than twice the expected value), and only $86.5\,\%$ of its NIS values fall in the $95\,\%$ band, whereas the learned-$\mathbf{R}_k$ filter has ANIS $2.02$ in clear and $2.04$ in fog, with $96.5\,\%$ inside. An over-confident filter in fog is dangerous beyond its RMSE: the gating test \eqref{eq:mahalanobis_gate} with too small an $\mathbf{S}_k$ rejects valid detections, tracks are dropped exactly when visibility is worst, and the innovation monitor raises false alarms. Third, the fixed-$\mathbf{R}$ filter is slightly \emph{better} in clear conditions ($0.424$ versus $0.434$~m) because its over-estimated $\mathbf{R}$ smooths more and the simulated target is exactly constant-velocity; this is the usual trade-off between accuracy on nominal data and consistency, and it is the reason why RMSE alone is not an adequate criterion for choosing a noise model. Figure~\ref{fig:hybrid-hetero-kf} shows the predicted and true standard deviations (the head tracks the range dependence and the fog step closely: $0.84$ versus $0.85$~m at $t=0$, $2.01$ versus $2.00$~m in the fog at $t=10$~s), the position errors, and the NIS traces of the two filters.
+\end{example}
+
+\begin{figure}[!t]
+\centering
+\resizebox{0.99\columnwidth}{!}{
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=1 by 3, vertical sep=14mm},
+    width=0.95\columnwidth,
+    scale only axis,
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    legend style={font=\scriptsize, draw=none, fill=white, fill opacity=0.85, text opacity=1},
+    grid=major,
+    grid style={line width=0.2pt, draw=gray!25},
+    axis line style={line width=0.5pt},
+    tick align=outside,
+    title style={font=\scriptsize, yshift=0.5mm},
+    xmin=0, xmax=20,
+]
+%% ---------------- panel (a): detector noise level ----------------
+\nextgroupplot[
+    height=2.6cm,
+    ylabel={$\sigma$ [m]},
+    ymin=0, ymax=2.6,
+    ytick={0,0.5,1,1.5,2,2.5},
+    legend pos=north west, legend columns=3, legend cell align=left,
+    title={(a) detector error standard deviation: true law, uncertainty head, and pooled constant},
+]
+\addplot[draw=none, fill=ManoeuvreOrange, fill opacity=0.45, forget plot]
+    coordinates {(7,0) (13,0) (13,2.6) (7,2.6)} \closedcycle;
+\addplot[TruthBlack, line width=1.0pt]
+    table[x=t, y=sig_true, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{true $\sigma(r,v)$}
+\addplot[EkfBlue, line width=0.9pt, densely dashed]
+    table[x=t, y=sig_hat, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{learned $\widehat{\sigma}$}
+\addplot[MeasGrey, line width=0.8pt, densely dotted]
+    coordinates {(0,1.336) (20,1.336)};
+\addlegendentry{fixed $\sigma_{\mathrm{fix}}$}
+\node[anchor=south, font=\scriptsize, text=black!70] at (axis cs:10,0.15) {fog};
+%% ---------------- panel (b): position error ----------------
+\nextgroupplot[
+    height=2.6cm,
+    ylabel={position error [m]},
+    ymin=0, ymax=4,
+    ytick={0,1,2,3,4},
+    legend pos=north west, legend columns=3, legend cell align=left,
+    title={(b) position error of the raw detections and of the two trackers},
+]
+\addplot[draw=none, fill=ManoeuvreOrange, fill opacity=0.45, forget plot]
+    coordinates {(7,0) (13,0) (13,4) (7,4)} \closedcycle;
+\addplot[MeasGrey, line width=0.4pt]
+    table[x=t, y=err_meas, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{detections}
+\addplot[MarkerOrange, line width=0.7pt]
+    table[x=t, y=err_fix, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{KF, fixed $\mathbf{R}$}
+\addplot[EkfBlue, line width=0.7pt]
+    table[x=t, y=err_ada, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{KF, learned $\mathbf{R}_k$}
+%% ---------------- panel (c): NIS ----------------
+\nextgroupplot[
+    height=2.6cm,
+    xlabel={time $t$ [s]},
+    ylabel={NIS $d_k^{2}$},
+    ymin=0, ymax=20,
+    ytick={0,5,10,15,20},
+    legend pos=north west, legend columns=2, legend cell align=left,
+    title={(c) innovation consistency against the $\chi^{2}_{2}$ interval},
+]
+\addplot[draw=none, fill=BandGrey, forget plot]
+    coordinates {(0,0.051) (20,0.051) (20,7.378) (0,7.378)} \closedcycle;
+\addplot[draw=none, fill=ManoeuvreOrange, fill opacity=0.45, forget plot]
+    coordinates {(7,0) (13,0) (13,20) (7,20)} \closedcycle;
+\addplot[draw=gray!70, line width=0.5pt, densely dotted, forget plot]
+    coordinates {(0,2) (20,2)};
+\addplot[MarkerOrange, line width=0.5pt]
+    table[x=t, y=nis_fix, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{fixed $\mathbf{R}$}
+\addplot[EkfBlue, line width=0.5pt]
+    table[x=t, y=nis_ada, col sep=comma] {data/ch04/hybrid_hetero_kf.csv};
+\addlegendentry{learned $\mathbf{R}_k$}
+\node[anchor=west, font=\scriptsize, text=black!55] at (axis cs:14.2,5.6) {$95\,\%$ interval};
+\end{groupplot}
+\end{tikzpicture}
+}
+\caption{A detector with heteroscedastic noise feeding a constant-velocity Kalman tracker (Example~\ref{ex:hybrid-hetero-kf}). (a)~True error standard deviation of the detector, the prediction of the learned uncertainty head, and the pooled constant used by the fixed-$\mathbf{R}$ filter; the shaded band is the fog patch. (b)~Position error of the raw detections and of the two filters. (c)~Normalised innovation squared against the two-sided $95\,\%$ interval of $\chi^{2}_{2}$ (dotted line: expected value $2$). The fixed-$\mathbf{R}$ filter is over-confident in fog and under-confident in clear conditions; the learned covariance keeps the filter consistent throughout.}
+\label{fig:hybrid-hetero-kf}
+\end{figure}
+
+\subsection{The Evidence Conflict Monitor in Numbers}
+\label{subsec:conflict-monitor}
+The second interface of Fig.~\ref{fig:hybrid-pipeline} converts the per-modality confidences attached to a fused track into basic belief assignments on $\Omega=\{\text{vehicle},\text{clutter}\}$, $m_i(\{\text{vehicle}\})=\alpha_i c_i$, $m_i(\{\text{clutter}\})=\alpha_i(1-c_i)$, $m_i(\Omega)=1-\alpha_i$, where $c_i$ is the calibrated confidence of modality $i$ and $\alpha_i$ its discount (Sect.~\ref{subsec:reliability-to-discounting}). The conflict between camera and LiDAR is, from \eqref{eq:dempster}, $K=m_{\mathrm{cam}}(\{\text{vehicle}\})\,m_{\mathrm{lid}}(\{\text{clutter}\})+m_{\mathrm{cam}}(\{\text{clutter}\})\,m_{\mathrm{lid}}(\{\text{vehicle}\})$. In clear conditions, with $c_{\mathrm{cam}}=0.92$, $c_{\mathrm{lid}}=0.90$ and $\alpha_{\mathrm{cam}}=\alpha_{\mathrm{lid}}=0.95$, the conflict is $K=0.148$. In the fog patch of Example~\ref{ex:hybrid-hetero-kf} the camera confidence on the same track falls to $0.35$ while the LiDAR keeps $0.88$: if the camera is still trusted at $\alpha_{\mathrm{cam}}=0.95$ the conflict rises to $K=0.554$, a value at which Dempster's rule \eqref{eq:dempster} would renormalise away more than half of the evidence and at which a monitor should raise a flag. Discounting the camera with the learned reliability of the fog condition, $\alpha_{\mathrm{cam}}=0.40$, brings the conflict back to $K=0.233$, and the fused belief follows the LiDAR, as it should. The monitor thus distinguishes two situations that look alike at the detection level: a modality that is unreliable \emph{and known to be} (low $\alpha_i$, low $K$) from one that is unreliable \emph{and still trusted} (high $K$), and only the second requires a fallback. Persistent conflict in conditions the reliability model declares benign is the out-of-distribution signal that no single network can produce about itself.
+
+\subsection{Design Guidelines}
+\label{subsec:hybrid-guidelines}
+The material of this chapter can be condensed into a few rules for building hybrid fusion stacks; Chapter~\ref{sec:application} applies them to a complete autonomous-driving architecture.
+\begin{list4a}
+    \item Learn perception, keep estimation classical: let networks produce measurements $\mathbf{y}_k$ with covariances $\mathbf{R}_k$ and leave temporal integration, association, and gating to the filters and smoothers of Chapter~\ref{sec:classicalSF}, whose assumptions are explicit and checkable.
+    \item Make every learned uncertainty calibrated before it enters a filter: check the ECE \eqref{eq:ece} for confidences and the NIS \eqref{eq:nis} for covariances, and fit a temperature or a scale factor on validation data; an uncalibrated covariance is worse than a fixed one.
+    \item Prefer heteroscedastic covariances over scalar reliabilities when the dominant error sources (range, visibility, occlusion) are observable from the input; prefer logistic or fuzzy reliabilities when only coarse quality indicators are available, and map either to the discount $\alpha_i$ for evidence combination.
+    \item Fuse late when auditability or missing-modality robustness dominates, fuse at the feature level when detection of weak objects dominates, and in both cases train with modality dropout and adverse-condition data.
+    \item Monitor the monitors: innovation statistics, conflict mass, and GP or ensemble spread are the run-time signals that reveal when the learned components leave their training distribution; route them to conservative fallbacks rather than to the planner directly.
+    \item Keep the numbers inspectable: gates, weights, discounts, residuals, and the conditions that produced them should be logged so that a fused decision can be traced back to sensor conditions, which is a prerequisite for the safety argumentation discussed in Chapter~\ref{sec:application}.
+\end{list4a}
+
+\problemsection
+\begin{prob}\label{prob:ch04:1}
+(\emph{Mixture-of-experts gate.}) Three range estimates $\widehat{x}=(41.8,\,42.6,\,43.1)$~m are gated by $g_i\propto\exp(\beta q_i)$ with quality indicators $q=(0.3,0.5,0.9)$. Compute the gate and the fused estimate for $\beta=0$, $\beta=4$, and $\beta=20$, and show analytically that the fused estimate tends to the estimate of the highest-quality source as $\beta\to\infty$. Compare with the proportional weights $w_i=q_i/\sum_j q_j$ of the fuzzy example of this chapter.
+\end{prob}
+\begin{prob}\label{prob:ch04:2}
+(\emph{Learned reliability in weighted least squares.}) Repeat Example~\ref{ex:logistic-wls} for a clear-day scene with $q=(0.9,\,0.8,\,0.9)$ and the same estimates and nominal standard deviations. Give the reliabilities, the fused estimate, and its standard deviation, and explain why the result is now closer to the plain weighted least-squares estimate.
+\end{prob}
+\begin{prob}\label{prob:ch04:3}
+(\emph{Calibration.}) A detector's confidences are binned into five bins with counts $(100,200,300,250,150)$, mean confidences $(0.30,0.50,0.70,0.90,0.98)$ and accuracies $(0.35,0.45,0.60,0.80,0.90)$. Compute the ECE \eqref{eq:ece}. Then, for logits $\mathbf{z}=(3.0,\,1.0,\,0.0)$, compute the softmax probabilities at temperatures $T=1$ and $T=2$ and verify that the arg-max is unchanged.
+\end{prob}
+\begin{prob}\label{prob:ch04:4}
+(\emph{Log-odds occupancy.}) With $p_{\mathrm{hit}}=0.7$, $p_{\mathrm{miss}}=0.4$, prior $L_0=0$, and clamping to $[-2,\,3.5]$, a cell receives $6$ hits followed by $n$ free observations. After how many free observations does the cell's probability fall below $0.5$, with and without clamping? Comment on the role of clamping for dynamic objects.
+\end{prob}
+\begin{prob}\label{prob:ch04:5}
+(\emph{Pose graph by hand.}) Redo Example~\ref{ex:pose-graph-1d} when the loop closure reports $x_3-x_0=2.7$~m with standard deviation $0.05$~m while the odometry keeps $0.10$~m. Derive the normal equations, the solution, the residuals, and the standard deviation of $\widehat{x}_3$. Show in general that, for $n$ equally weighted odometry steps and one loop closure of weight ratio $\rho=\sigma_{\mathrm{odo}}^{2}/\sigma_{\mathrm{lc}}^{2}$, the loop-closure residual equals the discrepancy divided by $1+n\rho$.
+\end{prob}
+\begin{prob}\label{prob:ch04:6}
+(\emph{Computational: miscalibrated uncertainty head.}) Re-run the tracker of Example~\ref{ex:hybrid-hetero-kf} with the learned standard deviation scaled by $c\in\{0.5,\,1,\,2\}$ and report RMSE, ANIS, and the fraction of NIS values inside the $95\,\%$ band for each case. Which case is over-confident, which under-confident, and why can RMSE alone not detect the miscalibration? See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch04/\allowbreak }.
+\end{prob}
+\begin{prob}\label{prob:ch04:7}
+(\emph{Computational: planar pose graph.}) Four poses $(x,y,\theta)$ are driven around a $10$~m square with noisy odometry (standard deviations $0.3$~m, $0.3$~m, $2^{\circ}$) and one loop closure between the last and the first pose ($0.1$~m, $0.1$~m, $1^{\circ}$). Implement Gauss--Newton for \eqref{eq:factor_graph} with the first pose anchored, starting from the dead-reckoning solution, and report the position error of the last pose before and after optimisation, the weighted cost, and the marginal standard deviations of the last pose. See \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch04/\allowbreak }.
+\end{prob}
+\begin{prob}\label{prob:ch04:8}
+(\emph{Fusion operators.}) For the gated fusion \eqref{eq:gated-fusion}, show that concatenation followed by a linear projection can represent any fixed gate but not an input-dependent one. Then compute the cross-attention output \eqref{eq:cross-attention} for $d_k=2$, query $(0,1)$, keys $(1,0),(0,1),(-1,0)$, and values $2,0,-2$, and compare with the example of Sect.~\ref{subsec:fusion-operators}.
+\end{prob}
+
+
+% ============================================

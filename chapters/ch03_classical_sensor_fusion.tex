@@ -8,17 +8,18 @@
 
 % Springer Nature: each chapter should have a 10--15 line online abstract.
 % This chapter abstract has not yet been written in the uploaded manuscript.
-\abstract{\added{This chapter reviews the classical, model-based techniques on which sensor fusion rests, and presents them as variations of a single idea: measurements are pieces of information about a hidden state, to be weighted by their uncertainty and combined additively when they are independent. The chapter starts from the static inverse problem and develops ordinary, weighted, regularised and sequential least squares, their maximum-likelihood and maximum-a-posteriori interpretations, the information matrix, and Gauss--Newton iterations for nonlinear sensor models. The same prediction--correction structure is then extended to dynamic states through Bayesian filtering, covering the Kalman filter, the extended and unscented Kalman filters, particle filters, innovation-based gating and the normalised innovation squared as a consistency diagnostic; a worked automotive-radar cut-in example with real numbers accompanies the discussion. Set-membership and zonotopic estimation are presented as the bounded-error counterpart of probabilistic filtering, with strip intersections, order reduction and a direct comparison with the EKF on the same scenario. Track-level fusion and data association follow, including temporal and spatial alignment, gating, nearest-neighbour, probabilistic and multi-hypothesis association, track management, fusion with known cross-correlation and covariance intersection. Evidence theory (Dempster--Shafer, the transferable belief model and DSmT) is introduced for conflicting qualitative information, optimisation-based fusion and factor graphs for trajectory estimation, and multi-criteria decision-making, in particular incomplete AHP solved by logarithmic least squares, for context-dependent sensor reliability weighting. The chapter closes with ten problems, whose solutions are collected at the end of the book and in the companion repository.}}
+\abstract{This chapter reviews the classical, model-based techniques on which sensor fusion rests, and presents them as variations of a single idea: measurements are pieces of information about a hidden state, to be weighted by their uncertainty and combined additively when they are independent. The chapter starts from the static inverse problem and develops ordinary, weighted, regularised and sequential least squares, their maximum-likelihood and maximum-a-posteriori interpretations, the information matrix, and Gauss--Newton iterations for nonlinear sensor models. The same prediction--correction structure is then extended to dynamic states through Bayesian filtering, covering the Kalman filter, the extended and unscented Kalman filters, particle filters, innovation-based gating and the normalised innovation squared as a consistency diagnostic; a worked automotive-radar cut-in example with real numbers accompanies the discussion. Set-membership and zonotopic estimation are presented as the bounded-error counterpart of probabilistic filtering, with strip intersections, order reduction and a direct comparison with the EKF on the same scenario. Track-level fusion and data association follow, including temporal and spatial alignment, gating, nearest-neighbour, probabilistic and multi-hypothesis association, track management, fusion with known cross-correlation and covariance intersection. Evidence theory (Dempster--Shafer, the transferable belief model and DSmT) is introduced for conflicting qualitative information, optimisation-based fusion and factor graphs for trajectory estimation, and multi-criteria decision-making, in particular incomplete AHP solved by logarithmic least squares, for context-dependent sensor reliability weighting. The chapter closes with ten problems, whose solutions are collected at the end of the book and in the companion repository.}
 \suppressfloats[t]
 
 \section{Mathematical introduction to sensor fusion}
+\label{sec:math-intro}
 % ============================================
 
 Sensor fusion concerns the estimation of an unknown physical quantity from multiple measurements that may differ in modality, dimension, accuracy, sampling rate, and uncertainty. The quantity to be estimated may be a static parameter, such as the location of a stationary source, or a time-varying state, such as the position, velocity, and orientation of a moving vehicle. Table~\ref{tab:notation} collects the notation used throughout the book and records where symbols are reused with different meanings across the method families reviewed here.
 \begin{table}[!t]
     \centering
     \small
-    \caption{\deleted{[To be updated at the end]} Principal notation. Symbols are reused across method families where the literatures conflict; the scope column states where each reading applies.}
+    \caption{Principal notation. Symbols are reused across method families where the literatures conflict; the scope column states where each reading applies.}
     \label{tab:notation}
     \begin{tabular}{p{0.13\linewidth} p{0.44\linewidth} p{0.28\linewidth}}
         \hline
@@ -36,16 +37,56 @@ Sensor fusion concerns the estimation of an unknown physical quantity from multi
         $\Omega$, $m(\cdot)$, $K$ & frame of discernment, belief mass, conflict & evidence theory \\
         $w$, $q$, $\mu$ & fusion weight, quality indicator, membership & reliability-aware fusion \\
         $\mathcal{G}$, $\mathcal{N}_i$ & communication graph, neighbour set & multi-agent fusion \\
-        \added{$\mathbf{H}$} & \added{measurement Jacobian or matrix inside filtering recursions (equals $\mathbf{G}$ for linear models)} & \added{Kalman filtering, Chapters~\ref{sec:learning}--\ref{sec:applications}} \\
-        \added{$\mathbf{L}$, $\lambda_2$, $\epsilon$} & \added{graph Laplacian, algebraic connectivity, consensus step size} & \added{multi-agent fusion} \\
-        \added{$\alpha_i$} & \added{discount (reliability) factor applied to the evidence of source $i$} & \added{evidence theory, reliability-aware fusion} \\
-        \added{NIS, NEES} & \added{normalised innovation squared, normalised estimation error squared (consistency statistics)} & \added{filtering, validation} \\
-        \added{ECE, $T$} & \added{expected calibration error, temperature-scaling parameter} & \added{learning-based fusion} \\
-        \added{$\mathbf{f}_c$, $\mathbf{f}_l$, $\mathbf{f}_r$} & \added{camera, LiDAR, radar feature representations} & \added{deep multimodal fusion} \\
-        \added{$\mathbf{T}_{VS}$, $\mathbf{K}$} & \added{extrinsic sensor-to-vehicle transform in $SE(3)$; camera intrinsic matrix (the gain is written $\mathbf{K}_k$ when both appear)} & \added{calibration and alignment, Chapter~\ref{sec:application}} \\
+        $\mathbf{H}$ & measurement Jacobian or matrix inside filtering recursions (equals $\mathbf{G}$ for linear models) & Kalman filtering, Chapters~\ref{sec:learning}--\ref{sec:applications} \\
+        $\mathbf{L}$, $\lambda_2$, $\epsilon$ & graph Laplacian, algebraic connectivity, consensus step size & multi-agent fusion \\
+        $\alpha_i$ & discount (reliability) factor applied to the evidence of source $i$ & evidence theory, reliability-aware fusion \\
+        NIS, NEES & normalised innovation squared, normalised estimation error squared (consistency statistics) & filtering, validation \\
+        ECE, $T$ & expected calibration error, temperature-scaling parameter & learning-based fusion \\
+        $\mathbf{f}_c$, $\mathbf{f}_l$, $\mathbf{f}_r$ & camera, LiDAR, radar feature representations & deep multimodal fusion \\
+        $\mathbf{T}_{VS}$, $\mathbf{K}$ & extrinsic sensor-to-vehicle transform in $SE(3)$; camera intrinsic matrix (the gain is written $\mathbf{K}_k$ when both appear) & calibration and alignment, Chapter~\ref{sec:application} \\
+        \added{$\mathbf{\Omega}_i$} & \added{information matrix of the $i$-th factor in factor-graph and SLAM formulations (bold, unrelated to the frame of discernment $\Omega$)} & \added{factor graphs, Chapter~\ref{sec:learning}} \\
         \hline
     \end{tabular}
 \end{table}
+
+\begin{addedblock}
+Readers trained in machine learning or computer science will meet most objects of this chapter under other names, because the estimation and the machine-learning literatures describe the same probabilistic models from different starting points \cite{bishop2006_prml,koller2009_pgm,sarkka2013_bayesian}. Table~\ref{tab:ml-dictionary} gives the correspondence for the main concepts of this and the following chapters. Some entries are exact identities: the Kalman filter is exact inference in a linear-Gaussian state-space model, that is, in a hidden Markov model with continuous states, and the regularised least-squares estimate with a Gaussian prior is ridge regression. Others are analogies that help intuition: zonotopes are also an abstract domain for the static analysis of programs and for the verification of neural networks \cite{ghorbal2009_zonotope,gehr2018_ai2}; the logarithmic least-squares completion of an incomplete AHP matrix is a least-squares ranking on a comparison graph, closely related to HodgeRank and to the Bradley--Terry model \cite{jiang2011_hodgerank,bradley1952_paired}; and the resilient consensus of Chapter~\ref{sec:MAS} belongs to the same family as the Byzantine-robust aggregation rules of distributed learning \cite{yin2018_byzantine}.
+
+\begin{table}[!t]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \caption{The main objects of this book in the vocabulary of machine learning and computer science.}
+    \label{tab:ml-dictionary}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.33\linewidth} >{\raggedright\arraybackslash}p{0.44\linewidth} >{\raggedright\arraybackslash}p{0.14\linewidth}}
+        \hline
+        \textbf{Estimation and fusion} & \textbf{Machine learning and computer science} & \textbf{In this book} \\
+        \hline
+        state $\mathbf{x}$ & latent (hidden) variable & Sect.~\ref{sec:math-intro} \\
+        measurement model $\mathbf{g}(\cdot)$ with noise $\mathbf{r}$ & observation model, likelihood $p(\mathbf{y}\mid\mathbf{x})$; decoder of a generative model & Sect.~\ref{sec:math-intro} \\
+        process model $\mathbf{f}(\cdot)$ with noise $\mathbf{q}$ & transition model $p(\mathbf{x}_k\mid\mathbf{x}_{k-1})$ & Sect.~\ref{sec:bayes-filtering} \\
+        (weighted) least squares; maximum-likelihood estimate under Gaussian noise & (weighted) mean-squared-error regression; minimisation of the negative log-likelihood & Sect.~\ref{sec:math-intro} \\
+        regularised least squares; MAP estimate with Gaussian prior & ridge (Tikhonov, $\ell_2$) regularisation, the prior acting as regulariser & Sect.~\ref{sec:math-intro} \\
+        information matrix $\mathbf{\Lambda}$ & Fisher information; Hessian of the negative log-likelihood & Sect.~\ref{sec:math-intro} \\
+        sequential least squares & recursive least squares; online learning & Sect.~\ref{sec:math-intro} \\
+        Bayesian filter (prediction and update) & forward recursion of inference in a hidden Markov model or dynamic Bayesian network & Sect.~\ref{sec:bayes-filtering} \\
+        Kalman filter & exact inference in a linear-Gaussian state-space model (linear dynamical system) & Sect.~\ref{sec:bayes-filtering} \\
+        EKF, UKF & approximate inference by linearisation and by deterministic sampling & Sect.~\ref{sec:bayes-filtering} \\
+        particle filter & sequential Monte Carlo (sequential importance resampling) & Sect.~\ref{sec:bayes-filtering} \\
+        innovation $\boldsymbol{\nu}$, NIS test & prediction residual; calibration and out-of-distribution test on residuals & Sect.~\ref{sec:bayes-filtering} \\
+        zonotopic set-membership estimate & reachability analysis; zonotope abstract domain of program analysis and neural-network verification & Sect.~\ref{sec:set-membership} \\
+        gating and data association & outlier rejection; bipartite matching (assignment problem) & Sect.~\ref{sec:track-level} \\
+        covariance intersection & conservative aggregation of estimates with unknown dependence, avoiding double counting & Sect.~\ref{subsec:track-fusion} \\
+        belief masses, Dempster's rule & belief functions; second-order uncertainty in classification, as in evidential deep learning \cite{sensoy2018_edl} & Sect.~\ref{sec:evidence} \\
+        factor graph & probabilistic graphical model \cite{kschischang2001_factor}; sparse nonlinear least squares & Sect.~\ref{sec:factor-graphs} \\
+        incomplete AHP, logarithmic least squares & ranking from pairwise comparisons (HodgeRank, Bradley--Terry) & Sect.~\ref{sec:mcdm} \\
+        learned measurement covariance & heteroscedastic regression; uncertainty calibration & Chapter~\ref{sec:learning} \\
+        consensus; resilient (W-MSR) consensus & gossip averaging \cite{boyd2006_gossip}; Byzantine-robust aggregation & Chapter~\ref{sec:MAS} \\
+        \hline
+    \end{tabular}
+\end{table}
+\end{addedblock}
+
 
 
 
@@ -968,7 +1009,7 @@ The first term encodes prior information about the initial state. The second ter
 % GAB: I reduced it a bit as it was too long and a bit redundant. 
 \subsection{Concluding perspective}
 
-Two ideas from the preceding derivations survive into every method in this survey. The first is that a measurement means nothing without its model and its uncertainty. What a sensor reports does not by itself determine how much it should move the estimate; that is fixed by what the sensor observes, how sensitively it responds to the state, how noisy it is, and whether it is biased. This is why covariance matrices are not bookkeeping: they encode how much each measurement and each direction in measurement space is to be believed.
+Two ideas from the preceding derivations survive into every method in this \deleted{survey}\added{book}. The first is that a measurement means nothing without its model and its uncertainty. What a sensor reports does not by itself determine how much it should move the estimate; that is fixed by what the sensor observes, how sensitively it responds to the state, how noisy it is, and whether it is biased. This is why covariance matrices are not bookkeeping: they encode how much each measurement and each direction in measurement space is to be believed.
 
 The second is that independence is what makes information additive. Two independent measurements contribute genuinely separate evidence; two correlated ones share part of theirs, and treating them as independent counts the shared part twice. The estimate then reports a confidence it has not earned. This is the characteristic failure mode of sensor fusion, and it is worse than plain inaccuracy, because a fused estimate that is confidently wrong will be acted upon. The remedy is not fewer sensors but honest models: an ignored bias, a miscalibrated covariance, or an unmodelled dependency degrades the fused estimate below what a single well-understood sensor would have delivered.
 
@@ -1007,6 +1048,7 @@ This is the essence of modern sensor fusion: \emph{not merely combining sensor o
 
 
 \section{Bayesian Filtering}
+\label{sec:bayes-filtering}
 %
 % ============================================
 
@@ -1553,6 +1595,7 @@ measurement model is nonlinear.
 
 
 \section{Set-Membership and Zonotopic Estimation}
+\label{sec:set-membership}
 
 The probabilistic filters discussed above describe uncertainty through probability distributions, typically by propagating a mean and covariance or a set of weighted particles. In many sensor-fusion settings, however, only deterministic bounds are defensible. A sensor data sheet may provide a maximum error, a calibration procedure may certify a tolerance interval, or a safety monitor may need to guarantee that all states consistent with bounded disturbances remain inside an admissible region. Set-membership estimation addresses this case by propagating a set of all states compatible with the process model, measurements, and assumed error bounds, rather than a single most likely state \cite{alamo2005_zonotopes,rego2020_constrained_zonotopes}.
 
@@ -1958,6 +2001,7 @@ to enclose.
 % ============================================
 %
 \section{Track-Level Fusion and Data Association}
+\label{sec:track-level}
 \label{subsec:track-fusion}
 %
 % ============================================
@@ -2209,6 +2253,7 @@ about position, while another is more informative about velocity.
 % ==============================================================
 %
 \section{Evidence Theory for Conflicting Sensor Information}
+\label{sec:evidence}
 %
 % ==============================================================
 
@@ -2346,6 +2391,7 @@ The main limitation of evidence theory is computational complexity: the power se
 
 A related extension is Dezert--Smarandache Theory (DSmT), which relaxes the strict mutual-exclusivity assumption of classical Dempster--Shafer theory \cite{smarandache_intro_dsmt_2009}. Instead of assigning masses only on the power set of exclusive hypotheses, DSmT can operate on a richer fusion space that also includes intersections between hypotheses. This is useful when the frame cannot be cleanly refined into mutually exclusive classes, for example when an autonomous-driving system must reason about overlapping or ambiguous propositions such as a partially observed object that may simultaneously support \emph{pedestrian-like} and \emph{cyclist-like} evidence, or when different sensors produce paradoxical but informative observations. The trade-off is that exact DSmT can be computationally demanding. Therefore, its most practical role in real-time autonomous driving is likely to be through restricted models, reduced focal sets, or approximate DSmT combination rules designed to reduce computational cost while preserving the ability to reason under strong conflict \cite{guo_evidenceclustering_2015}.
 \section{Optimisation-Based Fusion and Factor Graphs}
+\label{sec:factor-graphs}
 
 Optimisation-based fusion estimates the most likely state or trajectory by minimising an objective function that combines multiple measurement residuals. In autonomous driving, optimisation is central to visual--inertial odometry, LiDAR--inertial odometry, GNSS--IMU fusion, map matching, bundle adjustment, and pose graph optimisation.
 
@@ -2354,6 +2400,7 @@ A typical formulation defines a state vector containing poses, velocities, senso
 Factor graphs provide a structured representation of this problem. Nodes represent unknown states, while factors represent constraints from IMU integration, camera reprojection, LiDAR scan matching, GNSS measurements, wheel odometry, loop closures, or map priors. Compared with purely filtering-based methods, smoothing and factor graph approaches can use measurements over a time window or an entire trajectory, which can improve consistency and accuracy. Their main limitation is computational cost, particularly for real-time deployment on embedded platforms. Standard references and tooling have made this formulation the de facto back-end of modern localisation stacks: iSAM2 introduced incremental smoothing via the Bayes tree, and GTSAM and related libraries provide reusable factor abstractions \cite{kaess2012_isam2,dellaert2017_factor_graphs}. % [July 2026 pass] This subsection previously cited nothing; added the two canonical factor-graph references.
 
 \section{Fusion based on Multi-Criteria Decision-Making}
+\label{sec:mcdm}
 
 Multi-criteria decision-making (MCDM) provides a family of methods for ranking alternatives when several criteria must be considered simultaneously. In sensor fusion, the alternatives may be sensors, sensor suites, object hypotheses, fusion algorithms, tracks, or possible system actions. The criteria may include detection accuracy, localisation error, latency, energy consumption, robustness to weather, calibration quality, field of view, uncertainty, interpretability, cost, and safety relevance. MCDM is therefore not a replacement for probabilistic filtering or deep multimodal fusion; rather, it is a decision-support layer that can select, weight, or audit fusion choices when several imperfect sources must be balanced.
 
@@ -2449,7 +2496,6 @@ MCDM can also be integrated with evidence-theoretic fusion. For example, each se
 
 In autonomous driving, MCDM-based fusion is most appropriate when the decision problem is explicit and the criteria are interpretable. Examples include selecting the most reliable modality under degraded sensing, ranking candidate sensor suites during system design, choosing whether to trust an online map prior, selecting a fallback perception pipeline under compute constraints, or prioritising collision-warning responses. Its main advantages are transparency and auditability: the system can explain why a sensor was down-weighted or why a conservative action was selected. Its limitations are the subjectivity of criterion weights, sensitivity to normalisation choices, possible rank changes under perturbations, and the need to validate expert-driven rules under rare safety-critical scenarios.
 
-\begin{addedblock}
 \problemsection
 Solutions are collected at the end of the book. Every number used below was obtained with the scripts of the companion repository, \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak }, which also contains the problem statements in machine-readable form and the Jupyter notebooks of the computational problems.
 
@@ -2575,6 +2621,5 @@ $A_{12}=3$, $A_{23}=2$, $A_{13}=4$, $A_{34}=2$.
 \end{enumerate}
 A self-contained script and notebook are provided in the companion repository, in \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak solutions/}.
 \end{prob}
-\end{addedblock}
 
 % ============================================

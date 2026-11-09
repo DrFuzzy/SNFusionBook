@@ -1,5 +1,4 @@
 % Solutions to the problems of Chapter 6 (Sensor Fusion in Multi-Agent Systems). October 2026 revision.
-\begin{addedblock}
 \begin{sol}{prob:ch06:1}
 The Laplacian of the path is
 $\mathbf{L}=\begin{bmatrix}1&-1&0&0\\-1&2&-1&0\\0&-1&2&-1\\0&0&-1&1\end{bmatrix}$,
@@ -29,4 +28,3 @@ Renormalising the Metropolis weights over the received messages keeps every roun
 \begin{sol}{prob:ch06:7}
 Every connected graph is $1$-robust, because for any pair of non-empty disjoint subsets at least one node of one subset has a neighbour outside it. For $2$-robustness take $S_1=\{1,2\}$ and $S_2=\{3,4\}$: node $1$ has no neighbour outside $S_1$, node $2$ has one ($3$), node $3$ has one ($2$), and node $4$ has none, so no node of either subset has two neighbours outside, and the path is not $2$-robust, let alone $3$-robust as required by W-MSR with $F=1$. In the simulation, agent~$3$ discards the value $30$ of agent~$4$ as the largest, but agent~$4$'s neighbour is then isolated in the trimmed sense and the end agent~$1$, having a single neighbour, discards it whenever it differs from its own value: the compliant agents stop moving and never agree (agent~$1$ stays at $10$\,m while agents~$2$ and~$3$ settle at $11.5$\,m), which is the failure mode of W-MSR on a graph that is not sufficiently robust. The script \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch06/\allowbreak solutions/\allowbreak prob07\_\allowbreak wmsr\_\allowbreak path.py} reproduces it.
 \end{sol}
-\end{addedblock}
