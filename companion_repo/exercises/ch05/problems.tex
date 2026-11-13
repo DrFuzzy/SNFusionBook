@@ -1,0 +1,34 @@
+% Authoritative excerpt from chapters/ch05_autonomous_driving_application.tex; uses the book preamble.
+\begin{prob}\label{prob:ch05:1}
+A forward camera has focal length $f_{x}=f_{y}=1200$\,pixels and a $1920\times1080$ image. Its extrinsic calibration with respect to the LiDAR has a yaw error of $0.5^{\circ}$. (a)~By how many pixels is a LiDAR point projected through \eqref{eq:lidar-to-image} displaced horizontally, and does the displacement depend on the range? (b)~What lateral position error does the same yaw error produce for an object at $20$\,m and at $80$\,m if the camera bearing is used to position it? (c)~A translation error of $10$\,cm along the camera $x$ axis is present instead: how large is the projected pixel error at $20$\,m and at $80$\,m, and what does this imply for near-field versus far-field fusion?
+\end{prob}
+
+\begin{prob}\label{prob:ch05:2}
+A camera and a radar are synchronised in software with a residual time offset of $30$\,ms, and the ego vehicle drives at $20$\,m/s. (a)~Compute the apparent longitudinal misalignment between the two sensors for a static obstacle and for an oncoming vehicle travelling at $20$\,m/s. (b)~The longitudinal standard deviation of the innovation (the difference between the two detections) is $0.3$\,m; compute the normalised distance of the offset in both cases and discuss whether the gate \eqref{eq:mahalanobis_gate} with $\gamma=9.21$ ($99$\,\% for two degrees of freedom) would still associate the two detections. (c)~Propose a state augmentation that would allow the filter to estimate the offset online, and state when it is observable.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:3}
+Dead-reckoning drift. A vehicle drives straight at speed $v$ with a gyroscope bias $b$ that is not compensated. (a)~Show that the heading error after a time $\tau$ is $b\tau$ and the cross-track position error is approximately $vb\tau^{2}/2$. (b)~Evaluate both for $b=10$\,mrad/s, $v=14$\,m/s and $\tau=25$\,s and compare with the three-state filter of Example~\ref{ex:gnss-imu-odom}, whose error at the end of the outage is $63.9$\,m; explain the difference. (c)~A wheel scale error $s=2$\,\% is present as well: compute the along-track error after $\tau=25$\,s and the total error, and state which of the two errors would be reduced by a tactical-grade IMU.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:4}
+Computational. Re-run the GNSS--IMU--wheel-odometry filter of Example~\ref{ex:gnss-imu-odom} with (a)~a $60$\,s outage from $t=50$\,s and (b)~GNSS fixes at $1$\,Hz instead of $2$\,Hz before a $25$\,s outage. For each case report the position error at the end of the outage, the $3\sigma$ radius reported by the five-state filter and whether the error is inside it, and the $3\sigma$ uncertainty of the bias estimate at the tunnel entrance. Explain the dependence of the drift on the outage length and of the bias uncertainty on the GNSS rate. See \codeentry{P5}.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:5}
+Two tracks have identical covariances $\mathbf{P}_{1}=\mathbf{P}_{2}=\mathbf{P}$. (a)~Show that the independent rule \eqref{eq:independent-track-fusion-state} gives $\mathbf{P}_{\mathrm{f}}=\mathbf{P}/2$ whereas covariance intersection \eqref{eq:ci-cov} gives $\mathbf{P}_{\mathrm{CI}}=\mathbf{P}$ for every $\omega$. (b)~Interpret both results in terms of the information that the two tracks may share. (c)~Let the actual cross-covariance be $\mathbf{P}_{12}=\rho\mathbf{P}$ with $0\le\rho\le1$; compute the actual covariance of the naive fused estimate and its expected NEES $\tr(\mathbf{P}_{\mathrm{f}}^{-1}\mathbf{P}_{\mathrm{act}})$ as a function of $\rho$ for a two-dimensional state, and the value of $\rho$ above which the actual variance of the naive estimate exceeds the reported one by more than $50$\,\%.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:6}
+Computational. Starting from the script of Example~\ref{ex:camera-radar-ci}, vary the camera range accuracy $\sigma_{r}/r\in\{5,15,30\}$\,\% and the radar bearing accuracy $\sigma_{\theta}\in\{0.5,1.5,3\}^{\circ}$. For each of the nine combinations report $\omega^{\star}$, $\tr\mathbf{P}_{\mathrm{CI}}$ and $\tr\mathbf{P}_{\mathrm{f}}$ of the naive rule, and explain why $\omega^{\star}$ changes so little across the grid. Then replace the radar by an imaging radar with $\sigma_{\theta}=0.1^{\circ}$ and show what happens to $\omega^{\star}$ and to $\mathbf{P}_{\mathrm{CI}}$ when one track dominates the other in every direction. See \codeentry{P5}.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:7}
+Metrics. (a)~A 3D detector obtains $\mathrm{mAP}=0.60$, $\mathrm{mATE}=0.30$\,m, $\mathrm{mASE}=0.25$, $\mathrm{mAOE}=0.40$\,rad, $\mathrm{mAVE}=0.35$\,m/s and $\mathrm{mAAE}=0.15$ on nuScenes; compute its NDS with \eqref{eq:nds}. Adding a radar branch leaves all terms unchanged except $\mathrm{mAVE}=0.20$\,m/s; compute the new NDS. (b)~A tracker evaluated over $1000$ ground-truth objects misses $120$, raises $80$ false alarms and switches identity $10$ times; compute its MOTA with \eqref{eq:mota}. (c)~A classifier places $400$ predictions in the confidence bin $[0.8,0.9)$ with mean confidence $0.86$ and accuracy $0.74$, and $600$ in $[0.9,1.0]$ with mean confidence $0.95$ and accuracy $0.91$; compute its ECE with \eqref{eq:ece-metric}.
+\end{prob}
+
+\begin{prob}\label{prob:ch05:8}
+Latency budget. A perception chain has $\tau_{\mathrm{sense}}=33$\,ms (camera at $30$\,Hz), $\tau_{\mathrm{xfer}}=5$\,ms, $\tau_{\mathrm{detect}}=40$\,ms, $\tau_{\mathrm{fuse}}=5$\,ms, $\tau_{\mathrm{plan}}=60$\,ms, $\tau_{\mathrm{ctrl}}=10$\,ms and $\tau_{\mathrm{act}}=150$\,ms. (a)~Compute the end-to-end latency and the distance travelled at $30$\,m/s. (b)~The fusion module receives the camera detection with an age of $\tau_{\mathrm{sense}}+\tau_{\mathrm{xfer}}+\tau_{\mathrm{detect}}$ and a radar track with an age of $15$\,ms; to which time should it predict both before fusing them, and by how much does the position uncertainty of a vehicle with unmodelled acceleration $\sigma_{a}=0.8$\,m/s$^{2}$ grow when predicted over the larger of the two ages? (c)~Pipelining the detection on two GPUs doubles the throughput: how does this change the latency, and which of the terms would have to be reduced to shorten the stopping distance?
+\end{prob}
+
+% ============================================

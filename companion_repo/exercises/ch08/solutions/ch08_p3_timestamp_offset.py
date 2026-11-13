@@ -5,13 +5,14 @@ delta seconds, so a measurement taken at t - delta is interpreted at t.  For a t
 relative speed v this produces an innovation bias b = v * delta, and the expected NIS becomes
 1 + b^2 / sigma^2.  The script reproduces the analytic numbers of the solution, estimates by
 Monte Carlo the rejection rate of the single-sample 95 % gate and the detection probability of
-a windowed test (N = 20), and plots the minimum detectable offset as a function of speed.
+a windowed test (N = 20), and plots the detection probability as a function of offset.
 
 Run:  python3 ch08_p3_timestamp_offset.py   (prints the numbers, saves ch08_p3_nis_vs_offset.png)
 """
 # %%
 import numpy as np
-from scipy.stats import chi2, norm
+from scipy.stats import chi2, norm, ncx2
+from scipy.optimize import brentq
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -62,14 +63,20 @@ for v, delta in [(15.0, 0.0), (15.0, 0.020), (15.0, 0.050)]:
           f"P(reject | gate 3.84) = {np.mean(d2 > gate_1):.3f}  (analytic {rejection_rate_analytic(v, delta):.3f})")
 
 # %% [markdown]
-# ## (d) Minimum detectable offset with the windowed test
+# ## (d) Mean-crossing offset and a detection-power criterion
 # The test fires on average when 1 + b^2/sigma^2 > gate_w, i.e. |b| > sigma*sqrt(gate_w - 1).
 # Hence delta_min = sigma*sqrt(gate_w - 1) / v.
 
 # %%
 b_min = sigma * np.sqrt(gate_w - 1.0)
 for v in (15.0, 2.0):
-    print(f"v = {v:4.1f} m/s: minimum detectable bias {b_min:.3f} m  ->  delta_min = {1e3*b_min/v:6.1f} ms")
+    print(f"v = {v:4.1f} m/s: mean-crossing bias {b_min:.3f} m  ->  delta_min = {1e3*b_min/v:6.1f} ms")
+
+# A meaningful detection limit also specifies power; here 95% for one full window.
+lam95 = brentq(lambda lam: ncx2.sf(N_win * gate_w, N_win, lam) - 0.95, 0.0, 200.0)
+for v in (15.0, 2.0):
+    delta95 = sigma * np.sqrt(lam95 / N_win) / v
+    print(f"95% detection power at v={v:g} m/s: offset {1000*delta95:.1f} ms (lambda={lam95:.2f})")
 
 # Monte Carlo detection probability of the windowed test as a function of delta
 deltas = np.linspace(0.0, 0.12, 25)
@@ -98,7 +105,7 @@ print("saved ch08_p3_nis_vs_offset.png")
 # %% [markdown]
 # ## (e) Interpretation
 # At motorway closing speeds an offset of ~15 ms is already detectable and produces a bias
-# comparable to the sensor noise; in slow urban traffic a 100 ms offset is invisible to the
-# test and almost harmless (0.2 m).  The offset is therefore both most harmful and most
-# detectable at speed.  Because d h / d delta = v, delta is observable whenever v != 0 and can
-# be appended to the state vector (augmented-state estimation) instead of being merely flagged.
+# comparable to the sensor noise; in slow urban traffic a 100 ms offset is less detectable by this
+# window; whether a 0.2 m error is tolerable depends on the application.  The offset is therefore both most harmful and most
+# detectable at speed.  Because d h / d delta = v, nonzero v gives sensitivity, but delta is confounded with an unknown constant range
+# bias at constant speed. A reference or varying velocity is needed for joint identification.

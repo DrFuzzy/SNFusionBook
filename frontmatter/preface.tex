@@ -1,3 +1,13 @@
-% Preface (to be written by the authors; placeholder kept so the front matter follows the SNmono structure)
 \preface
-[Preface to be written by the authors before the December~1 delivery: motivation for the book, intended audience, how to use the chapters, the end-of-chapter problems and the companion repository.]
+\enlargethispage{2\baselineskip}
+Sensor fusion joins measurements that differ in what they observe, how often they arrive, and how they fail. This book develops the mathematical tools for doing that combination and the system decisions that make the results useful. Autonomous driving provides the main application; distributed sensing, maritime monitoring, and cable deformation provide further settings in which the same assumptions can be tested.
+
+The intended reader has a working knowledge of linear algebra, probability, and elementary calculus. The derivations introduce the notation needed for estimation, while the numerical examples make the effect of a modelling choice visible. Familiarity with Python and NumPy helps with the computational exercises; deep-learning experience is useful for Chapter~\ref{sec:learning} but is not required for the classical foundations.
+
+There are three useful reading routes. Readers new to estimation can start with Chapters~\ref{sec:Principles} and~\ref{sec:classicalSF}, solve the hand-computation problems, and then work through the hybrid examples. Readers coming from machine learning can use the terminology table in Chapter~\ref{sec:classicalSF} before turning to Chapters~\ref{sec:learning} and~\ref{sec:application}. Readers interested in networks or monitoring can continue from the classical methods to Chapters~\ref{sec:MAS} and~\ref{sec:applications}. Chapter~\ref{sec:open-challenges} separates what the worked examples demonstrate from what remains to be established for deployment.
+
+For each example, ask which uncertainty model is being assumed, which information is shared between sources, and what evidence would invalidate the model. A low error in one run does not establish a covariance guarantee; a small innovation does not exclude a common bias; and a deterministic enclosure is valid only under its stated bounds. These distinctions are part of the method, rather than qualifications added after the calculation.
+
+The \href{https://github.com/DrFuzzy/SNFusionCompanion}{SNFusionCompanion repository} contains the code and notebooks. Numerical files used to draw the figures accompany the LaTeX sources, allowing compilation without running the programs. The code documents simulation settings, seeds, and evaluation procedures; real-data examples give dataset-access instructions and explain reference-measurement limitations. Short code references link to the ``Companion Code and Data'' guide, which lists script locations and commands.
+
+Worked solutions to all 48 problems in Chapters~\ref{sec:classicalSF}--\ref{sec:open-challenges} are collected in ``Solutions to the Problems'' at the end of the book. For design and discussion problems, the proposed solutions illustrate reasonable approaches; other approaches may also satisfy the requirements.

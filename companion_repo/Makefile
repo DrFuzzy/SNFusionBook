@@ -24,7 +24,7 @@ examples:
 	$(PYTHON) tools/run_all_examples.py --quiet
 
 notebooks:
-	@for f in $$(find examples exercises -mindepth 2 -maxdepth 2 -name '*.py' ! -name '_*' 2>/dev/null | sort); do \
+	@for f in $$(find examples exercises -mindepth 2 -maxdepth 3 -name '*.py' ! -name '_*' 2>/dev/null | sort); do \
 		$(PYTHON) tools/py2nb.py $$f; \
 	done
 

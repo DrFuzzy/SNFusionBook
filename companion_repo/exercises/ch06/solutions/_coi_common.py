@@ -50,8 +50,8 @@ def run_coi(edges, L, p_loss=0.0, n_mc=20, seed=6):
                         for j in np.flatnonzero(A[i]):
                             if rng.random() < p_loss:
                                 Wk[i, j] = 0
-                        Wk[i, i] = 0
-                        Wk[i, i] = 1 - Wk[i].sum()
+                        # Retain the original self-weight and renormalise all survivors.
+                        Wk[i] /= Wk[i].sum()
                 Lams = [sum(Wk[i, j] * Lams[j] for j in range(N)) for i in range(N)]
                 qs = [sum(Wk[i, j] * qs[j] for j in range(N)) for i in range(N)]
             for i in range(N):

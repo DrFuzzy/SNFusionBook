@@ -85,8 +85,10 @@ rows = []
 for k, t in enumerate(ts):
     if k > 0:
         x_hat, P = ekf.predict(x_hat, P)          # eqs. (kf_state_prediction)-(kf_cov_prediction)
-    upd = ekf.update(x_hat, P, Z[k])              # eqs. (kf_innovation)-(kf_cov_update), Joseph form
-    x_hat, P, nis = upd.x, upd.P, upd.nis
+        upd = ekf.update(x_hat, P, Z[k])          # use each detection once
+        x_hat, P, nis = upd.x, upd.P, upd.nis
+    else:
+        nis = 0.0  # initiation placeholder, not a tested innovation; excluded from summaries
 
     # raw detection expressed in Cartesian coordinates, for comparison
     zx, zy = Z[k, 0] * np.cos(Z[k, 1]), Z[k, 0] * np.sin(Z[k, 1])

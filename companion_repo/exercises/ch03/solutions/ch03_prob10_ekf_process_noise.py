@@ -6,7 +6,7 @@ adjacent lane, initially 60 m ahead, lane change from 3.5 m to 0 m between t = 5
 and t = 8 s with a smooth cubic profile, 77 GHz radar at 20 Hz with
 sigma_r = 0.30 m, sigma_theta = 0.5 deg, sigma_rdot = 0.10 m/s).  The same
 detection sequence (fixed seed) is then processed by the constant-velocity EKF
-for several values of the white-noise-acceleration intensity sigma_a, and the
+for several values of the per-interval random-acceleration standard deviation sigma_a, and the
 normalised innovation squared (NIS) is analysed separately on the constant-velocity
 segments and inside the lane-change window.
 
@@ -69,9 +69,12 @@ def run_ekf(sigma_a):
                                [T**3 / 2, 0, T**2, 0], [0, T**3 / 2, 0, T**2]])
     r0, th0, _ = Z[0]
     x = np.array([r0 * np.cos(th0), r0 * np.sin(th0), 0.0, 0.0])
-    P = np.diag([1.0, 1.0, 30.0**2, 30.0**2])            # velocity unobserved at initialisation
+    J0 = np.array([[np.cos(th0), -r0 * np.sin(th0)], [np.sin(th0), r0 * np.cos(th0)]])
+    P = np.diag([0.0, 0.0, 10.0**2, 10.0**2])
+    P[:2, :2] = J0 @ R[:2, :2] @ J0.T  # propagate the polar initiation uncertainty
     est = np.zeros((N, 4)); nis = np.zeros(N); sig = np.zeros((N, 4))
-    for k in range(N):
+    est[0] = x; sig[0] = np.sqrt(np.diag(P))
+    for k in range(1, N):
         if k > 0:
             x = F @ x
             P = F @ P @ F.T + Q
@@ -89,7 +92,7 @@ def run_ekf(sigma_a):
 def summarise(sigma_a):
     est, nis, sig = run_ekf(sigma_a)
     err = est[:, :2] - X[:, :2]
-    steady = ~manoeuvre
+    steady = (~manoeuvre) & (t >= 1.0)
     inside = (nis >= CHI2_3_LO) & (nis <= CHI2_3_HI)
     return dict(sigma_a=sigma_a,
                 rmse_pos=np.sqrt((err**2).sum(axis=1).mean()),

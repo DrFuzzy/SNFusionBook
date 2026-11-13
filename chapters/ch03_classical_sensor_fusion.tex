@@ -8,7 +8,7 @@
 
 % Springer Nature: each chapter should have a 10--15 line online abstract.
 % This chapter abstract has not yet been written in the uploaded manuscript.
-\abstract{This chapter reviews the classical, model-based techniques on which sensor fusion rests, and presents them as variations of a single idea: measurements are pieces of information about a hidden state, to be weighted by their uncertainty and combined additively when they are independent. The chapter starts from the static inverse problem and develops ordinary, weighted, regularised and sequential least squares, their maximum-likelihood and maximum-a-posteriori interpretations, the information matrix, and Gauss--Newton iterations for nonlinear sensor models. The same prediction--correction structure is then extended to dynamic states through Bayesian filtering, covering the Kalman filter, the extended and unscented Kalman filters, particle filters, innovation-based gating and the normalised innovation squared as a consistency diagnostic; a worked automotive-radar cut-in example with real numbers accompanies the discussion. Set-membership and zonotopic estimation are presented as the bounded-error counterpart of probabilistic filtering, with strip intersections, order reduction and a direct comparison with the EKF on the same scenario. Track-level fusion and data association follow, including temporal and spatial alignment, gating, nearest-neighbour, probabilistic and multi-hypothesis association, track management, fusion with known cross-correlation and covariance intersection. Evidence theory (Dempster--Shafer, the transferable belief model and DSmT) is introduced for conflicting qualitative information, optimisation-based fusion and factor graphs for trajectory estimation, and multi-criteria decision-making, in particular incomplete AHP solved by logarithmic least squares, for context-dependent sensor reliability weighting. The chapter closes with ten problems, whose solutions are collected at the end of the book and in the companion repository.}
+\abstract{This chapter reviews the classical, model-based techniques of sensor fusion, and presents them as variations of a single idea: measurements are pieces of information about a hidden state, to be weighted by their uncertainty and combined additively when they are independent. The chapter starts from the static inverse problem and develops ordinary, weighted, regularised and sequential least squares, their maximum-likelihood and maximum-a-posteriori interpretations, the information matrix, and Gauss--Newton iterations for nonlinear sensor models. The same prediction--correction structure is then extended to dynamic states through Bayesian filtering, covering the Kalman filter, the extended and unscented Kalman filters (EKF, UKF), particle filters, innovation-based gating and the normalised innovation squared as a consistency diagnostic; a worked automotive-radar cut-in example with real numbers accompanies the discussion. Set-membership and zonotopic estimation are presented as the bounded-error counterpart of probabilistic filtering, with strip intersections, order reduction and a direct comparison with the EKF on the same scenario. Track-level fusion and data association follow, including temporal and spatial alignment, gating, nearest-neighbour, probabilistic and multi-hypothesis association, track management, fusion with known cross-correlation and covariance intersection. Evidence theory (Dempster--Shafer, the transferable belief model and Dezert--Smarandache theory, DSmT) is introduced for conflicting qualitative information, optimisation-based fusion and factor graphs for trajectory estimation, and multi-criteria decision-making, in particular the incomplete Analytic Hierarchy Process (AHP) solved by logarithmic least squares, for context-dependent sensor reliability weighting. The chapter closes with ten problems, whose solutions are collected at the end of the book and in the companion repository.}
 \suppressfloats[t]
 
 \section{Mathematical introduction to sensor fusion}
@@ -18,6 +18,7 @@
 Sensor fusion concerns the estimation of an unknown physical quantity from multiple measurements that may differ in modality, dimension, accuracy, sampling rate, and uncertainty. The quantity to be estimated may be a static parameter, such as the location of a stationary source, or a time-varying state, such as the position, velocity, and orientation of a moving vehicle. Table~\ref{tab:notation} collects the notation used throughout the book and records where symbols are reused with different meanings across the method families reviewed here.
 \begin{table}[!t]
     \centering
+    \renewcommand{\arraystretch}{1.25}% row spacing (layout only)
     \small
     \caption{Principal notation. Symbols are reused across method families where the literatures conflict; the scope column states where each reading applies.}
     \label{tab:notation}
@@ -44,18 +45,18 @@ Sensor fusion concerns the estimation of an unknown physical quantity from multi
         ECE, $T$ & expected calibration error, temperature-scaling parameter & learning-based fusion \\
         $\mathbf{f}_c$, $\mathbf{f}_l$, $\mathbf{f}_r$ & camera, LiDAR, radar feature representations & deep multimodal fusion \\
         $\mathbf{T}_{VS}$, $\mathbf{K}$ & extrinsic sensor-to-vehicle transform in $SE(3)$; camera intrinsic matrix (the gain is written $\mathbf{K}_k$ when both appear) & calibration and alignment, Chapter~\ref{sec:application} \\
-        \added{$\mathbf{\Omega}_i$} & \added{information matrix of the $i$-th factor in factor-graph and SLAM formulations (bold, unrelated to the frame of discernment $\Omega$)} & \added{factor graphs, Chapter~\ref{sec:learning}} \\
+        $\mathbf{\Omega}_i$ & information matrix of the $i$-th factor in factor-graph and SLAM formulations (bold, unrelated to the frame of discernment $\Omega$) & factor graphs, Chapter~\ref{sec:learning} \\
         \hline
     \end{tabular}
 \end{table}
 
-\begin{addedblock}
-Readers trained in machine learning or computer science will meet most objects of this chapter under other names, because the estimation and the machine-learning literatures describe the same probabilistic models from different starting points \cite{bishop2006_prml,koller2009_pgm,sarkka2013_bayesian}. Table~\ref{tab:ml-dictionary} gives the correspondence for the main concepts of this and the following chapters. Some entries are exact identities: the Kalman filter is exact inference in a linear-Gaussian state-space model, that is, in a hidden Markov model with continuous states, and the regularised least-squares estimate with a Gaussian prior is ridge regression. Others are analogies that help intuition: zonotopes are also an abstract domain for the static analysis of programs and for the verification of neural networks \cite{ghorbal2009_zonotope,gehr2018_ai2}; the logarithmic least-squares completion of an incomplete AHP matrix is a least-squares ranking on a comparison graph, closely related to HodgeRank and to the Bradley--Terry model \cite{jiang2011_hodgerank,bradley1952_paired}; and the resilient consensus of Chapter~\ref{sec:MAS} belongs to the same family as the Byzantine-robust aggregation rules of distributed learning \cite{yin2018_byzantine}.
+Readers trained in machine learning or computer science will meet most objects of this chapter under other names, because the estimation and the machine-learning literatures describe the same probabilistic models from different starting points \cite{bishop2006_prml,koller2009_pgm,sarkka2013_bayesian}. Table~\ref{tab:ml-dictionary} gives the correspondence for the main concepts of this and the following chapters. The letters differ as well: the machine-learning literature usually denotes the latent state by $\mathbf{z}$ and the observation by $\mathbf{x}$ \cite{bishop2006_prml}, whereas this book follows the convention of estimation and control, with $\mathbf{x}$ for the state and $\mathbf{y}$ for the measurement. Some entries are exact identities: the Kalman filter is exact inference in a linear-Gaussian state-space model, that is, in a hidden Markov model with continuous states, and the regularised least-squares estimate with a Gaussian prior is ridge regression. Others are analogies that help intuition: zonotopes are also an abstract domain for the static analysis of programs and for the verification of neural networks \cite{ghorbal2009_zonotope,gehr2018_ai2}; the logarithmic least-squares completion of an incomplete AHP matrix is a least-squares ranking on a comparison graph, closely related to HodgeRank and to the Bradley--Terry model \cite{jiang2011_hodgerank,bradley1952_paired}; and the resilient consensus of Chapter~\ref{sec:MAS} belongs to the same family as the Byzantine-robust aggregation rules of distributed learning \cite{yin2018_byzantine}.
 
 \begin{table}[!t]
     \centering
     \footnotesize
     \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.3}
     \caption{The main objects of this book in the vocabulary of machine learning and computer science.}
     \label{tab:ml-dictionary}
     \begin{tabular}{>{\raggedright\arraybackslash}p{0.33\linewidth} >{\raggedright\arraybackslash}p{0.44\linewidth} >{\raggedright\arraybackslash}p{0.14\linewidth}}
@@ -66,12 +67,13 @@ Readers trained in machine learning or computer science will meet most objects o
         measurement model $\mathbf{g}(\cdot)$ with noise $\mathbf{r}$ & observation model, likelihood $p(\mathbf{y}\mid\mathbf{x})$; decoder of a generative model & Sect.~\ref{sec:math-intro} \\
         process model $\mathbf{f}(\cdot)$ with noise $\mathbf{q}$ & transition model $p(\mathbf{x}_k\mid\mathbf{x}_{k-1})$ & Sect.~\ref{sec:bayes-filtering} \\
         (weighted) least squares; maximum-likelihood estimate under Gaussian noise & (weighted) mean-squared-error regression; minimisation of the negative log-likelihood & Sect.~\ref{sec:math-intro} \\
-        regularised least squares; MAP estimate with Gaussian prior & ridge (Tikhonov, $\ell_2$) regularisation, the prior acting as regulariser & Sect.~\ref{sec:math-intro} \\
-        information matrix $\mathbf{\Lambda}$ & Fisher information; Hessian of the negative log-likelihood & Sect.~\ref{sec:math-intro} \\
+        regularised least squares; maximum a posteriori (MAP) estimate with Gaussian prior & ridge (Tikhonov, $\ell_2$) regularisation, the prior acting as regulariser & Sect.~\ref{sec:math-intro} \\
+        information matrix $\mathbf{\Lambda}$ & precision matrix (inverse covariance); Fisher information; Hessian of the negative log-likelihood & Sect.~\ref{sec:math-intro} \\
         sequential least squares & recursive least squares; online learning & Sect.~\ref{sec:math-intro} \\
         Bayesian filter (prediction and update) & forward recursion of inference in a hidden Markov model or dynamic Bayesian network & Sect.~\ref{sec:bayes-filtering} \\
         Kalman filter & exact inference in a linear-Gaussian state-space model (linear dynamical system) & Sect.~\ref{sec:bayes-filtering} \\
-        EKF, UKF & approximate inference by linearisation and by deterministic sampling & Sect.~\ref{sec:bayes-filtering} \\
+       extended and unscented Kalman filters (EKF, UKF) & approximate inference by linearisation and by deterministic sampling & Sect.~\ref{sec:bayes-filtering} \\
+       observability of the state & identifiability of the latent variables from the observations & Chapters~\ref{sec:application} and~\ref{sec:MAS} \\
         particle filter & sequential Monte Carlo (sequential importance resampling) & Sect.~\ref{sec:bayes-filtering} \\
         innovation $\boldsymbol{\nu}$, NIS test & prediction residual; calibration and out-of-distribution test on residuals & Sect.~\ref{sec:bayes-filtering} \\
         zonotopic set-membership estimate & reachability analysis; zonotope abstract domain of program analysis and neural-network verification & Sect.~\ref{sec:set-membership} \\
@@ -85,7 +87,6 @@ Readers trained in machine learning or computer science will meet most objects o
         \hline
     \end{tabular}
 \end{table}
-\end{addedblock}
 
 
 
@@ -122,7 +123,7 @@ where $\Pi(\cdot)$ is a nonlinear projection operator and $\boldsymbol{\mathcal{
 % ============================================
 Measurements are not exact. Their uncertainty can arise from thermal noise, quantisation, imperfect calibration, environmental interference, finite resolution, unmodelled dynamics, or errors in the assumed sensor model.
 
-A standard starting assumption is that the measurement error has zero mean, $\mathbb{E}[\mathbf{r}_n]=\mathbf{0}_{d_n}$, and covariance $\mathbf{R}_n\in\mathbb{R}^{d_n\times d_n}$. The covariance matrix $\mathbf{R}_n$ describes both the magnitude and the directional structure of the uncertainty. For a scalar measurement, $y_n=g_n(\mathbf{x})+r_n$, the covariance reduces to the variance $\operatorname{var}(r_n)=\sigma_n^2$. A larger $\sigma_n^2$ means that the measurement is less precise. For a vector measurement $\mathbf{y}\triangleq \begin{bmatrix} y_{1} & y_{2} & \cdots & y_{d_n} \end{bmatrix}^T \in \mathbb{R}^{d_n}$,
+A standard starting assumption is that the measurement error has zero mean, $\mathbb{E}[\mathbf{r}_n]=\mathbf{0}_{d_n}$, and covariance $\mathbf{R}_n\in\mathbb{R}^{d_n\times d_n}$. The covariance matrix $\mathbf{R}_n$ describes both the magnitude and the directional structure of the uncertainty. For a scalar measurement, $y_n=g_n(\mathbf{x})+r_n$, the covariance reduces to the variance $\operatorname{var}(r_n)=\sigma_n^2$. A larger $\sigma_n^2$ means that the measurement is less precise. Figure~\ref{fig:mean-variance}(a) illustrates both notions: when the error has zero mean, repeated readings of the same quantity scatter around its true value, and the width of the scatter, measured by the standard deviation $\sigma_n$, is larger for the less precise sensor. For a vector measurement $\mathbf{y}\triangleq \begin{bmatrix} y_{1} & y_{2} & \cdots & y_{d_n} \end{bmatrix}^T \in \mathbb{R}^{d_n}$,
 \begin{align*}
 \mathbf{R}=
 \begin{bmatrix}
@@ -138,7 +139,65 @@ the correlated uncertainty region then becomes an ellipse,
 \begin{align*}
 \mathbf{R}=\mathbf{U}\left[\begin{matrix}\lambda _{1}&0\\ 0&\lambda _{2}\end{matrix}\right]\mathbf{U}^{\mathsf{T}} \;.
 \end{align*}
-In this decoupled form, the eigenvectors in $\mathbf{U}$ serve as a rotation matrix that determines the principal axes (directions) of the uncertainty ellipse. Meanwhile, the eigenvalues $\lambda _{1}$ and $\lambda _{2}$ represent the decoupled variances, directly dictating the lengths (magnitudes) of the ellipse's semi-axes along those new directions.
+In this decoupled form, the eigenvectors in $\mathbf{U}$ serve as a rotation matrix that determines the principal axes (directions) of the uncertainty ellipse. Meanwhile, the eigenvalues $\lambda _{1}$ and $\lambda _{2}$ represent the decoupled variances, directly dictating the lengths (magnitudes) of the ellipse's semi-axes along those new directions: for the ellipse of one standard deviation the semi-axes are $\sqrt{\lambda_1}$ and $\sqrt{\lambda_2}$, as shown in Fig.~\ref{fig:mean-variance}(b).
+
+\begin{figure}[!t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=16mm},
+    scale only axis,
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    title style={font=\scriptsize, yshift=0.5mm},
+    axis line style={line width=0.5pt},
+    tick align=outside,
+]
+%% ---------------- panel (a): repeated scalar readings ----------------
+\nextgroupplot[
+    width=0.42\columnwidth, height=3.3cm,
+    xlabel={reading [m]},
+    xmin=8.3, xmax=11.3, ymin=-0.45, ymax=1.7,
+    ytick={0,1}, yticklabels={coarse, precise},
+    title={(a) repeated readings of a $10$\,m distance},
+]
+\addplot[draw=gray!60, dashed, line width=0.4pt, forget plot] coordinates {(10,-0.45) (10,1.7)};
+\addplot[only marks, mark=*, mark size=0.9pt, draw=EkfBlue, fill=EkfBlue]
+    table[x=a, y=ja, col sep=comma] {data/ch03/mean_variance_1d.csv};
+\addplot[only marks, mark=square*, mark size=0.8pt, draw=ManoeuvreOrange!80!black, fill=ManoeuvreOrange!80!black]
+    table[x=b, y=jb, col sep=comma] {data/ch03/mean_variance_1d.csv};
+% sample mean and one sample standard deviation on each side (printed by the companion script)
+\draw[EkfBlue, line width=0.7pt, |-|] (axis cs:9.757,1.36) -- (axis cs:10.227,1.36);
+\fill[EkfBlue] (axis cs:9.992,1.36) circle (1.5pt);
+\draw[ManoeuvreOrange!80!black, line width=0.7pt, |-|] (axis cs:9.298,0.36) -- (axis cs:10.524,0.36);
+\fill[ManoeuvreOrange!80!black] (axis cs:9.911,0.36) circle (1.5pt);
+\node[font=\scriptsize, anchor=west] at (axis cs:10.27,1.36) {$\bar y\pm s$};
+\node[font=\scriptsize, anchor=west] at (axis cs:10.57,0.36) {$\bar y\pm s$};
+%% ---------------- panel (b): correlated two-dimensional errors ----------------
+\nextgroupplot[
+    width=0.42\columnwidth, height=3.3cm,
+    axis equal image,
+    xlabel={east error $r_1$ [m]}, ylabel={north error $r_2$ [m]},
+    xmin=-3.3, xmax=3.3, ymin=-2.3, ymax=2.3,
+    title={(b) correlated two-dimensional errors},
+]
+\addplot[only marks, mark=*, mark size=0.45pt, draw=MeasGrey, fill=MeasGrey]
+    table[x=x, y=y, col sep=comma] {data/ch03/covariance_2d_samples.csv};
+\addplot[EkfBlue, line width=0.9pt]
+    table[x=x1, y=y1, col sep=comma] {data/ch03/covariance_2d_ellipses.csv};
+\draw[->, >=stealth, line width=0.8pt, TruthBlack] (axis cs:0,0) -- (axis cs:0.9845,0.6563);
+\draw[->, >=stealth, line width=0.8pt, TruthBlack] (axis cs:0,0) -- (axis cs:-0.1754,0.2631);
+\node[font=\scriptsize, anchor=west, inner sep=1pt, fill=white, fill opacity=0.85, text opacity=1] at (axis cs:1.35,0.15) {$\sqrt{\lambda_1}\,\mathbf{u}_1$};
+\draw[gray, line width=0.3pt] (axis cs:1.37,0.22) -- (axis cs:0.75,0.50);
+\node[font=\scriptsize, anchor=east, inner sep=1pt, fill=white, fill opacity=0.85, text opacity=1] at (axis cs:-0.95,1.25) {$\sqrt{\lambda_2}\,\mathbf{u}_2$};
+\draw[gray, line width=0.3pt] (axis cs:-0.97,1.18) -- (axis cs:-0.15,0.30);
+\end{groupplot}
+\end{tikzpicture}}
+\caption{Mean, variance, and covariance of measurement errors. (a) Forty readings of the same $10$\,m distance (dashed line) taken by a precise sensor ($\sigma=0.2$\,m, dots) and by a coarse one ($\sigma=0.6$\,m, squares); the vertical scatter only separates overlapping marks. The bars show the sample mean $\bar y=\frac{1}{M}\sum_{j=1}^{M}y_j$ and one sample standard deviation $s=\big(\frac{1}{M-1}\sum_{j=1}^{M}(y_j-\bar y)^2\big)^{1/2}$ on each side, with $M=40$: $\bar y=9.99$ and $9.91$\,m, $s=0.24$ and $0.61$\,m. Both sets scatter around the true value, the coarse one about three times more widely. (b) Three hundred samples of a two-dimensional error with covariance $\mathbf{R}=\left[\begin{smallmatrix}1.0&0.6\\0.6&0.5\end{smallmatrix}\right]$\,m$^2$ (correlation coefficient $0.85$). The ellipse is the set of points $\mathbf{r}$ with $\mathbf{r}^{\mathsf T}\mathbf{R}^{-1}\mathbf{r}=1$: its principal axes are the eigenvectors $\mathbf{u}_1,\mathbf{u}_2$ of $\mathbf{R}$, and its semi-axes are $\sqrt{\lambda_1}=1.18$\,m and $\sqrt{\lambda_2}=0.32$\,m, with $\lambda_1=1.4$ and $\lambda_2=0.1$\,m$^2$. Data generated by \codeentry{E3-GAUSS}.}
+\label{fig:mean-variance}
+\end{figure}
+
 
 % ============================================
 \subsection{Independent and correlated measurement errors}
@@ -158,7 +217,7 @@ It is useful to distinguish between being uncorrelated and being independent. In
 % ============================================
 \subsection{Stacked measurement model}
 % ============================================
-Sensor fusion becomes particularly transparent when all measurements are written in a common stacked form. Starting from the individual measurement models
+Writing all measurements in a common stacked form turns the fusion of $N$ sensors into the processing of a single, longer measurement vector, so that the formulas derived below do not depend on how many sensors there are. Starting from the individual measurement models
 \begin{equation}
 \mathbf{y}_n
 =
@@ -228,12 +287,66 @@ These off-diagonal terms should not be ignored when sensors share common sources
 % ============================================
 A common and analytically convenient assumption is that the stacked measurement noise is Gaussian, i.e., $\mathbf{r} \sim \mathcal{N} \left( \mathbf{0}, \mathbf{R} \right)$. Since the measurement model is $\mathbf{y}=\mathbf{g}(\mathbf{x})+\mathbf{r}$, the conditional distribution of the measurements given the state is $\mathbf{y}\mid\mathbf{x} \sim \mathcal{N} \left( \mathbf{g}(\mathbf{x}), \mathbf{R} \right)$. 
 The corresponding likelihood is
-\begin{align}
+\begin{equation}
 \label{eq:Gaussianlikelihood}
-p(\mathbf{y}\mid\mathbf{x}) =& \frac{1} {(2\pi)^{d_y/2}|\mathbf{R}|^{1/2}}\times  \\ 
-&\exp \left( - \frac{1}{2} \left( \mathbf{y}-\mathbf{g}(\mathbf{x})\right)^{\mathsf T}\mathbf{R}^{-1}\left(\mathbf{y}-\mathbf{g}(\mathbf{x})\right)\right), \nonumber
-\end{align}
+p(\mathbf{y}\mid\mathbf{x}) = \frac{1}{(2\pi)^{d_y/2}|\mathbf{R}|^{1/2}}\exp \left( - \frac{1}{2} \left( \mathbf{y}-\mathbf{g}(\mathbf{x})\right)^{\mathsf T}\mathbf{R}^{-1}\left(\mathbf{y}-\mathbf{g}(\mathbf{x})\right)\right),
+\end{equation}
 where $d_y$ is the dimension of the stacked measurement vector. This expression shows that the plausibility of a state is not determined by the residual alone, but by the residual relative to the uncertainty. A residual of a given numerical size may be significant for a precise sensor and insignificant for a noisy sensor.
+
+Figure~\ref{fig:gaussian-1d-2d} shows the Gaussian density in one and two dimensions. For a scalar measurement, the interval of one standard deviation around the mean contains $68.3\,\%$ of the probability, and the interval of two standard deviations contains $95.4\,\%$. For a vector measurement, the density is constant on the ellipses (ellipsoids, in more than two dimensions) on which the quadratic form in the exponent of \eqref{eq:Gaussianlikelihood} takes a constant value $c^2$; their principal axes are the eigenvectors of $\mathbf{R}$ and their semi-axes are $c\sqrt{\lambda_1}$ and $c\sqrt{\lambda_2}$. The quadratic form is the squared Mahalanobis distance of the residual, that is, its squared length measured in units of the noise covariance, and for a Gaussian residual it follows a chi-square distribution with $d_y$ degrees of freedom. The probability contained in an ellipse therefore depends on the dimension: for $d_y=2$ it equals $1-e^{-c^2/2}$, which is only $39.3\,\%$ for $c=1$ and $86.5\,\%$ for $c=2$. The one-standard-deviation intuition of the scalar case does not carry over to several dimensions; the same chi-square distribution provides the thresholds of the consistency tests and of the gates of Sects.~\ref{sec:bayes-filtering} and~\ref{sec:track-level}.
+
+\begin{figure}[!t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=16mm},
+    scale only axis,
+    tick label style={font=\scriptsize},
+    label style={font=\scriptsize},
+    title style={font=\scriptsize, yshift=0.5mm},
+    axis line style={line width=0.5pt},
+    tick align=outside,
+]
+%% ---------------- panel (a): scalar Gaussian ----------------
+\nextgroupplot[
+    width=0.42\columnwidth, height=3.3cm,
+    xmin=-3.6, xmax=3.6, ymin=0, ymax=0.56,
+    xtick={-3,-2,-1,0,1,2,3},
+    xlabel={standardised value $(y-\mu)/\sigma$},
+    ytick=\empty, ylabel={density},
+    axis x line=bottom, axis y line=left,
+    title={(a) scalar Gaussian density},
+]
+\addplot[draw=none, fill=EkfBlue!14, domain=-2:2, samples=61] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+\addplot[draw=none, fill=EkfBlue!35, domain=-1:1, samples=41] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+\addplot[TruthBlack, line width=0.9pt, domain=-3.6:3.6, samples=121] {exp(-x^2/2)/sqrt(2*pi)};
+\draw[<->, >=stealth, line width=0.5pt] (axis cs:-1,0.435) -- (axis cs:1,0.435)
+    node[midway, above, font=\scriptsize, inner sep=1pt] {$68.3\,\%$};
+\draw[<->, >=stealth, line width=0.5pt] (axis cs:-2,0.505) -- (axis cs:2,0.505)
+    node[midway, above, font=\scriptsize, inner sep=1pt] {$95.4\,\%$};
+%% ---------------- panel (b): two-dimensional Gaussian ----------------
+\nextgroupplot[
+    width=0.42\columnwidth, height=3.3cm,
+    axis equal image,
+    xlabel={$r_1$ [m]}, ylabel={$r_2$ [m]},
+    xmin=-3.6, xmax=3.6, ymin=-2.5, ymax=2.5,
+    title={(b) two-dimensional Gaussian density},
+]
+\addplot[fill=EkfBlue!10, draw=EkfBlue, line width=0.5pt]
+    table[x=x3, y=y3, col sep=comma] {data/ch03/covariance_2d_ellipses.csv};
+\addplot[fill=EkfBlue!22, draw=EkfBlue, line width=0.5pt]
+    table[x=x2, y=y2, col sep=comma] {data/ch03/covariance_2d_ellipses.csv};
+\addplot[fill=EkfBlue!40, draw=EkfBlue, line width=0.6pt]
+    table[x=x1, y=y1, col sep=comma] {data/ch03/covariance_2d_ellipses.csv};
+\node[font=\scriptsize, anchor=north west, align=left] at (axis cs:-3.5,2.4)
+    {$c=1$: $39.3\,\%$\\ $c=2$: $86.5\,\%$\\ $c=3$: $98.9\,\%$};
+\end{groupplot}
+\end{tikzpicture}}
+\caption{Gaussian densities. (a) Scalar case: the intervals of one and two standard deviations around the mean contain $68.3\,\%$ and $95.4\,\%$ of the probability. (b) Two-dimensional case, with the covariance of Fig.~\ref{fig:mean-variance}(b): the density is constant on the ellipses $(\mathbf{y}-\boldsymbol{\mu})^{\mathsf T}\mathbf{R}^{-1}(\mathbf{y}-\boldsymbol{\mu})=c^2$, shown for $c=1,2,3$, which contain $1-e^{-c^2/2}$ of the probability. In two dimensions the ellipse of one standard deviation contains less than half of the probability.}
+\label{fig:gaussian-1d-2d}
+\end{figure}
+
 
 % ============================================
 \subsection{Residuals, least squares, and optimality criteria}
@@ -248,7 +361,7 @@ An estimator is obtained by minimising a cost function:
 \begin{align}
 \widehat{\mathbf{x}} = \operatorname*{arg\,min}_{\mathbf{x}} J(\mathbf{x}).
 \end{align}
-Different choices of $J(\mathbf{x})$ correspond to different assumptions about the measurement errors and different notions of optimality. Least-squares methods use a quadratic cost. For scalar measurements, the ordinary least-squares cost is
+Different choices of $J(\mathbf{x})$ correspond to different assumptions about the measurement errors and different notions of optimality. Least-squares methods use a quadratic cost. For scalar measurements, the ordinary least-squares (LS) cost is
 \begin{align}
 J_{\mathrm{LS}}(\mathbf{x}) = \sum_{n=1}^{N}\left(y_n-g_n(\mathbf{x})\right)^2.
 \end{align}
@@ -457,33 +570,9 @@ Thus, under additive Gaussian measurement noise, $\widehat{\mathbf{x}}_{\mathrm{
 
 \subsection{Prior information: regularised least squares and the MAP estimate}
 In some problems, measurements alone are insufficient to estimate $\mathbf{x}$ reliably. This may occur when the number of measurements is small, when the measurement geometry is poor, when the inverse problem is ill-conditioned, or when some components of the state are weakly observable. Regularised least squares addresses this by incorporating prior information. Let $\mathbf{m}$ denote a prior estimate of $\mathbf{x}$, and let $\mathbf{P}$ denote the covariance associated with this prior. A small $\mathbf{P}$ means that the prior is trusted strongly; a large $\mathbf{P}$ means that the prior is weak. The regularised least-squares cost is
-\begin{align}
-J_{\mathrm{ReLS}}(\mathbf{x})
-=&
-\left(
-\mathbf{y}
--
-\mathbf{G}\mathbf{x}
-\right)^{\mathsf T}
-\mathbf{R}^{-1}
-\left(
-\mathbf{y}
--
-\mathbf{G}\mathbf{x}
-\right) \nonumber \\
-&+
-\left(
-\mathbf{x}
--
-\mathbf{m}
-\right)^{\mathsf T}
-\mathbf{P}^{-1}
-\left(
-\mathbf{x}
--
-\mathbf{m}
-\right).
-\end{align}
+\begin{equation}
+J_{\mathrm{ReLS}}(\mathbf{x}) = \left( \mathbf{y} - \mathbf{G}\mathbf{x} \right)^{\mathsf T} \mathbf{R}^{-1} \left( \mathbf{y} - \mathbf{G}\mathbf{x} \right) + \left( \mathbf{x} - \mathbf{m} \right)^{\mathsf T} \mathbf{P}^{-1} \left( \mathbf{x} - \mathbf{m} \right).
+\end{equation}
 The first term measures consistency with the sensor data. The second term measures consistency with the prior. Differentiating and setting the gradient to zero gives
 \begin{equation}
 \left(
@@ -594,36 +683,9 @@ The maximum a posteriori estimate is
 p(\mathbf{x}\mid\mathbf{y}).
 \end{equation}
 Equivalently, it minimises the negative log-posterior. Ignoring constants independent of $\mathbf{x}$, this gives
-\begin{align}
-\widehat{\mathbf{x}}_{\mathrm{MAP}}
-=
-\operatorname*{arg\,min}_{\mathbf{x}}
-\bigg[
-&\left(
-\mathbf{y}
--
-\mathbf{G}\mathbf{x}
-\right)^{\mathsf T}
-\mathbf{R}^{-1}
-\left(
-\mathbf{y}
--
-\mathbf{G}\mathbf{x}
-\right) \nonumber \\
-&+
-\left(
-\mathbf{x}
--
-\mathbf{m}
-\right)^{\mathsf T}
-\mathbf{P}^{-1}
-\left(
-\mathbf{x}
--
-\mathbf{m}
-\right)
-\bigg].
-\end{align}
+\begin{equation}
+\widehat{\mathbf{x}}_{\mathrm{MAP}} = \operatorname*{arg\,min}_{\mathbf{x}} \bigg[ \left( \mathbf{y} - \mathbf{G}\mathbf{x} \right)^{\mathsf T} \mathbf{R}^{-1} \left( \mathbf{y} - \mathbf{G}\mathbf{x} \right) + \left( \mathbf{x} - \mathbf{m} \right)^{\mathsf T} \mathbf{P}^{-1} \left( \mathbf{x} - \mathbf{m} \right) \bigg].
+\end{equation}
 Therefore,
 \begin{equation}
 \widehat{\mathbf{x}}_{\mathrm{MAP}}
@@ -654,33 +716,9 @@ Suppose that after processing measurements up to step $n-1$, the available estim
 \operatorname{cov}(\mathbf{r}_n)=\mathbf{R}_n.
 \end{align*}
 Here, $\mathbf{G}_n$ is the measurement matrix of the new sensor observation, and $\mathbf{R}_n$ is the covariance of the new measurement error. We assume that the new measurement error is uncorrelated with the errors already incorporated into $\widehat{\mathbf{x}}_{n-1}$. This assumption is what allows information to be added recursively. The previous estimate can be interpreted as a prior estimate for the unknown vector $\mathbf{x}$. Therefore, after receiving $\mathbf{y}_n$, the updated estimate may be obtained by minimising a regularised weighted least-squares cost:
-\begin{align}
-J_n(\mathbf{x})
-=&
-\left(
-\mathbf{x}
--
-\widehat{\mathbf{x}}_{n-1}
-\right)^{\mathsf T}
-\mathbf{P}_{n-1}^{-1}
-\left(
-\mathbf{x}
--
-\widehat{\mathbf{x}}_{n-1}
-\right) \\
-&+
-\left(
-\mathbf{y}_n
--
-\mathbf{G}_n\mathbf{x}
-\right)^{\mathsf T}
-\mathbf{R}_n^{-1}
-\left(
-\mathbf{y}_n
--
-\mathbf{G}_n\mathbf{x}
-\right). \nonumber
-\end{align}
+\begin{equation}
+J_n(\mathbf{x}) = \left( \mathbf{x} - \widehat{\mathbf{x}}_{n-1} \right)^{\mathsf T} \mathbf{P}_{n-1}^{-1} \left( \mathbf{x} - \widehat{\mathbf{x}}_{n-1} \right) + \left( \mathbf{y}_n - \mathbf{G}_n\mathbf{x} \right)^{\mathsf T} \mathbf{R}_n^{-1} \left( \mathbf{y}_n - \mathbf{G}_n\mathbf{x} \right).
+\end{equation}
 The first term penalises deviation from the previous estimate, weighted by the inverse of its covariance. If $\mathbf{P}_{n-1}$ is small, the previous estimate is trusted strongly. If $\mathbf{P}_{n-1}$ is large, the previous estimate is uncertain and the new measurement can influence the update more strongly. The second term penalises disagreement with the new measurement, weighted by the inverse measurement covariance $\mathbf{R}_n^{-1}$. To derive the recursive estimator, we differentiate $J_n(\mathbf{x})$ with respect to $\mathbf{x}$ and set the gradient equal to zero. This gives
 \begin{equation}
 \mathbf{P}_{n-1}^{-1}
@@ -702,34 +740,12 @@ The first term penalises deviation from the previous estimate, weighted by the i
 \mathbf{0}.
 \end{equation}
 Rearranging terms gives the normal equation
-\begin{align*}
-&\left(\mathbf{P}_{n-1}^{-1}+\mathbf{G}_n^{\mathsf T}\mathbf{R}_n^{-1}\mathbf{G}_n\right)\widehat{\mathbf{x}}_n\\
-&\qquad=
-\mathbf{P}_{n-1}^{-1}\widehat{\mathbf{x}}_{n-1}
-+\mathbf{G}_n^{\mathsf T}\mathbf{R}_n^{-1}\mathbf{y}_n.
-\end{align*}
+\begin{equation*}
+\left(\mathbf{P}_{n-1}^{-1}+\mathbf{G}_n^{\mathsf T}\mathbf{R}_n^{-1}\mathbf{G}_n\right)\widehat{\mathbf{x}}_n = \mathbf{P}_{n-1}^{-1}\widehat{\mathbf{x}}_{n-1} +\mathbf{G}_n^{\mathsf T}\mathbf{R}_n^{-1}\mathbf{y}_n.
+\end{equation*}
 Hence, the updated estimate can be written in information form as
 \begin{equation}
-\begin{aligned}
-\widehat{\mathbf{x}}_n
-&=
-\left(
-\mathbf{P}_{n-1}^{-1}
-+
-\mathbf{G}_n^{\mathsf T}
-\mathbf{R}_n^{-1}
-\mathbf{G}_n
-\right)^{-1}\\
-&\quad{}\times
-\left(
-\mathbf{P}_{n-1}^{-1}
-\widehat{\mathbf{x}}_{n-1}
-+
-\mathbf{G}_n^{\mathsf T}
-\mathbf{R}_n^{-1}
-\mathbf{y}_n
-\right).
-\end{aligned}
+\widehat{\mathbf{x}}_n = \left( \mathbf{P}_{n-1}^{-1} + \mathbf{G}_n^{\mathsf T} \mathbf{R}_n^{-1} \mathbf{G}_n \right)^{-1} \left( \mathbf{P}_{n-1}^{-1} \widehat{\mathbf{x}}_{n-1} + \mathbf{G}_n^{\mathsf T} \mathbf{R}_n^{-1} \mathbf{y}_n \right).
 \end{equation}
 The corresponding covariance update in information form is
 \begin{equation}
@@ -892,7 +908,7 @@ The WLS estimate is defined as
 \end{equation}
 Unlike the linear case, this optimisation problem usually does not have a closed-form solution. Iterative numerical methods are therefore used.
 
-Let the Jacobian matrix of the measurement function be
+The methods below assume that $\mathbf{g}$ is differentiable, at least in a neighbourhood of the solution, so that its Jacobian exists; measurement functions with discontinuities, such as a bearing that wraps around at $\pm\pi$ or a saturating sensor, require the residual to be computed with care (for instance, by wrapping angle differences into $(-\pi,\pi]$). Let the Jacobian matrix of the measurement function be
 \begin{equation}
 \mathbf{G}_{\mathbf{x}}(\mathbf{x}) = \frac{\partial \mathbf{g}(\mathbf{x})}{\partial \mathbf{x}}.
 \end{equation}
@@ -906,7 +922,7 @@ A gradient-descent update is
 \end{equation}
 where $\gamma^{(i)}$ is a step size. The step size must be chosen carefully: a very small step leads to slow convergence, while a very large step can increase the cost or cause divergence.
 
-Gauss--Newton method often converges faster because it solves a locally linearised least-squares problem at each iteration. Around the current estimate $\widehat{\mathbf{x}}^{(i)}$, the measurement function is approximated by
+The Gauss--Newton method often converges faster because it solves a locally linearised least-squares problem at each iteration. Around the current estimate $\widehat{\mathbf{x}}^{(i)}$, the measurement function is approximated by its first-order Taylor expansion, that is, by the Taylor series truncated after the linear term,
 \begin{equation}
 \mathbf{g}(\mathbf{x}) \approx \mathbf{g} \left( \widehat{\mathbf{x}}^{(i)} \right) + \mathbf{G}_{\mathbf{x}} \left( \widehat{\mathbf{x}}^{(i)} \right) \left( \mathbf{x} - \widehat{\mathbf{x}}^{(i)} \right).
 \end{equation}
@@ -915,25 +931,9 @@ Define the current residual as
 \mathbf{e}^{(i)} = \mathbf{y} - \mathbf{g} \left( \widehat{\mathbf{x}}^{(i)} \right).
 \end{equation}
 The Gauss--Newton increment is
-\begin{align}
-\Delta \mathbf{x}^{(i)} = &\left(
-\mathbf{G}_{\mathbf{x}}^{\mathsf T}
-\left(
-\widehat{\mathbf{x}}^{(i)}
-\right)
-\mathbf{R}^{-1}
-\mathbf{G}_{\mathbf{x}}
-\left(
-\widehat{\mathbf{x}}^{(i)}
-\right)
-\right)^{-1} \times \nonumber \\
-&\mathbf{G}_{\mathbf{x}}^{\mathsf T}
-\left(
-\widehat{\mathbf{x}}^{(i)}
-\right)
-\mathbf{R}^{-1}
-\mathbf{e}^{(i)}.
-\end{align}
+\begin{equation}
+\Delta \mathbf{x}^{(i)} = \left( \mathbf{G}_{\mathbf{x}}^{\mathsf T} \left( \widehat{\mathbf{x}}^{(i)} \right) \mathbf{R}^{-1} \mathbf{G}_{\mathbf{x}} \left( \widehat{\mathbf{x}}^{(i)} \right) \right)^{-1} \mathbf{G}_{\mathbf{x}}^{\mathsf T} \left( \widehat{\mathbf{x}}^{(i)} \right) \mathbf{R}^{-1} \mathbf{e}^{(i)}.
+\end{equation}
 The estimate is then updated as
 \begin{equation}
 \widehat{\mathbf{x}}^{(i+1)} = \widehat{\mathbf{x}}^{(i)} + \Delta \mathbf{x}^{(i)}.
@@ -1009,12 +1009,12 @@ The first term encodes prior information about the initial state. The second ter
 % GAB: I reduced it a bit as it was too long and a bit redundant. 
 \subsection{Concluding perspective}
 
-Two ideas from the preceding derivations survive into every method in this \deleted{survey}\added{book}. The first is that a measurement means nothing without its model and its uncertainty. What a sensor reports does not by itself determine how much it should move the estimate; that is fixed by what the sensor observes, how sensitively it responds to the state, how noisy it is, and whether it is biased. This is why covariance matrices are not bookkeeping: they encode how much each measurement and each direction in measurement space is to be believed.
+Two ideas from the preceding derivations survive into every method in this book. The first is that a measurement means nothing without its model and its uncertainty. What a sensor reports does not by itself determine how much it should move the estimate; that is fixed by what the sensor observes, how sensitively it responds to the state, how noisy it is, and whether it is biased. This is why the covariance matrices are central to every method that follows: they state how much each measurement and each direction in measurement space is to be believed.
 
-The second is that independence is what makes information additive. Two independent measurements contribute genuinely separate evidence; two correlated ones share part of theirs, and treating them as independent counts the shared part twice. The estimate then reports a confidence it has not earned. This is the characteristic failure mode of sensor fusion, and it is worse than plain inaccuracy, because a fused estimate that is confidently wrong will be acted upon. The remedy is not fewer sensors but honest models: an ignored bias, a miscalibrated covariance, or an unmodelled dependency degrades the fused estimate below what a single well-understood sensor would have delivered.
+The second is that independence is what makes information additive. Two independent measurements contribute genuinely separate evidence; two correlated ones share part of theirs, and treating them as independent counts the shared part twice. The reported covariance is then smaller than the actual error. This overconfidence is the characteristic failure mode of sensor fusion, and it is more dangerous than a large but correctly reported error, because the modules downstream trust the reported covariance. It is avoided by modelling biases, covariances, and dependencies correctly: an ignored bias, a miscalibrated covariance, or an unmodelled dependency can make the fused estimate worse than that of a single well-understood sensor.
 
-Sequential estimation adds the operational reading. Past measurements need not be stored, because their effect is summarised by the current estimate and its covariance; a new measurement is then weighed by how surprising it is, through the innovation, and by how reliable it is, through the gain. This prediction--correction structure is the bridge from static least squares to the recursive filters of the next subsection.
-This is the essence of modern sensor fusion: \emph{not merely combining sensor outputs, but combining information with an explicit account of uncertainty.}
+Sequential estimation adds a third observation. For the linear model and covariance assumptions derived here, past measurements need not be stored, because their effect is summarised by the current estimate and its covariance; a new measurement is then weighed by how surprising it is, through the innovation, and by how reliable it is, through the gain. This prediction--correction structure is the bridge from static least squares to the recursive filters of the next subsection.
+In short, sensor fusion combines information together with an explicit account of its uncertainty.
 
 
 
@@ -1118,7 +1118,7 @@ When the process and measurement models are linear,
 \label{eq:kf_linear_measurement}
 \end{align}    
 \end{subequations}
-and the noises are Gaussian, i.e, $\mathbf{q}_{k-1}\sim \mathcal{N}(\mathbf{0},\mathbf{Q}_{k-1})$ and $\mathbf{r}_k\sim \mathcal{N}(\mathbf{0},\mathbf{R}_k)$, the posterior remains Gaussian. It can therefore be represented exactly by its conditional mean and covariance, that is,
+and the initial state is Gaussian, independent of the mutually independent, temporally white process and measurement noises, i.e., $\mathbf{q}_{k-1}\sim \mathcal{N}(\mathbf{0},\mathbf{Q}_{k-1})$ and $\mathbf{r}_k\sim \mathcal{N}(\mathbf{0},\mathbf{R}_k)$, the posterior remains Gaussian. It can therefore be represented exactly by its conditional mean and covariance, that is,
 \begin{equation}
 p(\mathbf{x}_k\mid\mathbf{y}_{1:k}) = \mathcal{N} \bigl(\widehat{\mathbf{x}}_{k|k}, \mathbf{P}_{k|k} \bigr).
 \end{equation}
@@ -1302,7 +1302,7 @@ whiteness, mean, and temporal correlation should also be monitored,
 because a sequence may have approximately correct marginal variance
 while still containing systematic or coloured modelling errors.
 
-Bayesian filtering should therefore be understood not merely as a collection of recursive equations, but as a mechanism for propagating and revising beliefs about a hidden dynamic state. The prediction step encodes what the motion model implies before the new observation is seen; the update step determines how the observation changes that belief; and the posterior uncertainty records what remains unknown after both sources of information have been combined. This prediction--innovation--correction structure underlies localisation, tracking, navigation, occupancy estimation, and many hybrid classical--learning fusion architectures considered throughout this book.
+Bayesian filtering should therefore be understood as a mechanism for propagating and revising beliefs about a hidden dynamic state, of which the recursive equations are one implementation. The prediction step encodes what the motion model implies before the new observation is seen; the update step determines how the observation changes that belief; and the posterior uncertainty records what remains unknown after both sources of information have been combined. This prediction--innovation--correction structure underlies localisation, tracking, navigation, occupancy estimation, and many hybrid classical--learning fusion architectures considered throughout this book.
 
 Let us conclude this subsection with some examples.
 
@@ -1332,7 +1332,7 @@ the constant-velocity model of the form
 \end{bmatrix},
 \qquad T=0.05\ \mathrm{s},
 \end{equation}
-and a discretised white-noise-acceleration process covariance
+and a discrete random-acceleration process covariance
 \begin{equation}
 \mathbf{Q}=\sigma_a^{2}
 \begin{bmatrix}
@@ -1343,14 +1343,13 @@ and a discretised white-noise-acceleration process covariance
 \end{bmatrix},
 \qquad \sigma_a=0.8\ \mathrm{m/s^{2}},
 \end{equation}
-in which $\sigma_a$ expresses how much unmodelled acceleration the target is
-permitted between updates. 
+in which $\sigma_a$ is the standard deviation of an acceleration drawn independently and held constant over each sampling interval. It is not a deterministic bound. Continuous-time white acceleration instead gives, for each position--velocity pair, $q_a\left[\begin{smallmatrix}T^3/3&T^2/2\\T^2/2&T\end{smallmatrix}\right]$, with spectral density $q_a$ in m$^2$/s$^3$; changing the sampling rate while holding $\sigma_a$ fixed changes the implied continuous-time excitation. 
 Let us assume the availability of a radar, which observes
 \begin{equation}
 \mathbf{g}(\mathbf{x}_k)=
 \begin{bmatrix}
 \sqrt{p_x^{2}+p_y^{2}}\\[4pt]
-\arctan\!\left(p_y/p_x\right)\\[4pt]
+\operatorname{atan2}(p_y,p_x)\\[4pt]
 \dfrac{p_xv_x+p_yv_y}{\sqrt{p_x^{2}+p_y^{2}}}
 \end{bmatrix},
 \qquad
@@ -1379,8 +1378,7 @@ sensor origin must be handled separately. Second, the azimuth component of the
 innovation \eqref{eq:kf_innovation} must be wrapped to $(-\pi,\pi]$ before it is
 used, since the difference of two angles is not the angle of the difference.
 Third, the track is initialised directly from the first detection,
-$\widehat{p}_x=r\cos\theta$ and $\widehat{p}_y=r\sin\theta$, with the velocity
-components set to zero and given a deliberately large prior variance; the
+$\widehat{p}_x=r\cos\theta$ and $\widehat{p}_y=r\sin\theta$, with the velocity components set to zero and given a deliberately large prior variance. The position covariance is $J_0\diag(\sigma_r^2,\sigma_\theta^2)J_0^{\mathsf T}$, where $J_0$ is the polar-to-Cartesian Jacobian at that detection. The first detection is used only for initiation, and filtering updates begin with the next detection; the zero in the first CSV NIS row is an initiation placeholder excluded from consistency summaries. In particular, the
 azimuth channel alone cannot resolve the velocity, and pretending otherwise
 produces an overconfident initial covariance.
 
@@ -1391,18 +1389,17 @@ outcome over a $10$\,s run at $20$\,Hz. In the upper panel the raw detections,
 converted to Cartesian coordinates for display, scatter visibly about the true
 trajectory, chiefly in the lateral direction: at $60$\,m an azimuth error of
 $0.5^{\circ}$ is already a lateral error of $0.5$\,m, which is why a bearing-only
-lateral estimate degrades with range while the range estimate does not. Over the
-run the EKF reduces the position RMSE from $0.42$\,m to $0.16$\,m, a reduction of
+lateral estimate degrades with range while the range estimate does not. After excluding the first second of initialisation, the EKF reduces the position root-mean-square error (RMSE) from $0.42$\,m to $0.16$\,m, a reduction of
 $62$\,\%, and it does so while also estimating the two velocity components, which
 the radar never observes directly.
 
 The lower panel shows why this example is placed after the discussion of filter
 consistency. It plots the normalised innovation squared \eqref{eq:nis} against
-the two-sided $95\,\%$ interval of the $\chi^{2}_{3}$ distribution. While the
-constant-velocity assumption holds, the filter is statistically consistent: the
-mean NIS is $2.57$ against an expected value of $3$, and $98.8\,\%$ of the
+the two-sided $95\,\%$ interval of the $\chi^{2}_{3}$ distribution. On the
+constant-velocity segments, the innovation statistics show no clear excess variance in this run: the
+mean NIS is $2.54$ against an expected value of $3$, and $98.8\,\%$ of the
 samples fall inside the interval. During the lane change the picture changes.
-The mean NIS rises to $3.73$, only $90.2\,\%$ of the samples remain inside the
+The mean NIS rises to $3.74$, only $90.2\,\%$ of the samples remain inside the
 interval, and the peak reaches $13.5$. Nothing is wrong with the sensor; what
 the diagnostic has detected is that the process model no longer describes the
 target. The estimate degrades accordingly but gracefully, with a peak lateral
@@ -1512,9 +1509,7 @@ estimate. The target closes on the ego vehicle, so time runs from right to left;
 the excursion at the right-hand edge is the initialisation transient, before the
 velocity components have been observed. The detection scatter is dominated by
 the azimuth channel and therefore grows with range. (b)~Normalised innovation
-squared against the two-sided $95\,\%$ interval of $\chi^{2}_{3}$. The filter is
-consistent while the constant-velocity assumption holds and becomes measurably
-inconsistent during the lane change (shaded), which is the intended behaviour of
+squared against the two-sided $95\,\%$ interval of $\chi^{2}_{3}$. The innovations show an increased model mismatch during the lane change (shaded), which is the intended behaviour of
 the diagnostic: it reports a model mismatch, not a sensor fault.}
 \label{fig:ekf-radar-cutin}
 \end{figure}
@@ -1531,10 +1526,7 @@ is applied only to the measurement update. This is the usual choice when only
 one of the two models is nonlinear, and it halves the number of sigma-point
 propagations.
 
-Over $200$ Monte Carlo runs the two filters are indistinguishable: the position
-RMSE is $0.1775$\,m for the EKF and $0.1776$\,m for the UKF, the paired
-difference averages $0.04\,\%$ of the RMSE, and the largest difference observed
-on any single run is $9$\,mm. The reason is not that the measurement model is
+The reproducible rate sweep below uses $100$ paired Monte Carlo runs at each rate (seeds $1000$--$1099$), with the same detections and initialisation for the EKF and UKF within each pair. At $20$\,Hz their mean position RMSEs are both about $0.175$\,m. The reason is not that the measurement model is
 mildly nonlinear in absolute terms, since the azimuth channel is decidedly not,
 but that what governs the linearisation error is the curvature of
 $\mathbf{g}$ \emph{over the support of the predicted covariance}. Here the
@@ -1546,7 +1538,7 @@ forgiven a poor approximation; there is no approximation error to speak of.
 The comparison becomes interesting only when that support grows, which in
 practice means sparse updates, long dead-reckoning intervals between external
 corrections, or a poor initialisation. Table~\ref{tab:ekf-ukf-rate} varies the
-radar update rate alone, leaving the geometry and all covariances unchanged.
+radar update rate while fixing the geometry, measurement noise, and continuous-time acceleration spectral density $q_a=0.032$\,m$^2$/s$^3$. Both filters use the continuous-time discretisation stated above for this sweep. This avoids changing the effective excitation per second when changing the rate. RMSE is the mean of the per-run Euclidean position RMSEs for $t\ge1$\,s; $\sigma_y$ is the mean predicted lateral standard deviation over those same samples, including any remaining initiation transient. The script for this comparison is the UKF radar cut-in script, identified as \codeentry{E3-UKF} in the companion-code guide. Its Monte Carlo option reproduces Table~\ref{tab:ekf-ukf-rate} and saves the rate-sweep results as a CSV file; the command and output file are listed under \codeentry{D3-UKF}.
 
 \begin{table}[!t]
 \centering
@@ -1561,24 +1553,21 @@ $\mathbf{g}$, which is the same in every row.}
 \hline
 \textbf{Rate} & \textbf{$\sigma_y$ [m]} & \textbf{EKF RMSE [m]} & \textbf{UKF RMSE [m]}\\
 \hline
-$20$\,Hz  & $0.11$ & $0.098$ & $0.098$\\
-$5$\,Hz   & $0.24$ & $0.188$ & $0.188$\\
-$1$\,Hz   & $0.91$ & $0.335$ & $0.343$\\
-$0.5$\,Hz & $2.56$ & $0.382$ & $0.508$\\
+$20$\,Hz & $0.11$ & $0.175$ & $0.175$\\
+$5$\,Hz & $0.21$ & $0.270$ & $0.270$\\
+$1$\,Hz & $1.49$ & $0.369$ & $0.415$\\
+$0.5$\,Hz & $5.39$ & $0.432$ & $0.863$\\
 \hline
 \end{tabular}
 \end{table}
 
 The UKF does not overtake the EKF anywhere in this problem, and at the lowest
 rate it is clearly worse. That last row should be read with care rather than
-as a general result: at $\sigma_y=2.56$\,m the sigma points straddle a genuinely
-curved region of $\mathbf{g}$, the covariance update
-$\mathbf{P}-\mathbf{K}\mathbf{P}_{zz}\mathbf{K}^{\mathsf T}$ has no Joseph-form
-equivalent, and the outcome becomes sensitive to the sigma-point tuning. Two
+as a general result: at a mean predicted $\sigma_y=5.39$\,m the sigma points straddle a genuinely
+curved region of $\mathbf{g}$, the subtractive covariance update $\mathbf{P}-\mathbf{K}\mathbf{P}_{zz}\mathbf{K}^{\mathsf T}$ can lose positive semidefiniteness in finite precision. Square-root and stabilised implementations help; the result also depends on the sigma-point tuning and on the few available updates. Two
 practical remarks follow. First, that tuning is not innocuous: with the
 frequently quoted $\alpha=10^{-3}$ the sigma points collapse to $0.002\sigma$
-and the centre weight becomes $-8\times10^{5}$, so the UKF degenerates into a
-central-difference EKF with poor conditioning; the values used here are
+and the centre weight becomes $-8\times10^{5}$, so moment reconstruction involves subtracting large weighted terms and can be poorly conditioned; it does not in general become identical to an EKF, since curvature terms can survive in the reconstructed moments; the values used here are
 $\alpha=1$, $\beta=2$, $\kappa=1$, which keep all weights
 positive~\cite{julier2004_ukf}. Second, the UKF costs $2n_x+1=9$ evaluations of
 $\mathbf{g}$ per update against a single Jacobian. The conclusion for
@@ -1622,7 +1611,7 @@ Consider a dynamic sensor-fusion model
 \mathbf{y}_k&=\mathbf{h}_k(\mathbf{x}_k)+\mathbf{v}_k,
 \end{align}
 where $\mathbf{w}_k\in\mathcal{W}_k$ and $\mathbf{v}_k\in\mathcal{V}_k$ are unknown but bounded
-\textcolor{olive}{, in contrast with the zero-mean stochastic $\mathbf{q}_k$ and $\mathbf{r}_k$ assumed earlier: the model is the same, only the description of the noise changes from a covariance to a set}. 
+, in contrast with the zero-mean stochastic $\mathbf{q}_k$ and $\mathbf{r}_k$ assumed earlier: the model is the same, only the description of the noise changes from a covariance to a set. 
 
 If the current state enclosure is $\mathcal{X}_k=p_k\oplus H_k\mathbb{B}_{\infty}^{m_k}$, the prediction step maps this set through the dynamics and adds the process-noise set. For nonlinear dynamics, a practical extended zonotopic estimator linearises the model around $p_k$ and appends a bounded Taylor-remainder zonotope:
 \begin{equation}
@@ -1763,13 +1752,12 @@ The strip is $0.4\le x_2\le1.6$. With $\gamma=c$, the centre moves to $\hat p=[0
 0 & 0 & 0 & 0.6
 \end{bmatrix},
 \end{equation}
-and the retained zonotope encloses the exact intersection shown in Fig.~\ref{fig:zonotope_strip_correction}. \textcolor{olive}{The price of that guarantee is visible in the same figure: the retained set spans $x_1\in[-3.2,3.2]$, the full width of the prediction, because a zonotope cannot represent the slanted cut that the strip actually makes. Containment is exact; tightness is not.} Processing several sensor channels sequentially gives a corrected zonotope that still contains all measurement-consistent states, provided the assumed bounds are valid.
-Processing several sensor channels sequentially gives a corrected zonotope that still contains all measurement-consistent states, provided the assumed bounds are valid.
+and the retained zonotope encloses the exact intersection shown in Fig.~\ref{fig:zonotope_strip_correction}. The same figure shows the cost of this guarantee: the retained set spans $x_1\in[-3.2,3.2]$, the full width of the prediction, because a zonotope cannot represent the slanted cut that the strip actually makes. The enclosure is therefore guaranteed, but it is not tight. Processing several sensor channels sequentially gives a corrected zonotope that still contains all measurement-consistent states, provided the assumed bounds are valid.
 \end{example}
 
 
 
-\textcolor{olive}{Example~\ref{ex:zonotope-strip} shows such a correction mechanism from a numerical perspective.} The number of columns of the generator matrix is the number of independent uncertainty directions retained by the filter. Prediction appends process-noise and linearisation-remainder generators, and each strip correction appends a measurement-noise generator. Without compression, the matrix $H$ therefore grows at every time step, increasing memory use and making subsequent matrix products more expensive. Practical zonotopic estimators control this growth by order reduction. If
+Example~\ref{ex:zonotope-strip} shows such a correction mechanism from a numerical perspective. The number of columns of the generator matrix is the number of independent uncertainty directions retained by the filter. Prediction appends process-noise and linearisation-remainder generators, and each strip correction appends a measurement-noise generator. Without compression, the matrix $H$ therefore grows at every time step, increasing memory use and making subsequent matrix products more expensive. Practical zonotopic estimators control this growth by order reduction. If
 \begin{equation}
 H=\left[H_{\mathrm{keep}}\quad H_{\mathrm{red}}\right],
 \end{equation}
@@ -1789,7 +1777,7 @@ This replacement reduces many low-priority columns to only $d_x$ axis-aligned ge
 
 
 % GAB: i shortened this as it vas too verbose.
-\textcolor{olive}{A recent extension replaces the purely deterministic description with probabilistic zonotopes, in which a bounded component and a Gaussian component coexist in the same geometric object~\cite{modares2026reachability}. The motivation is that real uncertainty budgets are mixed: a calibration tolerance or a certified sensor limit is a hard bound, whereas thermal noise is not. The framework additionally separates disturbances already realised, which can be inferred from logged trajectories and used to tighten the data-consistent model set, from future aleatory ones, which must still be propagated to obtain high-probability reachable sets. The practical consequence for fusion is that data can be used not only to confirm that a conservative uncertainty model is safe, but to shrink it.}
+A recent extension replaces the purely deterministic description with probabilistic zonotopes, in which a bounded component and a Gaussian component coexist in the same geometric object~\cite{modares2026reachability}. The motivation is that real uncertainty budgets are mixed: a calibration tolerance or a certified sensor limit is a hard bound, whereas thermal noise is not. The framework additionally separates disturbances already realised, which can be inferred from logged trajectories and used to tighten the data-consistent model set, from future aleatory ones, which must still be propagated to obtain high-probability reachable sets. The practical consequence for fusion is that data can be used both to confirm that a conservative uncertainty model is safe and to shrink it.
 
 
 %A recent extension of this line of work is the use of probabilistic zonotopes for data-driven reachability analysis and uncertainty refinement \cite{modares2026reachability}. While classical zonotopic estimators treat uncertainty mainly through deterministic bounded sets, probabilistic zonotopes combine bounded deterministic components with Gaussian stochastic components, thereby retaining the geometric advantages of zonotopes while also representing probabilistic uncertainty. This is particularly relevant for safety-oriented sensor fusion, where some uncertainty sources are best described by hard bounds, such as calibration tolerances or certified sensor error limits, whereas others are naturally stochastic, such as measurement noise or environmental variability. The framework in \cite{modares2026reachability} further distinguishes between realized disturbances, which are inferred from collected trajectories and used to tighten the data-consistent model set, and future aleatory disturbances, which must still be propagated to obtain high-probability reachable sets. This distinction is important for autonomous and robotic systems because data should not only validate whether a conservative prior uncertainty model is safe, but also refine it to reduce unnecessary conservatism. In this sense, probabilistic zonotopes provide a bridge between deterministic set-membership fusion and stochastic uncertainty propagation: they preserve containment-oriented reasoning while allowing data-driven refinement of the uncertainty model.
@@ -1844,7 +1832,7 @@ which is the Kalman gain of Example~\ref{ex:ekf-radar-cutin} with
 $\widetilde H\widetilde H^{\mathsf T}$ in the place of the covariance and
 $\bar\phi^{2}$ in the place of the measurement noise.
 
-Taking the sensor bounds at four standard deviations of the noise used in
+A four-standard-deviation threshold on Gaussian noise is not a hard bound for all future measurements. For this finite synthetic record we take the sensor bounds at four standard deviations of the noise used in
 Example~\ref{ex:ekf-radar-cutin}, that is $\bar r=1.2$\,m,
 $\bar\theta=2^{\circ}$, $\bar{\dot r}=0.4$\,m/s, and running the estimator on
 the same detection sequence gives Fig.~\ref{fig:zono-radar-cutin}. Every
@@ -1853,7 +1841,7 @@ its bound over the $201$ steps, and the peak lateral acceleration of the lane
 change is $2.33$\,m/s$^{2}$, inside $\bar a$. The result is the trade-off this
 subsection exists to describe, in numbers. The zonotopic enclosure contains the
 true state at \emph{every} step, including throughout the manoeuvre. The
-$3\sigma$ envelope of the EKF does not: it is breached on $24$ of $201$ steps,
+$3\sigma$ envelope of the EKF does not: it is breached on $23$ of $201$ steps,
 and the breaches are not spread evenly. During the constant-velocity segment it
 is never violated; during the lane change it fails on $29.5\,\%$ of the steps.
 This is the same model mismatch that the NIS reported in
@@ -1861,9 +1849,9 @@ Example~\ref{ex:ekf-radar-cutin}, seen from the other side, and it is worth
 noting that the probabilistic envelope is only mildly wrong, the largest
 excursion being $0.15$\,m.
 
-The price is conservatism, and it is not small. The zonotopic lateral envelope
+This guarantee comes with considerable conservatism. The zonotopic lateral envelope
 is between five and nine times wider than the EKF's $6\sigma$ band, narrowing
-from $7.6$\,m at a range of $57$\,m to $1.4$\,m at $10$\,m. That profile is
+from $7.4$\,m at a range of $55$\,m to $1.4$\,m at $10$\,m. That profile is
 itself informative: the width is dominated by the tangential strip
 \eqref{eq:zono-strip-tangential}, whose half-width $(r+\bar r)\sin\bar\theta$
 scales with range, so bounded-error tracking of a distant target is expensive
@@ -1952,7 +1940,7 @@ the point estimate that planning and control actually consume.
 \caption{Bounded-error and probabilistic descriptions for Example~\ref{ex:zono-radar-cutin}, from the same detections.
 (a)~The zonotopic enclosure contains the true lateral offset at every step; the
 EKF $3\sigma$ envelope is far tighter but is not a guarantee. (b)~The same data
-plotted relative to the truth: the $3\sigma$ band crosses zero on $29.5\,\%$ of
+plotted relative to the truth: the $3\sigma$ band excludes zero on $29.5\,\%$ of
 the steps inside the lane-change window (shaded) and on none of the steps while
 the constant-velocity model holds. The conservatism of the enclosure is the
 price of the guarantee, and it scales with range because the tangential strip
@@ -2242,7 +2230,7 @@ where $J(\mathbf{P})$ may be
 $\operatorname{tr}(\mathbf{P})$,
 $\det(\mathbf{P})$, or
 $\log\det(\mathbf{P})$
-\cite{uhlmann1995dynamic,julier1997nondivergent,julier2001general}. CI guarantees consistency without requiring the cross-covariance. It is therefore suitable for merging tracks from independently developed
+\cite{uhlmann1995dynamic,julier1997nondivergent,julier2001general}. For unbiased estimates whose reported covariances upper-bound their error covariances, CI preserves this bound without requiring the cross-covariance. More generally the bound must cover the error second moment, including any bias; a covariance that omits a common bias does not satisfy the premise. A weight fixed from the covariance information has this guarantee; selecting weights from the realised estimation errors requires separate analysis. It is therefore suitable for merging tracks from independently developed
 perception modules, neighbouring vehicles, or roadside infrastructure when their information histories are unavailable. Its price is conservatism: CI avoids claiming that all information contained in the two estimates is independent. When the true cross covariance is known, the correlated fusion rule generally gives a tighter estimate \cite{barshalom2011tracking,julier2001general}. CI should not be interpreted as simple arithmetic averaging. The scalar
 $\omega$ weights the complete information matrices. Consequently, the
 fusion remains direction dependent: one track may be more informative
@@ -2313,7 +2301,7 @@ where
 \begin{equation}
 K=\sum_{\gamma_b \cap \gamma_c=\emptyset}m_i(\gamma_b)m_j(\gamma_c)
 \end{equation}
-is the conflict between the two sources. The rule is attractive when the frame of discernment is trusted and the sources are expected to be reliable, but it may produce overconfident results under severe conflict.
+is the conflict between the two sources. The rule requires $K<1$; at total conflict it is undefined and a supervisor must retain the conflict or invoke a fallback. Independence here concerns the information sources, not merely separate sensor housings: outputs that share images, training, priors, or preprocessing may be dependent. The rule is attractive when the frame of discernment is trusted and the sources are expected to be reliable, but it may produce overconfident results under severe conflict.
 
 The Transferable Belief Model proposed by Smets avoids this normalisation and permits non-zero mass on the empty set \cite{smets_transferable_1990}:
 \begin{equation}
@@ -2350,7 +2338,7 @@ The discounted BBAs are then combined. In autonomous driving, \(\alpha_i\) may d
         \draw[->, thick, blue!75!black] (rl.east) -- (comb.west);
         \draw[->, thick, blue!75!black] (comb.east) -- (plan.west);
     \end{tikzpicture}
-    \caption{Evidence-theoretic fusion for a rain-night autonomous-driving conflict. The conflict mass is not merely a nuisance term: it is a safety signal that the perception stack should request additional sensing or choose a conservative manoeuvre.}
+    \caption{Evidence-theoretic fusion for a rain-night autonomous-driving conflict. A large conflict mass is a safety signal: it indicates that the perception stack should request additional sensing or choose a conservative manoeuvre.}
     \label{fig:evidence-theory-autonomous-driving-example}
 \end{figure}
 \begin{example}[Rain-night occlusion conflict.]
@@ -2497,7 +2485,7 @@ MCDM can also be integrated with evidence-theoretic fusion. For example, each se
 In autonomous driving, MCDM-based fusion is most appropriate when the decision problem is explicit and the criteria are interpretable. Examples include selecting the most reliable modality under degraded sensing, ranking candidate sensor suites during system design, choosing whether to trust an online map prior, selecting a fallback perception pipeline under compute constraints, or prioritising collision-warning responses. Its main advantages are transparency and auditability: the system can explain why a sensor was down-weighted or why a conservative action was selected. Its limitations are the subjectivity of criterion weights, sensitivity to normalisation choices, possible rank changes under perturbations, and the need to validate expert-driven rules under rare safety-critical scenarios.
 
 \problemsection
-Solutions are collected at the end of the book. Every number used below was obtained with the scripts of the companion repository, \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak }, which also contains the problem statements in machine-readable form and the Jupyter notebooks of the computational problems.
+Solutions are collected at the end of the book. Every number used below was obtained with the scripts of the companion repository, \codeentry{P3}, which also contains the problem statements in machine-readable form and the Jupyter notebooks of the computational problems.
 
 \begin{prob}\label{prob:ch03:1}
 \textbf{(Least squares versus weighted least squares.)} A radar and a camera both report the longitudinal distance $x$ to a lead vehicle: $y_1=41.6$\,m with $\sigma_1=0.30$\,m and $y_2=43.4$\,m with $\sigma_2=1.50$\,m, the two errors being zero-mean and independent.
@@ -2533,7 +2521,7 @@ The radar of Problem~\ref{prob:ch03:1} then measures the range only, $y=41.6$\,m
 \end{prob}
 
 \begin{prob}\label{prob:ch03:4}
-\textbf{(One Kalman-filter step by hand.)} A lead vehicle is tracked along one dimension with the state $\mathbf{x}=\begin{bmatrix}p&v\end{bmatrix}^{\mathsf T}$ (relative position and velocity), the constant-velocity model $\mathbf{F}=\begin{bmatrix}1&T\\0&1\end{bmatrix}$ with $T=0.5$\,s and the discretised white-noise-acceleration covariance $\mathbf{Q}=\sigma_a^{2}\begin{bmatrix}T^{4}/4&T^{3}/2\\T^{3}/2&T^{2}\end{bmatrix}$ with $\sigma_a=0.8$\,m/s$^{2}$, as in Example~\ref{ex:ekf-radar-cutin}. At time $k-1$ the posterior is $\widehat{\mathbf{x}}_{k-1|k-1}=\begin{bmatrix}50.0&-4.0\end{bmatrix}^{\mathsf T}$, $\mathbf{P}_{k-1|k-1}=\diag(0.25,0.16)$. At time $k$ a range-only measurement $y_k=47.4$\,m arrives, with $\mathbf{H}=\begin{bmatrix}1&0\end{bmatrix}$ and $\mathbf{R}=0.09$\,m$^{2}$.
+\textbf{(One Kalman-filter step by hand.)} A lead vehicle is tracked along one dimension with the state $\mathbf{x}=\begin{bmatrix}p&v\end{bmatrix}^{\mathsf T}$ (relative position and velocity), the constant-velocity model $\mathbf{F}=\begin{bmatrix}1&T\\0&1\end{bmatrix}$ with $T=0.5$\,s and the discrete random-acceleration covariance $\mathbf{Q}=\sigma_a^{2}\begin{bmatrix}T^{4}/4&T^{3}/2\\T^{3}/2&T^{2}\end{bmatrix}$ with $\sigma_a=0.8$\,m/s$^{2}$, as in Example~\ref{ex:ekf-radar-cutin}. At time $k-1$ the posterior is $\widehat{\mathbf{x}}_{k-1|k-1}=\begin{bmatrix}50.0&-4.0\end{bmatrix}^{\mathsf T}$, $\mathbf{P}_{k-1|k-1}=\diag(0.25,0.16)$. At time $k$ a range-only measurement $y_k=47.4$\,m arrives, with $\mathbf{H}=\begin{bmatrix}1&0\end{bmatrix}$ and $\mathbf{R}=0.09$\,m$^{2}$.
 \begin{enumerate}
 \item[(a)] Compute $\mathbf{Q}$.
 \item[(b)] Compute the prediction \eqref{eq:kf_state_prediction}--\eqref{eq:kf_cov_prediction}.
@@ -2588,7 +2576,7 @@ m_L & 0 & 0.4 & 0.1 & 0.4 & 0.1
 \end{prob}
 
 \begin{prob}\label{prob:ch03:8}
-\textbf{(Covariance intersection.)} Two tracks $(\widehat{\mathbf{x}}_1,\mathbf{P}_1)$ and $(\widehat{\mathbf{x}}_2,\mathbf{P}_2)$ of the same object are consistent, i.e.\ their true error covariances $\bar{\mathbf{P}}_1$ and $\bar{\mathbf{P}}_2$ satisfy $\bar{\mathbf{P}}_i\preceq\mathbf{P}_i$, but their cross-covariance $\bar{\mathbf{P}}_{12}$ is unknown.
+\textbf{(Covariance intersection.)} Two tracks $(\widehat{\mathbf{x}}_1,\mathbf{P}_1)$ and $(\widehat{\mathbf{x}}_2,\mathbf{P}_2)$ of the same object are consistent, i.e.\ their errors are zero-mean and their true error covariances $\bar{\mathbf{P}}_1$ and $\bar{\mathbf{P}}_2$ satisfy $\bar{\mathbf{P}}_i\preceq\mathbf{P}_i$, but their cross-covariance $\bar{\mathbf{P}}_{12}$ is unknown.
 \begin{enumerate}
 \item[(a)] Prove that the CI estimate \eqref{eq:ci-cov}--\eqref{eq:ci-est} is consistent for \emph{every} $\omega\in[0,1]$ and every $\bar{\mathbf{P}}_{12}$ for which the joint error covariance is positive semidefinite. \emph{Hint:} write the CI error as $\mathbf{e}=\mathbf{P}_{\mathrm{CI}}\left(\omega\mathbf{P}_1^{-1}\mathbf{e}_1+(1-\omega)\mathbf{P}_2^{-1}\mathbf{e}_2\right)$ and show first that
 \begin{equation*}
@@ -2613,13 +2601,13 @@ $A_{12}=3$, $A_{23}=2$, $A_{13}=4$, $A_{34}=2$.
 \end{prob}
 
 \begin{prob}\label{prob:ch03:10}
-\textbf{(Computational: process noise and innovation consistency.)} Reproduce the radar cut-in scenario of Example~\ref{ex:ekf-radar-cutin} (ego vehicle at $27$\,m/s, target at $22$\,m/s initially $60$\,m ahead in the adjacent lane, lane change from $3.5$\,m to $0$\,m between $t=5$\,s and $t=8$\,s, radar at $20$\,Hz with $\sigma_r=0.30$\,m, $\sigma_\theta=0.5^{\circ}$, $\sigma_{\dot r}=0.10$\,m/s) and run the constant-velocity EKF on one and the same detection sequence for $\sigma_a\in\{0.1,0.2,0.4,0.8,1.6,3.2,6.4\}$\,m/s$^{2}$. For each value report the position RMSE, the mean NIS \eqref{eq:nis} and the fraction of samples inside the two-sided $95\,\%$ interval of $\chi^{2}_{3}$, separately on the constant-velocity segments and inside the lane-change window.
+\textbf{(Computational: process noise and innovation consistency.)} Reproduce the radar cut-in scenario of Example~\ref{ex:ekf-radar-cutin} (ego vehicle at $27$\,m/s, target at $22$\,m/s initially $60$\,m ahead in the adjacent lane, lane change from $3.5$\,m to $0$\,m between $t=5$\,s and $t=8$\,s, radar at $20$\,Hz with $\sigma_r=0.30$\,m, $\sigma_\theta=0.5^{\circ}$, $\sigma_{\dot r}=0.10$\,m/s) and run the constant-velocity EKF on one and the same detection sequence for $\sigma_a\in\{0.1,0.2,0.4,0.8,1.6,3.2,6.4\}$\,m/s$^{2}$. For each value report the position RMSE, the mean NIS \eqref{eq:nis} and the fraction of samples inside the two-sided $95\,\%$ interval of $\chi^{2}_{3}$, separately on the constant-velocity segments after the first second and inside the lane-change window. Use polar-to-Cartesian covariance propagation at initiation and do not update again with the initiating detection.
 \begin{enumerate}
-\item[(a)] For which values is the filter overconfident, and for which is it underconfident? Use the NIS, not the RMSE, to answer.
+\item[(a)] For which values do the innovation statistics suggest under- or over-reported uncertainty? Use the NIS and discuss what a single run can establish.
 \item[(b)] Explain why the RMSE on the constant-velocity segments first decreases and then increases with $\sigma_a$, whereas the RMSE inside the lane change decreases monotonically.
-\item[(c)] Is there a value of $\sigma_a$ for which the NIS is consistent in both segments? Relate your answer to the closing remark of Example~\ref{ex:ekf-radar-cutin} on interacting multiple-model filters.
+\item[(c)] Which value gives mean NIS closest to $3$ in both segments in this run? Does this, or a single threshold crossing, establish consistency? Relate your answer to the closing remark of Example~\ref{ex:ekf-radar-cutin} on interacting multiple-model filters.
 \end{enumerate}
-A self-contained script and notebook are provided in the companion repository, in \repopath{companion\_\allowbreak repo/\allowbreak exercises/\allowbreak ch03/\allowbreak solutions/}.
+A self-contained script and notebook are provided in the companion repository, in \codeentry{P3}.
 \end{prob}
 
 % ============================================

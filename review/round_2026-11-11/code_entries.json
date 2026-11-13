@@ -1,0 +1,218 @@
+[
+  {
+    "id": "E3-GAUSS",
+    "title": "Measurement uncertainty",
+    "path": "examples/ch03_mean_variance_gaussian/mean_variance_gaussian.py",
+    "kind": "example"
+  },
+  {
+    "id": "E3-EKF",
+    "title": "EKF radar cut-in",
+    "path": "examples/ch03_ekf_radar_cutin/ekf_radar_cutin.py",
+    "kind": "example"
+  },
+  {
+    "id": "E3-UKF",
+    "title": "UKF radar cut-in and Monte Carlo rate sweep",
+    "path": "examples/ch03_ukf_radar_cutin/ukf_radar_cutin.py",
+    "kind": "example"
+  },
+  {
+    "id": "E3-ZONO",
+    "title": "Zonotope radar cut-in",
+    "path": "examples/ch03_zonotope_radar_cutin/zono_radar_cutin.py",
+    "kind": "example"
+  },
+  {
+    "id": "E3-EVID",
+    "title": "Evidence fusion under occlusion",
+    "path": "examples/ch03_evidence_occlusion/evidence_occlusion.py",
+    "kind": "example"
+  },
+  {
+    "id": "E3-AHP",
+    "title": "Incomplete AHP",
+    "path": "examples/ch03_incomplete_ahp/incomplete_ahp.py",
+    "kind": "example"
+  },
+  {
+    "id": "E4-HYBRID",
+    "title": "Learned uncertainty and Kalman tracking",
+    "path": "examples/ch04_hybrid_hetero_kf/hybrid_hetero_kf.py",
+    "kind": "example"
+  },
+  {
+    "id": "E4-GNSS",
+    "title": "Learned GNSS error model on comma2k19",
+    "path": "examples/ch04_comma2k19_learned_gnss/comma2k19_learned_gnss.py",
+    "kind": "example"
+  },
+  {
+    "id": "E4-POSE",
+    "title": "One-dimensional pose graph",
+    "path": "examples/ch04_pose_graph_1d/pose_graph_1d.py",
+    "kind": "example"
+  },
+  {
+    "id": "E5-CI",
+    "title": "Camera--radar covariance intersection",
+    "path": "examples/ch05_camera_radar_ci_fusion/camera_radar_ci_fusion.py",
+    "kind": "example"
+  },
+  {
+    "id": "E5-GNSS",
+    "title": "GNSS--IMU--odometry localisation",
+    "path": "examples/ch05_gnss_imu_odometry_ekf/gnss_imu_odometry_ekf.py",
+    "kind": "example"
+  },
+  {
+    "id": "E6-TRACK",
+    "title": "Distributed tracking",
+    "path": "examples/ch06_distributed_tracking/distributed_tracking.py",
+    "kind": "example"
+  },
+  {
+    "id": "E6-WMSR",
+    "title": "Resilient consensus",
+    "path": "examples/ch06_resilient_consensus/resilient_consensus.py",
+    "kind": "example"
+  },
+  {
+    "id": "E7-AIS",
+    "title": "AIS--radar innovation monitoring",
+    "path": "examples/ch07_ais_innovation_monitoring/ais_innovation_monitoring.py",
+    "kind": "example"
+  },
+  {
+    "id": "E7-CABLE",
+    "title": "Idealised cable strain benchmark",
+    "path": "examples/ch07_cable_das_kf/cable_das_kf.py",
+    "kind": "example"
+  },
+  {
+    "id": "E7-MCDM",
+    "title": "Maritime evidence and prioritisation",
+    "path": "examples/ch07_evidence_mcdm/evidence_mcdm.py",
+    "kind": "example"
+  },
+  {
+    "id": "P3-HAND",
+    "title": "Chapter 3 hand computations",
+    "path": "exercises/ch03/solutions/ch03_hand_computations.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P3.10",
+    "title": "Process noise and innovation consistency",
+    "path": "exercises/ch03/solutions/ch03_prob10_ekf_process_noise.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P4.6",
+    "title": "Miscalibrated uncertainty head",
+    "path": "exercises/ch04/solutions/prob6_miscalibrated_head.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P4.7",
+    "title": "Planar pose graph",
+    "path": "exercises/ch04/solutions/prob7_pose_graph_2d.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P4.9-10",
+    "title": "GNSS calibration and temporal correlation",
+    "path": "exercises/ch04/solutions/prob9_10_comma2k19.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P5.4",
+    "title": "GNSS outage variants",
+    "path": "exercises/ch05/solutions/prob04_gnss_outage_variants.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P5.6",
+    "title": "Covariance-intersection sensitivity",
+    "path": "exercises/ch05/solutions/prob06_ci_sensitivity.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P6.5",
+    "title": "Consensus rounds and topology",
+    "path": "exercises/ch06/solutions/prob05_consensus_rounds.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P6.6",
+    "title": "Packet loss",
+    "path": "exercises/ch06/solutions/prob06_packet_loss.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P6.7",
+    "title": "W-MSR graph robustness",
+    "path": "exercises/ch06/solutions/prob07_wmsr_path.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P7.6",
+    "title": "AIS spoofing and window-length sweep",
+    "path": "exercises/ch07/solutions/prob06_spoof_sweep.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P7.7",
+    "title": "Cable location and coupling sweep",
+    "path": "exercises/ch07/solutions/prob07_cable_sweep.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P8.2",
+    "title": "Expected calibration error",
+    "path": "exercises/ch08/solutions/ch08_p2_ece.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P8.3",
+    "title": "Timestamp offset and detection power",
+    "path": "exercises/ch08/solutions/ch08_p3_timestamp_offset.py",
+    "kind": "exercise"
+  },
+  {
+    "id": "P3",
+    "title": "Chapter 3 problems and computational solutions",
+    "path": "exercises/ch03/",
+    "kind": "collection"
+  },
+  {
+    "id": "P4",
+    "title": "Chapter 4 problems and computational solutions",
+    "path": "exercises/ch04/",
+    "kind": "collection"
+  },
+  {
+    "id": "P5",
+    "title": "Chapter 5 problems and computational solutions",
+    "path": "exercises/ch05/",
+    "kind": "collection"
+  },
+  {
+    "id": "P6",
+    "title": "Chapter 6 problems and computational solutions",
+    "path": "exercises/ch06/",
+    "kind": "collection"
+  },
+  {
+    "id": "P7",
+    "title": "Chapter 7 problems and computational solutions",
+    "path": "exercises/ch07/",
+    "kind": "collection"
+  },
+  {
+    "id": "P8",
+    "title": "Chapter 8 problems and computational solutions",
+    "path": "exercises/ch08/",
+    "kind": "collection"
+  }
+]

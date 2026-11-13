@@ -1,0 +1,317 @@
+[
+  {
+    "before": "\\DIFadd{The companion source bundle contains the Python library, numerical examples, exercise scripts, and notebooks. Generated numerical data are also shipped with the manuscript so that the book can be compiled independently. Computational comparisons state their seeds, evaluation intervals, and noise conventions; real-data experiments identify their reference estimates and their limitations. Solutions to all 48 }\\DIFaddend end-of-chapter \\DIFdelbegin \\DIFdel{problems and the companion repository. }%DIFDELCMD < ]\n%DIFDELCMD < %%%\n\\DIFdelend \\DIFaddbegin \\DIFadd{problems in Chapters~\\ref{sec:classicalSF}--\\ref{sec:open-challenges} appear in the back matter. Design and discussion solutions illustrate defensible choices rather than prescribe a unique implementation.\n}\\DIFaddend ",
+    "replacement": "\\RtwoDel{\\DIFadd{The companion source bundle contains the Python library, numerical examples, exercise scripts, and notebooks. Generated numerical data are also shipped with the manuscript so that the book can be compiled independently. Computational comparisons state their seeds, evaluation intervals, and noise conventions; real-data experiments identify their reference estimates and their limitations. Solutions to all 48 }\\DIFaddend end-of-chapter \\DIFdelbegin \\DIFdel{problems and the companion repository. }%DIFDELCMD < ]\n%DIFDELCMD < %%%\n\\DIFdelend \\DIFaddbegin \\DIFadd{problems in Chapters~\\ref{sec:classicalSF}--\\ref{sec:open-challenges} appear in the back matter. Design and discussion solutions illustrate defensible choices rather than prescribe a unique implementation.\n}\\DIFaddend }\\RtwoAdd{The \\href{https://github.com/DrFuzzy/SNFusionCompanion}{SNFusionCompanion repository} contains the code and notebooks. Numerical files used to draw the figures accompany the LaTeX sources, allowing compilation without running the programs. The code documents simulation settings, seeds, and evaluation procedures; real-data examples give dataset-access instructions and explain reference-measurement limitations. Short code references link to the ``Companion Code and Data'' guide, which lists script locations and commands.\n\nWorked solutions to all 48 problems in Chapters~\\ref{sec:classicalSF}--\\ref{sec:open-challenges} are collected in ``Solutions to the Problems'' at the end of the book. For design and discussion problems, the proposed solutions illustrate reasonable approaches; other approaches may also satisfy the requirements.}",
+    "reason": "Clarify preface while retaining its previous marked paragraph."
+  },
+  {
+    "before": "\\DIFadd{while fixing the geometry, measurement noise, and continuous-time acceleration spectral density $q_a=0.032$\\,m$^2$/s$^3$. Both filters use the continuous-time discretisation stated above for this sweep. This avoids changing the effective excitation per second when changing the rate. RMSE is the mean of the per-run Euclidean position RMSEs for $t\\ge1$\\,s; $\\sigma_y$ is the mean predicted lateral standard deviation over those same samples, including any remaining initiation transient. The script's }\\texttt{\\DIFadd{--montecarlo}} \\DIFadd{option exports \\repopath{output/ukf\\_rate\\_sweep.csv}.\n}",
+    "replacement": "\\RtwoDel{\\DIFadd{while fixing the geometry, measurement noise, and continuous-time acceleration spectral density $q_a=0.032$\\,m$^2$/s$^3$. Both filters use the continuous-time discretisation stated above for this sweep. This avoids changing the effective excitation per second when changing the rate. RMSE is the mean of the per-run Euclidean position RMSEs for $t\\ge1$\\,s; $\\sigma_y$ is the mean predicted lateral standard deviation over those same samples, including any remaining initiation transient. The script's }\\texttt{\\DIFadd{--montecarlo}} \\DIFadd{option exports \\repopath{output/ukf\\_rate\\_sweep.csv}.\n}}\\RtwoAdd{while fixing the geometry, measurement noise, and continuous-time acceleration spectral density $q_a=0.032$\\,m$^2$/s$^3$. Both filters use the continuous-time discretisation stated above for this sweep. This avoids changing the effective excitation per second when changing the rate. RMSE is the mean of the per-run Euclidean position RMSEs for $t\\ge1$\\,s; $\\sigma_y$ is the mean predicted lateral standard deviation over those same samples, including any remaining initiation transient. The script for this comparison is the UKF radar cut-in script, identified as \\codeentry{E3-UKF} in the companion-code guide. Its Monte Carlo option reproduces Table~\\ref{tab:ekf-ukf-rate} and saves the rate-sweep results as a CSV file; the command and output file are listed under \\codeentry{D3-UKF}.}",
+    "reason": "Identify the Monte Carlo script without a long path."
+  },
+  {
+    "before": "\\DIFdel{\\textbf{[URL of the companion repository, to be inserted]}}\\DIFadd{Companion Python code and notebooks are supplied in the \\repopath{companion\\_repo} folder of the accompanying source bundle.}",
+    "replacement": "\\RtwoDel{\\DIFdel{\\textbf{[URL of the companion repository, to be inserted]}}\\DIFadd{Companion Python code and notebooks are supplied in the \\repopath{companion\\_repo} folder of the accompanying source bundle.}}\\RtwoAdd{The companion repository is \\url{https://github.com/DrFuzzy/SNFusionCompanion}. Short code references link to the ``Companion Code and Data guide, which lists exact script locations and data-access instructions.}",
+    "reason": "Add the supplied repository URL while preserving earlier footnote changes."
+  },
+  {
+    "before": "\\includegraphics[width=0.85\\columnwidth]{figures/fusion_pipeline_v02.pdf}",
+    "replacement": "\\RtwoFigure{\\includegraphics[width=0.85\\columnwidth]{figures/fusion_pipeline_v02.pdf}}\\par\\RtwoAdd{\\scriptsize Figure reduced by 20\\% in the 11 November revision.}",
+    "reason": "Reduce Figure 2.1 without displaying duplicate graphics."
+  },
+  {
+    "before": "(Senior Member, IEEE)",
+    "replacement": "\\RtwoDel{(Senior Member, IEEE)}\\RtwoAdd{}",
+    "reason": "Remove IEEE membership designation."
+  },
+  {
+    "before": "(Senior Member, IEEE)",
+    "replacement": "\\RtwoDel{(Senior Member, IEEE)}\\RtwoAdd{}",
+    "reason": "Remove IEEE membership designation."
+  },
+  {
+    "before": "(Senior Member, IEEE)",
+    "replacement": "\\RtwoDel{(Senior Member, IEEE)}\\RtwoAdd{}",
+    "reason": "Remove IEEE membership designation."
+  },
+  {
+    "before": "\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}",
+    "replacement": "\\RtwoDel{\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}}\\RtwoAdd{\\codeentry{P8.3}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }}\\RtwoAdd{\\codeentry{P8}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}",
+    "replacement": "\\RtwoDel{\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}}\\RtwoAdd{\\codeentry{P8.2}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak cable\\_\\allowbreak sweep.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak cable\\_\\allowbreak sweep.py}}\\RtwoAdd{\\codeentry{P7.7}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak spoof\\_\\allowbreak sweep.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak spoof\\_\\allowbreak sweep.py}}\\RtwoAdd{\\codeentry{P7.6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak wmsr\\_\\allowbreak path.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak wmsr\\_\\allowbreak path.py}}\\RtwoAdd{\\codeentry{P6.7}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak packet\\_\\allowbreak loss.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak packet\\_\\allowbreak loss.py}}\\RtwoAdd{\\codeentry{P6.6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob05\\_\\allowbreak consensus\\_\\allowbreak rounds.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob05\\_\\allowbreak consensus\\_\\allowbreak rounds.py}}\\RtwoAdd{\\codeentry{P6.5}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak ci\\_\\allowbreak sensitivity.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak ci\\_\\allowbreak sensitivity.py}}\\RtwoAdd{\\codeentry{P5.6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob04\\_\\allowbreak gnss\\_\\allowbreak outage\\_\\allowbreak variants.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob04\\_\\allowbreak gnss\\_\\allowbreak outage\\_\\allowbreak variants.py}}\\RtwoAdd{\\codeentry{P5.4}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak }}\\RtwoAdd{\\codeentry{P4}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{prob9\\_\\allowbreak 10\\_\\allowbreak comma2k19.py}",
+    "replacement": "\\RtwoDel{\\repopath{prob9\\_\\allowbreak 10\\_\\allowbreak comma2k19.py}}\\RtwoAdd{\\codeentry{P4.9-10}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob7\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 2d.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob7\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 2d.py}}\\RtwoAdd{\\codeentry{P4.7}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob6\\_\\allowbreak miscalibrated\\_\\allowbreak head.py}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob6\\_\\allowbreak miscalibrated\\_\\allowbreak head.py}}\\RtwoAdd{\\codeentry{P4.6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{exercises/\\allowbreak ch03/\\allowbreak solutions/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{exercises/\\allowbreak ch03/\\allowbreak solutions/\\allowbreak }}\\RtwoAdd{\\codeentry{P3}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch03\\_\\allowbreak prob10\\_\\allowbreak ekf\\_\\allowbreak process\\_\\allowbreak noise.py}",
+    "replacement": "\\RtwoDel{\\repopath{ch03\\_\\allowbreak prob10\\_\\allowbreak ekf\\_\\allowbreak process\\_\\allowbreak noise.py}}\\RtwoAdd{\\codeentry{P3.10}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak chNN}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak chNN}}\\RtwoAdd{\\codeentry{Exercises}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}}\\RtwoAdd{\\codeentry{Examples}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }}\\RtwoAdd{\\codeentry{P8}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}",
+    "replacement": "\\RtwoDel{\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}}\\RtwoAdd{\\codeentry{P8.3}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }}\\RtwoAdd{\\codeentry{P8}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}",
+    "replacement": "\\RtwoDel{\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}}\\RtwoAdd{\\codeentry{P8.2}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }}\\RtwoAdd{\\codeentry{P7}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }}\\RtwoAdd{\\codeentry{P7}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak cable\\_\\allowbreak das\\_\\allowbreak kf/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak cable\\_\\allowbreak das\\_\\allowbreak kf/\\allowbreak }}\\RtwoAdd{\\codeentry{E7-CABLE}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak evidence\\_\\allowbreak mcdm/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak evidence\\_\\allowbreak mcdm/\\allowbreak }}\\RtwoAdd{\\codeentry{E7-MCDM}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak ais\\_\\allowbreak innovation\\_\\allowbreak monitoring/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak ais\\_\\allowbreak innovation\\_\\allowbreak monitoring/\\allowbreak }}\\RtwoAdd{\\codeentry{E7-AIS}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }}\\RtwoAdd{\\codeentry{P6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }}\\RtwoAdd{\\codeentry{P6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }}\\RtwoAdd{\\codeentry{P6}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak resilient\\_\\allowbreak consensus/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak resilient\\_\\allowbreak consensus/\\allowbreak }}\\RtwoAdd{\\codeentry{E6-WMSR}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak distributed\\_\\allowbreak tracking/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak distributed\\_\\allowbreak tracking/\\allowbreak }}\\RtwoAdd{\\codeentry{E6-TRACK}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }}\\RtwoAdd{\\codeentry{P5}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }}\\RtwoAdd{\\codeentry{P5}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch05\\_\\allowbreak camera\\_\\allowbreak radar\\_\\allowbreak ci\\_\\allowbreak fusion}",
+    "replacement": "\\RtwoDel{\\repopath{ch05\\_\\allowbreak camera\\_\\allowbreak radar\\_\\allowbreak ci\\_\\allowbreak fusion}}\\RtwoAdd{\\codeentry{E5-CI}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch05\\_\\allowbreak gnss\\_\\allowbreak imu\\_\\allowbreak odometry\\_\\allowbreak ekf}",
+    "replacement": "\\RtwoDel{\\repopath{ch05\\_\\allowbreak gnss\\_\\allowbreak imu\\_\\allowbreak odometry\\_\\allowbreak ekf}}\\RtwoAdd{\\codeentry{E5-GNSS}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak }}\\RtwoAdd{\\codeentry{Examples}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }}\\RtwoAdd{\\codeentry{P4}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }}\\RtwoAdd{\\codeentry{P4}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss/}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss/}}\\RtwoAdd{\\codeentry{E4-GNSS}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}}\\RtwoAdd{\\codeentry{Examples}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss}",
+    "replacement": "\\RtwoDel{\\repopath{ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss}}\\RtwoAdd{\\codeentry{E4-GNSS}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}}\\RtwoAdd{\\codeentry{Examples}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch04\\_\\allowbreak hybrid\\_\\allowbreak hetero\\_\\allowbreak kf}",
+    "replacement": "\\RtwoDel{\\repopath{ch04\\_\\allowbreak hybrid\\_\\allowbreak hetero\\_\\allowbreak kf}}\\RtwoAdd{\\codeentry{E4-HYBRID}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}}\\RtwoAdd{\\codeentry{Examples}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{ch04\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 1d}",
+    "replacement": "\\RtwoDel{\\repopath{ch04\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 1d}}\\RtwoAdd{\\codeentry{E4-POSE}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak solutions/}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak solutions/}}\\RtwoAdd{\\codeentry{P3}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak }",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak }}\\RtwoAdd{\\codeentry{P3}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch03\\_mean\\_variance\\_gaussian/}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch03\\_mean\\_variance\\_gaussian/}}\\RtwoAdd{\\codeentry{E3-GAUSS}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak \\ldots}",
+    "replacement": "\\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak \\ldots}}\\RtwoAdd{\\codeentry{Repository}}",
+    "reason": "Use a linked code-guide identifier."
+  },
+  {
+    "before": "Chapters~\\ref{sec:classicalSF} to~\\ref{sec:open-challenges} each end with a set of problems, ranging from short hand computations to small computational studies; their solutions are collected in a dedicated section at the end of the book. Where a worked example, a figure or a problem relies on numerical computation, the text refers to the corresponding script or notebook of the companion repository, whose paths are typeset as \\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak \\ldots}}\\RtwoAdd{\\codeentry{Repository}}.",
+    "replacement": "\\RtwoDel{Chapters~\\ref{sec:classicalSF} to~\\ref{sec:open-challenges} each end with a set of problems, ranging from short hand computations to small computational studies; their solutions are collected in a dedicated section at the end of the book. Where a worked example, a figure or a problem relies on numerical computation, the text refers to the corresponding script or notebook of the companion repository, whose paths are typeset as \\RtwoDel{\\repopath{companion\\_\\allowbreak repo/\\allowbreak \\ldots}}\\RtwoAdd{\\codeentry{Repository}}.}\\RtwoAdd{Chapters~\\ref{sec:classicalSF} to~\\ref{sec:open-challenges} each end with a set of problems, ranging from short hand computations to small computational studies; their solutions are collected in a dedicated section at the end of the book. Where a worked example, a figure or a problem relies on numerical computation, the text refers to the corresponding script or notebook of the companion repository, identified by short references such as \\codeentry{E3-UKF}. These references link to the ``Companion Code and Data guide, where the exact paths and data-access instructions are collected.}",
+    "reason": "Explain named code entries in the introduction."
+  },
+  {
+    "before": "",
+    "replacement": "\\clearpage\n\\begingroup\\color{blue}\n\\chapter*{Companion Code and Data}\n\\markboth{Companion Code and Data}{Companion Code and Data}\n\\addcontentsline{toc}{chapter}{Companion Code and Data}\n\\phantomsection\\label{sec:companion-code}\nThe companion repository is \\url{https://github.com/DrFuzzy/SNFusionCompanion}.\nThe identifiers below are used throughout the text so that full file paths do not interrupt the explanation. Each identifier links to its entry in this guide. Paths are relative to the companion-code folder, supplied as \\repopath{companion\\_repo} with the book sources. Run the commands below from that folder; in a checkout containing only the companion code, this is the checkout root. Script names and paths identify the files supplied with this revision. The repository README gives installation and execution instructions.\n\n\\section*{Repository and data access}\n\\phantomsection\\label{code:Repository}\n\\textbf{Repository.} The URL above is the entry point for the code and supporting files.\n\\phantomsection\\label{code:Examples}\n\\textbf{Examples.} Worked-example scripts are grouped by chapter in \\repopath{examples/}.\n\\phantomsection\\label{code:Exercises}\n\\textbf{Exercises.} Problems, solution scripts, and notebooks are grouped by chapter in \\repopath{exercises/}; exact problem statements are supplied as \\repopath{problems.tex}. Computational solutions are in each chapter's \\repopath{solutions/} subfolder.\n\nThe numerical files used by the book's figures are generated results, distinct from the original observations used in real-data experiments. Copies accompany the LaTeX sources in \\repopath{data/} and \\repopath{figures/}, allowing compilation without running Python. Worked-example programs write generated results to their local \\repopath{output/} folders; the export tool copies the files needed by the book into its source tree.\n\nThe comma2k19 driving observations are an external dataset, accessed at \\url{https://huggingface.co/datasets/commaai/comma2k19} and described in \\cite{schafer2018_comma2k19}. Download instructions are provided with \\codeentry{E4-GNSS}; the raw-data cache is not part of the book's generated figure data. Run the downloader in that example's folder before the real-data script or Problems~\\ref{prob:ch04:9}--\\ref{prob:ch04:10}. The reference trajectory shares some GNSS observations with the evaluated measurements; it therefore supports reference-relative diagnostics, with the limitations stated in Chapter~\\ref{sec:learning}.\n\n\\section*{Worked-example scripts}\n\n\\par\\medskip\\phantomsection\\label{code:E3-GAUSS}\n\\noindent\\textbf{E3-GAUSS --- Measurement uncertainty}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak mean\\_\\allowbreak variance\\_\\allowbreak gaussian/\\allowbreak mean\\_\\allowbreak variance\\_\\allowbreak gaussian.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E3-EKF}\n\\noindent\\textbf{E3-EKF --- EKF radar cut-in}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak ekf\\_\\allowbreak radar\\_\\allowbreak cutin/\\allowbreak ekf\\_\\allowbreak radar\\_\\allowbreak cutin.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E3-UKF}\n\\noindent\\textbf{E3-UKF --- UKF radar cut-in and Monte Carlo rate sweep}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak ukf\\_\\allowbreak radar\\_\\allowbreak cutin/\\allowbreak ukf\\_\\allowbreak radar\\_\\allowbreak cutin.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E3-ZONO}\n\\noindent\\textbf{E3-ZONO --- Zonotope radar cut-in}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak zonotope\\_\\allowbreak radar\\_\\allowbreak cutin/\\allowbreak zono\\_\\allowbreak radar\\_\\allowbreak cutin.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E3-EVID}\n\\noindent\\textbf{E3-EVID --- Evidence fusion under occlusion}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak evidence\\_\\allowbreak occlusion/\\allowbreak evidence\\_\\allowbreak occlusion.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E3-AHP}\n\\noindent\\textbf{E3-AHP --- Incomplete AHP}\\par\n\\noindent\\repopath{examples/\\allowbreak ch03\\_\\allowbreak incomplete\\_\\allowbreak ahp/\\allowbreak incomplete\\_\\allowbreak ahp.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E4-HYBRID}\n\\noindent\\textbf{E4-HYBRID --- Learned uncertainty and Kalman tracking}\\par\n\\noindent\\repopath{examples/\\allowbreak ch04\\_\\allowbreak hybrid\\_\\allowbreak hetero\\_\\allowbreak kf/\\allowbreak hybrid\\_\\allowbreak hetero\\_\\allowbreak kf.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E4-GNSS}\n\\noindent\\textbf{E4-GNSS --- Learned GNSS error model on comma2k19}\\par\n\\noindent\\repopath{examples/\\allowbreak ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss/\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss.py}\\par\nDownload script: \\repopath{examples/\\allowbreak ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss/\\allowbreak download\\_\\allowbreak comma2k19.py}.\\par\n\n\\par\\medskip\\phantomsection\\label{code:E4-POSE}\n\\noindent\\textbf{E4-POSE --- One-dimensional pose graph}\\par\n\\noindent\\repopath{examples/\\allowbreak ch04\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 1d/\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 1d.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E5-CI}\n\\noindent\\textbf{E5-CI --- Camera--radar covariance intersection}\\par\n\\noindent\\repopath{examples/\\allowbreak ch05\\_\\allowbreak camera\\_\\allowbreak radar\\_\\allowbreak ci\\_\\allowbreak fusion/\\allowbreak camera\\_\\allowbreak radar\\_\\allowbreak ci\\_\\allowbreak fusion.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E5-GNSS}\n\\noindent\\textbf{E5-GNSS --- GNSS--IMU--odometry localisation}\\par\n\\noindent\\repopath{examples/\\allowbreak ch05\\_\\allowbreak gnss\\_\\allowbreak imu\\_\\allowbreak odometry\\_\\allowbreak ekf/\\allowbreak gnss\\_\\allowbreak imu\\_\\allowbreak odometry\\_\\allowbreak ekf.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E6-TRACK}\n\\noindent\\textbf{E6-TRACK --- Distributed tracking}\\par\n\\noindent\\repopath{examples/\\allowbreak ch06\\_\\allowbreak distributed\\_\\allowbreak tracking/\\allowbreak distributed\\_\\allowbreak tracking.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E6-WMSR}\n\\noindent\\textbf{E6-WMSR --- Resilient consensus}\\par\n\\noindent\\repopath{examples/\\allowbreak ch06\\_\\allowbreak resilient\\_\\allowbreak consensus/\\allowbreak resilient\\_\\allowbreak consensus.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E7-AIS}\n\\noindent\\textbf{E7-AIS --- AIS--radar innovation monitoring}\\par\n\\noindent\\repopath{examples/\\allowbreak ch07\\_\\allowbreak ais\\_\\allowbreak innovation\\_\\allowbreak monitoring/\\allowbreak ais\\_\\allowbreak innovation\\_\\allowbreak monitoring.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E7-CABLE}\n\\noindent\\textbf{E7-CABLE --- Idealised cable strain benchmark}\\par\n\\noindent\\repopath{examples/\\allowbreak ch07\\_\\allowbreak cable\\_\\allowbreak das\\_\\allowbreak kf/\\allowbreak cable\\_\\allowbreak das\\_\\allowbreak kf.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:E7-MCDM}\n\\noindent\\textbf{E7-MCDM --- Maritime evidence and prioritisation}\\par\n\\noindent\\repopath{examples/\\allowbreak ch07\\_\\allowbreak evidence\\_\\allowbreak mcdm/\\allowbreak evidence\\_\\allowbreak mcdm.py}\\par\n\n\\section*{Computational exercise scripts}\n\n\\par\\medskip\\phantomsection\\label{code:P3-HAND}\n\\noindent\\textbf{P3-HAND --- Chapter 3 hand computations}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch03/\\allowbreak solutions/\\allowbreak ch03\\_\\allowbreak hand\\_\\allowbreak computations.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P3.10}\n\\noindent\\textbf{P3.10 --- Process noise and innovation consistency}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch03/\\allowbreak solutions/\\allowbreak ch03\\_\\allowbreak prob10\\_\\allowbreak ekf\\_\\allowbreak process\\_\\allowbreak noise.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P4.6}\n\\noindent\\textbf{P4.6 --- Miscalibrated uncertainty head}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob6\\_\\allowbreak miscalibrated\\_\\allowbreak head.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P4.7}\n\\noindent\\textbf{P4.7 --- Planar pose graph}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob7\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 2d.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P4.9-10}\n\\noindent\\textbf{P4.9-10 --- GNSS calibration and temporal correlation}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob9\\_\\allowbreak 10\\_\\allowbreak comma2k19.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P5.4}\n\\noindent\\textbf{P5.4 --- GNSS outage variants}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob04\\_\\allowbreak gnss\\_\\allowbreak outage\\_\\allowbreak variants.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P5.6}\n\\noindent\\textbf{P5.6 --- Covariance-intersection sensitivity}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak ci\\_\\allowbreak sensitivity.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P6.5}\n\\noindent\\textbf{P6.5 --- Consensus rounds and topology}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob05\\_\\allowbreak consensus\\_\\allowbreak rounds.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P6.6}\n\\noindent\\textbf{P6.6 --- Packet loss}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak packet\\_\\allowbreak loss.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P6.7}\n\\noindent\\textbf{P6.7 --- W-MSR graph robustness}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak wmsr\\_\\allowbreak path.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P7.6}\n\\noindent\\textbf{P7.6 --- AIS spoofing and window-length sweep}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak spoof\\_\\allowbreak sweep.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P7.7}\n\\noindent\\textbf{P7.7 --- Cable location and coupling sweep}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak cable\\_\\allowbreak sweep.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P8.2}\n\\noindent\\textbf{P8.2 --- Expected calibration error}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}\\par\n\n\\par\\medskip\\phantomsection\\label{code:P8.3}\n\\noindent\\textbf{P8.3 --- Timestamp offset and detection power}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}\\par\n\n\\section*{Problem collections}\n\n\\par\\medskip\\phantomsection\\label{code:P3}\n\\noindent\\textbf{P3 --- Chapter 3 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch03/\\allowbreak }\\par\n\n\\par\\medskip\\phantomsection\\label{code:P4}\n\\noindent\\textbf{P4 --- Chapter 4 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch04/\\allowbreak }\\par\n\n\\par\\medskip\\phantomsection\\label{code:P5}\n\\noindent\\textbf{P5 --- Chapter 5 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch05/\\allowbreak }\\par\n\n\\par\\medskip\\phantomsection\\label{code:P6}\n\\noindent\\textbf{P6 --- Chapter 6 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch06/\\allowbreak }\\par\n\n\\par\\medskip\\phantomsection\\label{code:P7}\n\\noindent\\textbf{P7 --- Chapter 7 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch07/\\allowbreak }\\par\n\n\\par\\medskip\\phantomsection\\label{code:P8}\n\\noindent\\textbf{P8 --- Chapter 8 problems and computational solutions}\\par\n\\noindent\\repopath{exercises/\\allowbreak ch08/\\allowbreak }\\par\n\n\\section*{UKF rate-sweep command and output}\n\\phantomsection\\label{code:D3-UKF}\n\\textbf{D3-UKF.} From the companion-code folder, run:\n\\begin{lstlisting}\npython3 examples/ch03_ukf_radar_cutin/ukf_radar_cutin.py --montecarlo\n\\end{lstlisting}\nThe command uses the paired seeds and noise convention specified in Example~\\ref{ex:ukf-radar-cutin} and saves the rate-sweep table as\n\\repopath{examples/\\allowbreak ch03\\_\\allowbreak ukf\\_\\allowbreak radar\\_\\allowbreak cutin/\\allowbreak output/\\allowbreak ukf\\_\\allowbreak rate\\_\\allowbreak sweep.csv}.\nThe values are generated numerical results, not an independently collected dataset.\n\n\\section*{Notebooks and execution context}\nScripts have matching Jupyter notebooks in the same folders. Open each notebook from its own folder so relative paths resolve correctly. Notebooks are supplied unexecuted; their script source records the settings and seeds used in the examples. The repository README identifies required packages and the public-data download step.\n\n\\endgroup\n",
+    "reason": "Add the new guide in blue."
+  },
+  {
+    "before": "",
+    "replacement": "\n% Second editorial round: existing DIF commands are retained verbatim.\n\\DeclareRobustCommand{\\RtwoDel}[1]{{\\color{red}%\n  \\renewcommand{\\DIFadd}[1]{##1}\\renewcommand{\\DIFdel}[1]{##1}%\n  #1}}\n\\DeclareRobustCommand{\\RtwoAdd}[1]{{\\color{blue}#1}}\n\\newcommand{\\RtwoFigure}[1]{\\resizebox{0.68\\columnwidth}{!}{#1}}\n\\DeclareRobustCommand{\\codeentry}[1]{\\hyperref[code:#1]{\\texttt{#1}}}\n",
+    "reason": "Define round-two markup."
+  },
+  {
+    "before": "",
+    "replacement": "\n\\par\\medskip\\textcolor{blue}{Additional co-author revisions: 11 November 2026.}\nBoth rounds remain unaccepted and visible. Earlier deletions and additions are retained.\nWhen wording added in the first round is replaced in this round, the complete earlier\nmarked passage remains visible in red, followed by the new wording in blue.\nThe previous round's PDF is also preserved unchanged in the source package.\n\\par\\medskip\n",
+    "reason": "Explain the cumulative comparison."
+  },
+  {
+    "before": "which also downloads the data (about $110$~MB).",
+    "replacement": "\\RtwoDel{which also downloads the data (about $110$~MB).}\\RtwoAdd{the accompanying downloader retrieves the data (about $110$~MB).}",
+    "reason": "Distinguish the data downloader from the GNSS analysis script."
+  },
+  {
+    "before": "",
+    "replacement": "\\enlargethispage{2\\baselineskip}\n",
+    "reason": "Keep the clean preface ending together within the available page margins."
+  }
+]

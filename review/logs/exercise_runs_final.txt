@@ -1,0 +1,14 @@
+{'script': 'companion_repo/exercises/ch03/solutions/ch03_hand_computations.py', 'returncode': 0, 'seconds': 0.57, 'log': 'review/logs/ch03_ch03_hand_computations.txt'}
+{'script': 'companion_repo/exercises/ch03/solutions/ch03_prob10_ekf_process_noise.py', 'returncode': 0, 'seconds': 0.57, 'log': 'review/logs/ch03_ch03_prob10_ekf_process_noise.txt'}
+{'script': 'companion_repo/exercises/ch04/solutions/prob6_miscalibrated_head.py', 'returncode': 0, 'seconds': 0.09, 'log': 'review/logs/ch04_prob6_miscalibrated_head.txt'}
+{'script': 'companion_repo/exercises/ch04/solutions/prob7_pose_graph_2d.py', 'returncode': 0, 'seconds': 0.08, 'log': 'review/logs/ch04_prob7_pose_graph_2d.txt'}
+{'script': 'companion_repo/exercises/ch04/solutions/prob9_10_comma2k19.py', 'returncode': 0, 'seconds': 4.43, 'log': 'review/logs/ch04_prob9_10_comma2k19.txt'}
+{'script': 'companion_repo/exercises/ch05/solutions/prob04_gnss_outage_variants.py', 'returncode': 0, 'seconds': 0.52, 'log': 'review/logs/ch05_prob04_gnss_outage_variants.txt'}
+{'script': 'companion_repo/exercises/ch05/solutions/prob06_ci_sensitivity.py', 'returncode': 0, 'seconds': 0.17, 'log': 'review/logs/ch05_prob06_ci_sensitivity.txt'}
+{'script': 'companion_repo/exercises/ch06/solutions/prob05_consensus_rounds.py', 'returncode': 0, 'seconds': 6.0, 'log': 'review/logs/ch06_prob05_consensus_rounds.txt'}
+{'script': 'companion_repo/exercises/ch06/solutions/prob06_packet_loss.py', 'returncode': 0, 'seconds': 2.8, 'log': 'review/logs/ch06_prob06_packet_loss.txt'}
+{'script': 'companion_repo/exercises/ch06/solutions/prob07_wmsr_path.py', 'returncode': 0, 'seconds': 0.08, 'log': 'review/logs/ch06_prob07_wmsr_path.txt'}
+{'script': 'companion_repo/exercises/ch07/solutions/prob06_spoof_sweep.py', 'returncode': 0, 'seconds': 0.58, 'log': 'review/logs/ch07_prob06_spoof_sweep.txt'}
+{'script': 'companion_repo/exercises/ch07/solutions/prob07_cable_sweep.py', 'returncode': 0, 'seconds': 4.95, 'log': 'review/logs/ch07_prob07_cable_sweep.txt'}
+{'script': 'companion_repo/exercises/ch08/solutions/ch08_p2_ece.py', 'returncode': 0, 'seconds': 0.52, 'log': 'review/logs/ch08_ch08_p2_ece.txt'}
+{'script': 'companion_repo/exercises/ch08/solutions/ch08_p3_timestamp_offset.py', 'returncode': 0, 'seconds': 0.98, 'log': 'review/logs/ch08_ch08_p3_timestamp_offset.txt'}

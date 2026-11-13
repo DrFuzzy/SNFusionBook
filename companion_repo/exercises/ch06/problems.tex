@@ -1,0 +1,34 @@
+% Authoritative excerpt from chapters/ch06_multi_agent_sensor_fusion.tex; uses the book preamble.
+\begin{prob}\label{prob:ch06:1}
+(Convergence rate of consensus.) For the running network of Fig.~\ref{fig:mas-network}, whose Laplacian eigenvalues are $0$, $1.382$, $2.382$, $3.618$, and $4.618$, use \eqref{eq:consensus-rate} to compute the contraction factor $\rho$ for $\epsilon=0.3$, the number of rounds needed to reduce the initial disagreement $\|\boldsymbol{\delta}(0)\|$ by a factor of $100$, the optimal constant step $\epsilon^{\star}$, and the corresponding $\rho^{\star}$. Repeat for the path $1$--$2$--$3$--$4$--$5$ obtained by removing the edges $5$--$1$ and $1$--$3$, whose Laplacian eigenvalues are $2-2\cos(\pi m/5)$, $m=0,\dots,4$. Explain why in both cases $\epsilon^{\star}$ lies on the boundary of the sufficient condition $\epsilon<1/d_{\max}$ without compromising convergence.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:2}
+(Average preservation on directed graphs.) Show that for an undirected graph the iteration \eqref{eq:consensus-laplacian} preserves the network average, and that the weighted iteration \eqref{eq:consensus-weighted} preserves it if and only if $\mathbf{W}$ is column-stochastic. Then consider three agents with the row-stochastic weight matrix
+\begin{equation*}
+\mathbf{W}=\begin{bmatrix}1/2&1/2&0\\ 1/3&1/3&1/3\\ 0&1/2&1/2\end{bmatrix}
+\end{equation*}
+and initial values $\mathbf{z}(0)=[10\ 12\ 11]^{\mathsf T}$. Compute the left Perron eigenvector $\boldsymbol{\pi}$ of $\mathbf{W}$ (normalised so that $\boldsymbol{\pi}^{\mathsf T}\mathbf{1}=1$), the consensus value $\boldsymbol{\pi}^{\mathsf T}\mathbf{z}(0)$, and compare it with the average $11$.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:3}
+(Covariance-intersection weight.) Two estimates of a scalar quantity have variances $P_1=1$ and $P_2=4$. Write $P_{\mathrm{CI}}(\omega)$ from \eqref{eq:ci-cov}, find the weight that minimises it, and interpret the result. Repeat for the two-dimensional case $\mathbf{P}_1=\diag(1,4)$ and $\mathbf{P}_2=\diag(4,1)$ with the trace criterion of \eqref{eq:ci-weight}: find $\omega^{\star}$ and $\mathbf{P}_{\mathrm{CI}}$ and compare them with the independent-fusion covariance of \eqref{eq:independent-track-fusion-state}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:4}
+(Double counting of a common prior.) Two nodes share a scalar prior with variance $1$ and each measures the same quantity once with noise variance $1$. Compute the posterior variance of each node, the variance claimed by the naive sum of the two posterior information values, the correct centralised posterior variance, and the \emph{actual} error variance of the naive estimate. Deduce the expected NEES of the naive estimate and comment on the result in the light of Example~\ref{ex:mas-distributed-tracking}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:5}
+(Computational: consensus rounds and topology.) Using the script of Example~\ref{ex:mas-distributed-tracking}, rerun the consensus-on-information filter with $L\in\{1,3,10\}$ rounds, first on the original graph and then on the path graph $1$--$2$--$3$--$4$--$5$ (ring and chord removed), and report RMSE and mean NEES. Explain the dependence on $L$ through the second largest eigenvalue modulus of the Metropolis matrix of each graph. See \codeentry{P6}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:6}
+(Computational: packet loss.) Modify the consensus-on-information filter of Example~\ref{ex:mas-distributed-tracking} so that each message is lost independently with probability $p\in\{0,0.3,0.6\}$ and each node renormalises its Metropolis weights over the messages actually received. Report RMSE and mean NEES for each $p$ and assess whether these finite-sample diagnostics suggest over-reported or under-reported uncertainty. Explain why they do not prove matrix consistency. See \codeentry{P6}.
+\end{prob}
+
+\begin{prob}\label{prob:ch06:7}
+(Robustness of the running network.) Show that the running network of Fig.~\ref{fig:mas-network} is not $2$-robust by exhibiting two disjoint subsets of nodes in which no node has two neighbours outside its own subset, so that W-MSR with $F=1$ comes with no guarantee on it. Then (computationally, see \codeentry{P6}) run W-MSR with $F=1$ and $\epsilon=0.3$ on it, with the initial values of Example~\ref{ex:mas-network-consensus} and node~$5$ broadcasting $30$\,m, and describe what happens to the compliant nodes.
+\end{prob}
+
+% ============================================

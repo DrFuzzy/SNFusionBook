@@ -1,0 +1,338 @@
+[
+  {
+    "problem": "3.1",
+    "topic": "LS and WLS",
+    "method": "Independent arithmetic + variance proof",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "LS 42.50 m, variance 0.585; WLS 41.669 m, variance 0.08654. Feasible."
+  },
+  {
+    "problem": "3.2",
+    "topic": "Regularised LS / prior fusion",
+    "method": "Independent matrix calculation + limits",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Posterior (41.633, -5.110); off-diagonal prior couples the unmeasured velocity. Feasible."
+  },
+  {
+    "problem": "3.3",
+    "topic": "Sequential versus batch LS",
+    "method": "Information-form derivation + arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Information sums commute only with the specified independence/prior assumptions. Recovers Problem 3.1."
+  },
+  {
+    "problem": "3.4",
+    "topic": "Kalman step",
+    "method": "Independent matrix calculation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Q = [[0.01,0.04],[0.04,0.16]]; posterior (47.538,-4.185); NIS 0.923. Clarified discrete acceleration model."
+  },
+  {
+    "problem": "3.5",
+    "topic": "Radar Jacobian and wrapping",
+    "method": "Independent differentiation + arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Wrapped innovation 0.008185 rad; atan2 is needed for quadrant correctness. Feasible away from zero range."
+  },
+  {
+    "problem": "3.6",
+    "topic": "Zonotope / strip",
+    "method": "Independent LP extrema + gain calculation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Exact intersection hull [1.1,1.7] x [-0.7333,1.2]; gain (0.9731,0.4537). Different gains optimise different criteria."
+  },
+  {
+    "problem": "3.7",
+    "topic": "Dempster and Smets",
+    "method": "Independent enumeration of set products",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "K=0.28; main fused masses reproduce. Total conflict K=1 would make normalised Dempster undefined."
+  },
+  {
+    "problem": "3.8",
+    "topic": "Covariance intersection proof",
+    "method": "Analytic PSD bound + independent optimisation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Zero-mean premise added. Prove for 0<omega<1; endpoints simply return one input. Covariance-dependent fixed weights are covered, not arbitrary error-dependent selection."
+  },
+  {
+    "problem": "3.9",
+    "topic": "Incomplete AHP",
+    "method": "Independent Laplacian solve + graph reasoning",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Connected graph gives a unique priority ratio vector after fixing gauge. Tree-edge residual vanishes. Feasible."
+  },
+  {
+    "problem": "3.10",
+    "topic": "Process-noise sweep",
+    "method": "Executed script + independent initiation check",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Correct polar covariance, no repeated initiating update, t>=1 s CV statistics. Replaced answer table; closest mean NIS at sigma_a=0.8 does not establish consistency."
+  },
+  {
+    "problem": "4.1",
+    "topic": "Mixture-of-experts gate",
+    "method": "Independent softmax calculation + limit",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "At beta=4 gate (0.070,0.156,0.774), estimate 42.93 m; unique best quality wins as beta grows."
+  },
+  {
+    "problem": "4.2",
+    "topic": "Learned reliability WLS",
+    "method": "Independent logistic/information arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Estimate 42.60 m, reported sd about 0.41 m. R/p is a chosen weighting model, not a general posterior theorem."
+  },
+  {
+    "problem": "4.3",
+    "topic": "ECE and temperature",
+    "method": "Independent arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "ECE 0.082; positive temperature preserves logit ordering. Feasible."
+  },
+  {
+    "problem": "4.4",
+    "topic": "Log-odds occupancy",
+    "method": "Independent logarithms / inequality",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "13 free observations without clamping; 9 with clamping. Assumed inverse sensor model and prior are explicit."
+  },
+  {
+    "problem": "4.5",
+    "topic": "One-dimensional pose graph",
+    "method": "Independent normal equations",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Solution (0.908,1.815,2.723) m; last-pose sd 0.048 m. Fixed anchor removes gauge freedom."
+  },
+  {
+    "problem": "4.6",
+    "topic": "Miscalibrated uncertainty head",
+    "method": "Executed script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "RMSE/ANIS distinguish smoothing performance from covariance calibration. Values reproduce; one run is illustrative."
+  },
+  {
+    "problem": "4.7",
+    "topic": "Planar pose graph",
+    "method": "Executed script + geometry/factor review",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Clarified four poses and four relative factors. Five iterations, final-position error 0.246 to 0.106 m; cost 23.07 to 1.23."
+  },
+  {
+    "problem": "4.8",
+    "topic": "Fusion operators",
+    "method": "Counterexamples + independent attention arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Fixed gate is a restricted linear map; input-dependent gate is generally nonlinear, with degenerate exceptions. Query (0,1) gives output zero."
+  },
+  {
+    "problem": "4.9",
+    "topic": "Public GNSS example",
+    "method": "Downloaded public data + executed script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Reproduced RAV4/Civic split and grid extension. Training assessment is in-sample; shared GNSS reference precludes absolute NEES certification."
+  },
+  {
+    "problem": "4.10",
+    "topic": "Correlated GNSS fixes",
+    "method": "Independent finite-sum variance",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Common bias remains in the mean and temporal correlations reduce effective independent fixes; feasible."
+  },
+  {
+    "problem": "5.1",
+    "topic": "Angular calibration error",
+    "method": "Independent units / small-angle calculation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "0.5 deg gives about 10.47 pixels, lateral 0.175 m at 20 m and 0.698 m at 80 m."
+  },
+  {
+    "problem": "5.2",
+    "topic": "Timestamp mismatch",
+    "method": "Independent arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "30 ms gives 0.6 m at 20 m/s and 1.2 m at 40 m/s; squared normalised residuals 4 and 16."
+  },
+  {
+    "problem": "5.3",
+    "topic": "Tunnel drift",
+    "method": "Independent small-angle integration",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Heading 0.25 rad, cross-track about 43.75 m, wheel-scale along-track 7 m. Approximation explains scale, not exact simulated trajectory."
+  },
+  {
+    "problem": "5.4",
+    "topic": "GNSS outage variants",
+    "method": "Executed script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "60-s outage error 10.16 m, trace radius 53.62 m; 1-Hz case error 2.19 m, radius 13.74 m. Single-trajectory containment is not consistency proof."
+  },
+  {
+    "problem": "5.5",
+    "topic": "Equal-covariance correlated tracks",
+    "method": "Independent covariance derivation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Actual naive covariance (1+rho)P/2; expected 2-D NEES 2(1+rho). CI retains P."
+  },
+  {
+    "problem": "5.6",
+    "topic": "CI sensitivity grid",
+    "method": "Executed script + Loewner-order reasoning",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Nine combinations reproduce. A dominating radar gives endpoint weight zero and CI covariance equal to radar covariance."
+  },
+  {
+    "problem": "5.7",
+    "topic": "Detection/tracking metrics",
+    "method": "Independent arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "NDS 0.655, improved 0.670; MOTA 0.79; ECE 0.072. Feasible under the definitions in the book."
+  },
+  {
+    "problem": "5.8",
+    "topic": "Latency budget",
+    "method": "Independent sum / propagation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "303 ms and 9.09 m at 30 m/s. Throughput improvement alone does not reduce per-item latency."
+  },
+  {
+    "problem": "6.1",
+    "topic": "Consensus convergence",
+    "method": "Independent spectrum and bounds",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Running graph rho about 0.5854, nine rounds for factor 100. Optimal constant step need not satisfy the stricter positive-diagonal sufficient bound."
+  },
+  {
+    "problem": "6.2",
+    "topic": "Directed average preservation",
+    "method": "Stationary-distribution derivation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Perron weights (2,3,2)/7, limit 78/7=11.143 rather than 11. Feasible."
+  },
+  {
+    "problem": "6.3",
+    "topic": "CI weight",
+    "method": "Independent convex optimisation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Scalar endpoint selects variance 1; symmetric 2-D case omega=0.5 gives 1.6 I versus 0.8 I under independence."
+  },
+  {
+    "problem": "6.4",
+    "topic": "Double counting a prior",
+    "method": "Independent error expansion",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Local 1/2, claimed 1/4, central 1/3, actual 3/8, expected scalar NEES 1.5. Feasible."
+  },
+  {
+    "problem": "6.5",
+    "topic": "Consensus rounds/topology",
+    "method": "Executed script + spectral interpretation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "All six settings run and agree with model answers. Mean NEES and RMSE are finite-run diagnostics."
+  },
+  {
+    "problem": "6.6",
+    "topic": "Packet loss",
+    "method": "Executed corrected script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Original implementation moved lost weight to self; now renormalises surviving row as stated. p=0/0.3/0.6: RMSE 0.967/0.964/1.043; NEES 1.92/1.73/1.85."
+  },
+  {
+    "problem": "6.7",
+    "topic": "W-MSR robustness",
+    "method": "Exhaustive subset test + executed script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Running graph is not 2-robust; absence of sufficient guarantee is not proof of failure in every run. Weight/self-value premises clarified."
+  },
+  {
+    "problem": "7.1",
+    "topic": "Maritime evidence",
+    "method": "Independent set-product enumeration",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "K=0.56, threat BetP about 0.455; discounting AIS gives K=0.28 and threat BetP about 0.602."
+  },
+  {
+    "problem": "7.2",
+    "topic": "Windowed NIS / false alarms",
+    "method": "Independent SciPy quantiles + dependence argument",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Correct two-sided 99% interval [26.51,76.97], one-sided cutoff 73.68. Expected alarm samples at most 3.6/hour; episodes are dependent."
+  },
+  {
+    "problem": "7.3",
+    "topic": "Biased innovations",
+    "method": "Noncentral chi-square derivation + independent power",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Gaussian independence now stated. Mean-crossing is separated from alarm probability; a W-sample window is not a guaranteed delay bound."
+  },
+  {
+    "problem": "7.4",
+    "topic": "Priority sensitivity",
+    "method": "Independent eigenvector/scores + affine difference",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Scores reproduce to rounding; changing proximity alone cannot reverse a1 versus a3 in [0,1). Eigenvector and log-least-squares weights need not be identical."
+  },
+  {
+    "problem": "7.5",
+    "topic": "Cable strain observability",
+    "method": "Independent integrals / mode evaluation",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Mode 2 is blind at 250 m; odd modes blind to the small-gauge slope row at 500 m. Zero route slope makes all first-order channels blind at rest there."
+  },
+  {
+    "problem": "7.6",
+    "topic": "AIS spoof/window sweep",
+    "method": "Executed script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "All twelve cases reproduce. Longer windows are not always slower; ties and the slowest short window are now acknowledged. Null law is approximate under model mismatch."
+  },
+  {
+    "problem": "7.7",
+    "topic": "Cable location/coupling sweep",
+    "method": "Executed stabilised script",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Principal PSD root fixes eigenvector-sign sensitivity. Updated delays/localisation and 1.2/0.4/9.7% nominal/half/double-coupling window alarm rates; conditional on idealised mechanics."
+  },
+  {
+    "problem": "8.1",
+    "topic": "Sensor-health monitor design",
+    "method": "Dimensional/distribution check + design review",
+    "verdict": "Feasible with revised assumptions; design answers are illustrative",
+    "finding": "Correct raw mean NIS threshold chi-square(N*ny)/N; per-dof normalisation is separate. Handle alpha=0 by skipping; avoid gated-residual selection bias."
+  },
+  {
+    "problem": "8.2",
+    "topic": "Calibration scores",
+    "method": "Executed script + independent arithmetic",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "ECE 0.2275, Brier 0.2313, T about 1.815; in-sample ECE after scaling 0.132. Twelve observations cannot validate deployment calibration."
+  },
+  {
+    "problem": "8.3",
+    "topic": "Timestamp offset / detection power",
+    "method": "Executed Monte Carlo + independent noncentral law",
+    "verdict": "Feasible under stated assumptions",
+    "finding": "Mean-crossing 15.1/113.3 ms; 95% detection-power 24.8/185.9 ms at 15/2 m/s. Constant offset confounds constant range bias without excitation/reference."
+  },
+  {
+    "problem": "8.4",
+    "topic": "Sim-to-real protocol",
+    "method": "Identifiability counterexample + design review",
+    "verdict": "Feasible with revised assumptions; design answers are illustrative",
+    "finding": "Reframed as unlabelled failure screening. Missed objects and correctness cannot be certified from residuals and conflict alone; labelled independent validation required."
+  },
+  {
+    "problem": "8.5",
+    "topic": "Cooperative message design",
+    "method": "Interface / dependence review",
+    "verdict": "Feasible with revised assumptions; design answers are illustrative",
+    "finding": "A feasible answer includes state, covariance, frame, time, identity and provenance. Trust tests on differences need unknown cross-covariance handled; no empirical deployment claim."
+  },
+  {
+    "problem": "8.6",
+    "topic": "Foundation model as source",
+    "method": "Evidence semantics / calibration review",
+    "verdict": "Feasible with revised assumptions; design answers are illustrative",
+    "finding": "Mapping and discounting are proposed policies, not unique answers. Held-out precision alone is not a universal belief discount. Independence, ontology and containment policy remain design obligations."
+  }
+]

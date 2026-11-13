@@ -1,0 +1,14 @@
+set,filter,rmse,sd,nees,cov2,nis
+test,"white, datasheet 2.5 m",3.25,0.63,133.95,4.7,0.02
+test,"white, tuned to NIS 0.3 m",3.22,0.12,1927.39,0.2,0.18
+test,"white, learned variance",3.25,0.62,136.03,4.6,0.02
+test,"white, learned variance and offset",2.31,0.61,55.17,11.4,0.02
+test,"learned kernel, constant",2.35,2.5,1.92,84.9,0.07
+test,"learned kernel, feature-based",2.36,2.54,1.79,88.9,0.07
+rav4,"white, datasheet 2.5 m",2.84,0.71,100.08,0.8,0.01
+rav4,"white, tuned to NIS 0.3 m",2.84,0.14,1471.14,0.0,0.07
+rav4,"white, learned variance",2.84,0.7,101.66,0.7,0.01
+rav4,"white, learned variance and offset",1.59,0.69,29.17,37.7,0.01
+rav4,"learned kernel, constant",1.61,2.51,0.85,98.7,0.05
+rav4,"learned kernel, feature-based",1.63,2.08,1.27,91.0,0.06
+rav4,"learned kernel, features clipped",1.61,2.21,1.09,93.6,0.05

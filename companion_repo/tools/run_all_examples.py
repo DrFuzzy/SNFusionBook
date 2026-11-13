@@ -20,7 +20,8 @@ REPO = Path(__file__).resolve().parents[1]
 
 def find_scripts(subdir: str = "examples", pattern: str = ""):
     scripts = sorted((REPO / subdir).glob("*/*.py"))
-    return [s for s in scripts if not s.name.startswith("_") and pattern in str(s.relative_to(REPO))]
+    # download_*.py scripts fetch public data and are run by hand, not by `make examples`
+    return [s for s in scripts if not s.name.startswith(("_", "download_")) and pattern in str(s.relative_to(REPO))]
 
 
 def run(script: Path, quiet: bool = False) -> bool:

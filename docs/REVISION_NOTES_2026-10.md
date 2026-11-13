@@ -191,3 +191,147 @@ Full build after the errata: 0 errors, 0 undefined references, 0 multiply-define
 - recency of the autonomous-driving literature (no driving paper after 2023 in Chapters 4–5), safety content in Chapter 8 (ODD, degraded modes, minimal-risk manoeuvre), learned V2X cooperative perception, 3D multi-object tracking, online mapping, 4D radar;
 - repeated "embedded/FPGA perspective" paragraphs in Chapter 4 and the MUEAVI/YOLOv3 detail in Chapter 5 (co-author material);
 - leftover editorial comments in the sources (`% [July 2026 pass]`, `% Addressed ...`).
+
+---
+
+# Round 3 — November 2026 (comments of G. Oliva, 8 November 2026)
+
+**Before this round** all the markup of the October rounds was accepted (blue kept, red removed, the leftover
+`\textcolor{olive}` text of Chapter 3 turned black). The marked-up sources of the October rounds are archived in
+`SN_book_20261108_round2_markup.zip`. The "Note on the Revision Markup" front-matter chapter was removed
+(`frontmatter/revision_note.tex` deleted, include removed from `main.tex`). In the current sources blue/red mark only
+the changes of this round. New bibliography entries of this round are in `bib/additions_2026-11_*.bib`
+(included by `main.tex`). Layout-only changes are not coloured and are listed below.
+
+## Chapters 1–3, 6, 8, 9 and front matter (main session)
+
+| Where | Change |
+|---|---|
+| Book abstract | acronyms expanded (LiDAR, GNSS, IMU); set-membership estimation and MCDM added to the list of methods; "this survey" → "this book"; keywords updated (added cooperative perception, distributed estimation, hybrid classical–learning fusion, multi-criteria decision-making, object tracking, set-membership estimation; removed multimodal perception and object detection) |
+| Ch. 1 abstract | rewritten for readability: contributions grouped as methods / systems / tutorial apparatus |
+| Ch. 1, "Individual sensors…" | paragraph replaced: two sensors (camera, radar), each with a concrete failure case; the other sensors point to Table 5.x; LiDAR, GNSS, IMU defined at first use |
+| Ch. 1, Sect. 1.2 | chapter in parentheses after each contribution; MCDM and AHP defined; one-line gloss of set-membership estimation for readers from ML; footnote with the companion-repository URL at its first mention (macro `\repourl` in `main.tex`, **placeholder to be filled**) |
+| Ch. 1, Sect. 1.3 | "generic" → "general-purpose"; "domain-specific viewpoints" → "discipline-specific" + one sentence (the book is centred on one domain but draws on all communities); overclaiming sentence ("not only … but also reinterprets … through a unified, modern lens") rewritten; "short book" → "book"; new paragraph stating in which three senses the view is "unified" and why the title says "towards" |
+| Ch. 1, Sect. 1.3.1 | wrong claim corrected: the estimation notation is *not* the ML notation (ML writes z for the latent state and x for the observation); JDL, SLAM, V2X defined |
+| Ch. 1, Sect. 1.4 | aligned with Sect. 1.2 (Chapter 3 includes track-level fusion; Chapter 5 includes sensor suite and alignment) |
+| Ch. 2 | taxonomy paragraph checked: "coincide with" → "are related to"; early/intermediate/late fusion: the terms are used differently in multimodal ML (Baltrušaitis) and in driving (Feng et al. 2021); JDL and AR/VR defined; new paragraph on the OODA loop and the Omnibus model (Bedworth & O'Brien 2000) read against Fig. 2.1 (no new figure). References of the chapter checked (all correct). No problems added to Chapter 2 (conceptual chapter) |
+| Ch. 3 | "on which sensor fusion rests" → "of sensor fusion"; "particularly transparent" replaced by what the stacked form actually gives; LS defined; two new figures (`fig:mean-variance`: repeated readings with sample mean/std and correlated 2-D errors with eigen-axes; `fig:gaussian-1d-2d`: 1-D density with 68.3/95.4 % and 2-D ellipses with 39.3/86.5/98.9 %) with text (Mahalanobis distance, chi-square, link to NIS and gating); differentiability assumption before the Jacobian and "first-order Taylor expansion truncated after the linear term" for the Gauss–Newton linearisation; Table 3.2: row spacing, MAP/EKF/UKF expanded, "precision matrix", new row observability ↔ identifiability; sentence on the z/x vs x/y notation clash; rhetorical sentences rewritten ("covariance matrices are not bookkeeping", "a confidence it has not earned", "the remedy is not fewer sensors but honest models", "not merely … but", "Containment is exact; tightness is not", "The price is conservatism, and it is not small", "the conflict mass is not merely a nuisance term"); EKF, UKF, DSmT, AHP, RMSE defined |
+| Ch. 4 | BEV, mAP, NDS, GPU, FPGA, IoU defined; two rhetorical phrases toned down (no structural change: see the proposal in the reply of 8 November) |
+| Ch. 6 | AIS, V2V, V2I defined; rhetorical sentences rewritten ("not merely more data", "Three observations carry the lesson", "useless", "catastrophic", "honest") |
+| Ch. 8 | DNN, SoC defined; "AI-based" spelled out |
+| Ch. 9 | rhetorical sentences rewritten ("If a single lesson…", "not competitors but layers", "uncertainty bookkeeping", "decisive insight", "not a compromise", "represent uncertainty honestly", "a map and an invitation") |
+| Companion repo | new example `examples/ch03_mean_variance_gaussian/` (script + notebook + outputs), CSVs copied to `data/ch03/`; README updated |
+
+**Layout only (not coloured).** Seven displayed equations of Chapter 3 that were broken over two lines although
+they fit on one were joined (Gaussian likelihood (3.x, label `eq:Gaussianlikelihood`), regularised LS cost, MAP
+estimate (former 3.44), sequential LS cost, the normal equation of sequential LS, its solution, Gauss–Newton
+increment (near former 3.64)). The remaining two-line displays of Chapters 1–4, 6, 8, 9 are either genuinely wider than
+the text width or pairs of distinct equations. Row spacing (`\arraystretch` 1.25–1.3) added to the tables with
+multi-line cells: 1.2 (terminology), 3.1 (notation), 3.2 (dictionary), 4.x (deep-fusion methods, fusion-level
+trade-off), 8.1, 9.1.
+
+## Chapter 5 (editorial and technical pass)
+
+All numbers of Examples 5.x, Table 5.4 and Solutions 5.4/5.6 were re-run with the companion scripts (CSV files
+byte-identical). Corrections (markup in the text): the gyro-bias 3σ bound falls on the initial straight, not "during the
+first curve" (text, caption (c), Solution 5.4); "45 s" → 50 s before the tunnel; 0.60 m 2-D RMS compared with the
+matching 2.1 m single-fix RMS; the 0.5 m lane-level budget is exceeded about 6 s after the tunnel entrance (not 10 s);
+0.52 m compared with the fused 1σ (0.21 m) instead of the sensors' 1.55/1.58 m; gating uses the innovation σ
+(eq. 3.91; also Problem 5.2); J is the inverse of the radar Jacobian's position block; "consistent iff NEES ≤ 2" removed
+(trace test is necessary, not sufficient); NEES cannot be monitored online without ground truth; small-rotation formula,
+transform-tree root, eq. 5.5, rollback innovation; dataset table (Argoverse 2 lidar split has no cameras, Argoverse 1
+added, Waymo cameras not full surround), nuScenes' reason for centre distance instead of IoU; FPGA/HIL claims aligned
+with the cited papers; Autoware (ROS 1) claim corrected. Glosses for ML readers (lever arm, SE(3)/SO(3) vs covariance R,
+retrodiction, innovation, consistency, observability, dead reckoning, information matrix). Acronyms defined at first
+use. Rhetorical phrases removed. Six references added and verified (ApolloScape TPAMI 2020, View-of-Delft RA-L 2022,
+K-Radar NeurIPS 2022 and MAN TruckScenes NeurIPS 2024 also as table rows, Fan et al. 4D-radar survey T-IV 2024,
+MultiCorrupt IV 2024); Lyft Level 5 dropped (no peer-reviewed reference, official page gone). Corrected entries
+`ester1996_dbscan` and `deliparaschos2016_jee_fpga` replace the faulty `ester_dbscan_1996`, `deliparaschos_fpga_2016`,
+`deliparaschos_fpgabased_2016` (no longer cited; can be deleted from references.bib). Row spacing added to the four
+tables of the chapter (layout only).
+
+**For the authors:** dropping Lyft and the two new dataset rows; merging the duplicate FPGA keys; the MUEAVI material
+(co-author) is not really about fusion, its Fig. 5.5 caption repeats the paragraph, "YOLOv3" could read "YOLO-family
+detectors (YOLOv3 in MUEAVI)"; Fig. 5.3a has unequal axis scales; Table 5.3 mixes resolution and accuracy.
+
+## Chapter 7 (submarine-cable section aligned with the revised EJC paper, kept short)
+
+The strain model is corrected: a lateral displacement stretches a straight cable only to second order, so for a
+route bent in plan the channel reading is quadratic in the state (`eq:ch07-strain-channel`), monitored by an EKF with
+second-order measurement prediction (`eq:ch07-second-order-prediction`); the old linear-output model, example and
+figure are in deleted blocks (labels `-old`, old CSVs kept in `data/ch07/superseded/`, to be deleted when the markup
+is accepted). New Example `ex:ch07-cable-das` "Anchor drag on a pre-curved 1-km span" on the paper's benchmark (numbers
+printed by the rewritten `companion_repo/examples/ch07_cable_das_kf/cable_das_kf.py`; tests 38/38), new Fig. 7.3,
+a short limitations paragraph (idealised benchmark, synthetic data, local axial closure not self-consistent on the
+seabed, field validation). Problems 7.5 and 7.7 and their solutions updated. Clean section length ≈ +8 %.
+Nothing about the reviews appears in the book. New bib: `oliva_quadratic_ejc_2026` (@unpublished, "under review at
+European Journal of Control"), Jazwinski 1970, Rega 2004.
+
+**references.bib corrections (objective):** `fioravanti_cable_med_2026` is published (Proc. 34th MED, pp. 811–816,
+doi 10.1109/MED70602.2026.11598378, from the revised paper's bibliography); `baudouin_cable_pde_2018` year 2019;
+`modares2026reachability` had given and family names swapped.
+
+**For the authors:** update the EJC entry if accepted before 1 December; κ_j = 0.78 is called "transduction" in the
+paper's code but is not explained in the paper or in the book (strain-optic factor of silica fibre?); the example
+discretises time exactly (paper: forward Euler) and keeps the book's windowed NIS-sum test and residual-profile
+localiser (paper: window mean and likelihood-ratio search).
+
+## Front matter
+List of acronyms added (`frontmatter/acronym.tex`, included after the table of contents).
+
+## Verification (8 November 2026)
+Full build with markup: 0 LaTeX errors, 0 undefined citations or references, 227 pages (`main.pdf` updated).
+Clean build (`\revisionmarkupfalse`): 0 errors, 0 undefined, 227 pages.
+
+## Chapter 4 — worked application on public driving data (added 8–9 November 2026, after the authors' go-ahead)
+
+New subsection `subsec:c2k-application` "Worked Application: Learning a GNSS Error Model from Public Driving Data"
+in the section *Hybrid Classical–Learning Architectures*, after the synthetic example (all in blue):
+- data: comma2k19 (Schafer et al., arXiv:1812.05752, MIT licence; u-blox M8 fixes and raw C/N0, phone gyro, CAN speed,
+  reference poses); 4 Civic drives for training (59 min), 3 Civic drives for testing (35 min), 4 RAV4 drives (47 min);
+- step 1 alignment (fix epoch vs arrival: median latency 159 ms); step 2 baseline EKF (E, N, ψ, gyro bias, CAN speed
+  scale) with white 2.5 m noise: RMSE 3.25 m, reported 0.63 m, mean NEES 134;
+- step 3 learning: along-track offset 1.69 m; errors strongly correlated in time; Gaussian-process kernel
+  σ_b² + σ_g(u)σ_g(u') exp(−|t−t'|/T) learned by maximum marginal likelihood (σ_b 2.16 m, σ_g 1.37 m, T 111 s; the
+  feature-based amplitude overfits the training drives);
+- step 4 hybrid EKF with the state-space form of the kernel: RMSE 2.35 m, reported 2.50 m, mean NEES 1.92, 84.9 % in
+  the 86.5 % ellipse; the offset gives the accuracy, the correlation model the consistency (learning the variance
+  alone: NEES 136); the NIS is far below 2 for every filter and cannot reveal the problem;
+- step 5 second car (RAV4): the Civic model is conservative (NEES 0.85), the feature-based one less so (1.27);
+- Table `tab:c2k-results`, Figures `fig:c2k-learning` (autocovariance and kernel; coverage curves) and
+  `fig:c2k-route`; Problems 4.9 (opposite shift: NEES 5.78, coverage 51 %) and 4.10 (600 fixes in a minute are worth
+  1.05 independent fixes) with solutions.
+Also: Ch. 4 abstract, pointers from Sects. 4.1.3–4.1.5, Ch. 1 contributions bullet, comma2k19 row in Table 5.x
+(datasets), CAN and GPS in the list of acronyms. Companion repository: `examples/ch04_comma2k19_learned_gnss/`
+(`download_comma2k19.py`, stdlib only, fetches about 110 MB with HTTP Range requests into `data_cache/`, which is
+git-ignored; `comma2k19_learned_gnss.py` + notebook; outputs copied to `data/ch04/c2k_*.csv`), exercise script
+`exercises/ch04/solutions/prob9_10_comma2k19.py`; `tools/run_all_examples.py` skips `download_*.py`.
+
+Full build after this addition: 0 errors, 0 undefined references, 231 pages; clean build also 0/0, 231 pages.
+
+## Chapter 6 — refocus (9 November 2026, after the authors' go-ahead)
+
+The chapter is now organised around one question (how can agents that only talk to their neighbours fuse estimates
+of the same quantity without double counting and without being misled by a faulty agent?) and one running example,
+the five-node network (ring 1–2–3–4–5–1 with chord 1–3) already used by the distributed-tracking example.
+- Abstract rewritten; old introduction (two paragraphs) replaced by: the question, the running network (new
+  Fig. `fig:mas-network`), four learning objectives mapped to sections, and an explicit scope statement (multi-robot
+  SLAM, distributed particle filters, learned cooperative perception, coordination/control not treated).
+- The four-vehicle path example is replaced by `ex:mas-network-consensus` (same initial values plus 13 m for node 5;
+  one consensus step computed by hand); the Laplacian numbers now refer to the running network (9 rounds) and to the
+  path obtained by removing two edges (38 rounds).
+- Distributed-tracking example, table and figure unchanged (now introduced as the running network).
+- Resilient consensus: new `ex:mas-resilient-net` and `fig:mas-resilient-net` on the running network: it is only
+  1-robust, adding links 2–4, 2–5, 3–5 makes it 3-robust (no smaller addition does); plain consensus → 30 m,
+  W-MSR → 13.33 m. The old seven-agent example and figure are in deleted blocks (old CSV kept in
+  `data/ch06/superseded/`, to be deleted when the markup is accepted).
+- Sections "Communication Constraints", "Cooperative Perception in Connected Vehicles", and "Validation" (≈1,170 words)
+  are in deleted blocks, replaced by one section "From the Core to Real Networks" (≈500 words). The chapter had no
+  sections in the outline shared with the editor (they were introduced in October), so the outline is unchanged.
+- Problems 6.1 and 6.7 and their solutions rewritten for the running network; companion scripts updated
+  (`examples/ch06_resilient_consensus/resilient_consensus.py`, `exercises/ch06/solutions/prob07_wmsr_path.py`,
+  exercises README); tests 38/38.
+- Clean length ≈5,200 words (from ≈5,750): the core sections are unchanged, the survey parts shrink, the introduction
+  grows by the objectives and the scope statement.
+
+Full build with markup: 0 errors, 0 undefined, 237 pages; clean build: 0/0, 229 pages.

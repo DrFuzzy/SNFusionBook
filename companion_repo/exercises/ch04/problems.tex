@@ -1,0 +1,40 @@
+% Authoritative excerpt from chapters/ch04_learning_based_and_hybrid_fusion.tex; uses the book preamble.
+\begin{prob}\label{prob:ch04:1}
+(\emph{Mixture-of-experts gate.}) Three range estimates $\widehat{x}=(41.8,\,42.6,\,43.1)$~m are gated by $g_i\propto\exp(\beta q_i)$ with quality indicators $q=(0.3,0.5,0.9)$. Compute the gate and the fused estimate for $\beta=0$, $\beta=4$, and $\beta=20$, and show analytically that the fused estimate tends to the estimate of the highest-quality source as $\beta\to\infty$. Compare with the proportional weights $w_i=q_i/\sum_j q_j$ of the fuzzy example of this chapter.
+\end{prob}
+\begin{prob}\label{prob:ch04:2}
+(\emph{Learned reliability in weighted least squares.}) Repeat Example~\ref{ex:logistic-wls} for a clear-day scene with $q=(0.9,\,0.8,\,0.9)$ and the same estimates and nominal standard deviations. Give the reliabilities, the fused estimate, and its standard deviation, and explain why the result is now closer to the plain weighted least-squares estimate.
+\end{prob}
+\begin{prob}\label{prob:ch04:3}
+(\emph{Calibration.}) A detector's confidences are binned into five bins with counts $(100,200,300,250,150)$, mean confidences $(0.30,0.50,0.70,0.90,0.98)$ and accuracies $(0.35,0.45,0.60,0.80,0.90)$. Compute the ECE \eqref{eq:ece}. Then, for logits $\mathbf{z}=(3.0,\,1.0,\,0.0)$, compute the softmax probabilities at temperatures $T=1$ and $T=2$ and verify that the arg-max is unchanged.
+\end{prob}
+\begin{prob}\label{prob:ch04:4}
+(\emph{Log-odds occupancy.}) With $p_{\mathrm{hit}}=0.7$, $p_{\mathrm{miss}}=0.4$, prior $L_0=0$, and clamping to $[-2,\,3.5]$, a cell receives $6$ hits followed by $n$ free observations. After how many free observations does the cell's probability fall below $0.5$, with and without clamping? Comment on the role of clamping for dynamic objects.
+\end{prob}
+\begin{prob}\label{prob:ch04:5}
+(\emph{Pose graph by hand.}) Redo Example~\ref{ex:pose-graph-1d} when the loop closure reports $x_3-x_0=2.7$~m with standard deviation $0.05$~m while the odometry keeps $0.10$~m. Derive the normal equations, the solution, the residuals, and the standard deviation of $\widehat{x}_3$. Show in general that, for $n$ equally weighted odometry steps and one loop closure of weight ratio $\rho=\sigma_{\mathrm{odo}}^{2}/\sigma_{\mathrm{lc}}^{2}$, the loop-closure residual equals the discrepancy divided by $1+n\rho$.
+\end{prob}
+\begin{prob}\label{prob:ch04:6}
+(\emph{Computational: miscalibrated uncertainty head.}) Re-run the tracker of Example~\ref{ex:hybrid-hetero-kf} with the learned standard deviation scaled by $c\in\{0.5,\,1,\,2\}$ and report RMSE, ANIS, and the fraction of NIS values inside the $95\,\%$ band for each case. Which case is over-confident, which under-confident, and why can RMSE alone not detect the miscalibration? See \codeentry{P4}.
+\end{prob}
+\begin{prob}\label{prob:ch04:7}
+(\emph{Computational: planar pose graph.}) Four poses $(x,y,\theta)$ are $(0,0,0)$, $(10,0,\pi/2)$, $(10,10,\pi)$, and $(0,10,-\pi/2)$ in metres and radians. Three odometry factors connect consecutive poses; a fourth relative-pose factor connects pose 3 to pose 0, completing a $10$~m square with noisy odometry (standard deviations $0.3$~m, $0.3$~m, $2^{\circ}$) and one loop closure between the last and the first pose ($0.1$~m, $0.1$~m, $1^{\circ}$). Implement Gauss--Newton for \eqref{eq:factor_graph} with the first pose anchored, starting from the dead-reckoning solution, and report the position error of the last pose before and after optimisation, the weighted cost, and the marginal standard deviations of the last pose. See \codeentry{P4}.
+\end{prob}
+\begin{prob}\label{prob:ch04:8}
+(\emph{Fusion operators.}) For the gated fusion \eqref{eq:gated-fusion}, show that concatenation followed by a linear projection can represent any fixed gate. Give an input-dependent gate whose output cannot be represented by a fixed linear map. Then compute the cross-attention output \eqref{eq:cross-attention} for $d_k=2$, query $(0,1)$, keys $(1,0),(0,1),(-1,0)$, and values $2,0,-2$, and compare with the example of Sect.~\ref{subsec:fusion-operators}.
+\end{prob}
+
+\begin{prob}\label{prob:ch04:9}
+(\emph{Computational --- the opposite shift.}) Using the scripts of Sect.~\ref{subsec:c2k-application}, learn the along-track offset and the kernel \eqref{eq:c2k-kernel} with a constant amplitude on the four RAV4 drives, and run the filter of Step~4 on the RAV4 drives and on the three Civic test drives. Report RMSE, reported standard deviation, mean NEES, coverage of the $86.5\,\%$ ellipse, and mean NIS. Which case is overconfident, and why? Could the NIS have warned the driver of the Civic?
+\end{prob}
+
+\begin{prob}\label{prob:ch04:10}
+(\emph{How many independent fixes?}) For the error model \eqref{eq:c2k-kernel} with constant amplitude, $\sigma_b=2.16$~m, $\sigma_g=1.37$~m, $T=111$~s, and negligible $\sigma_w$, show that the variance of the average of $n$ consecutive fixes taken every $\Delta t$ is
+\begin{equation*}
+\sigma_b^{2}+\frac{\sigma_g^{2}}{n}\Big[1+2\sum_{k=1}^{n-1}\Big(1-\frac{k}{n}\Big)\phi^{k}\Big],\qquad \phi=e^{-\Delta t/T}.
+\end{equation*}
+Evaluate it for one minute of fixes at $10$~Hz and compare with the value $(\sigma_b^{2}+\sigma_g^{2})/n$ that a white-noise model would claim. How many independent fixes is the minute worth? What happens when the averaging interval grows to one hour, and why?
+\end{prob}
+
+
+% ============================================

@@ -1,0 +1,359 @@
+wrote examples/ch03_ekf_radar_cutin/output/ekf_radar_cutin.csv
+steps                         : 201
+position RMSE, raw detections : 0.422 m
+position RMSE, EKF            : 0.162 m
+  -> reduction                : 62 %
+lateral RMSE, raw detections  : 0.288 m
+lateral RMSE, EKF             : 0.156 m
+vy RMSE, EKF (after 1 s)      : 0.487 m/s
+peak lateral error, cut-in    : 0.40 m
+mean NIS, constant-velocity   : 2.54  (E=3)
+mean NIS, during cut-in       : 3.74  (E=3)
+max  NIS, during cut-in       : 13.47
+chi2_3 95% two-sided interval : [0.216, 9.348]
+NIS inside interval, CV       : 98.8 %
+NIS inside interval, cut-in   : 90.2 %
+chi2_3 95% upper bound        : 7.81
+NIS above 7.815, CV segment   : 0.0 %
+NIS above 7.815, cut-in       : 13.1 %
+wrote examples/ch03_ekf_radar_cutin/output/ekf_radar_cutin.png
+Frame of discernment
+  F: free lane
+  O: occupied by vehicle/obstacle
+  U: unknown vulnerable road user
+
+Camera BBA m_C
+  {F}     : 0.5500
+  {O,U}   : 0.2000
+  Omega   : 0.2500
+
+Radar-LiDAR BBA m_RL
+  {O}     : 0.4500
+  {O,U}   : 0.3500
+  Omega   : 0.2000
+
+Unnormalised Smets combination
+  empty   : 0.4400
+  {F}     : 0.1100
+  {O}     : 0.2025
+  {O,U}   : 0.1975
+  Omega   : 0.0500
+Conflict K = m_S(empty) = 0.4400
+
+Dempster-normalised combination
+  {F}     : 0.1964
+  {O}     : 0.3616
+  {O,U}   : 0.3527
+  Omega   : 0.0893
+
+Bel(O) = 0.3616
+Pl(O)  = 0.8036
+
+Pignistic probabilities, eq. (pignistic-transform)
+  BetP(F) = 0.2262
+  BetP(O) = 0.5677
+  BetP(U) = 0.2061
+
+wrote examples/ch03_evidence_occlusion/output/evidence_occlusion.csv
+wrote examples/ch03_evidence_occlusion/output/evidence_occlusion.png
+Incomplete AHP priorities for a rain-night autonomous-driving scene
+  C (camera semantics    ) = 0.0915
+  L (LiDAR geometry      ) = 0.1829
+  R (radar range-rate    ) = 0.4415
+  M (map/IMU lane prior  ) = 0.2842
+  ranking: R > M > L > C
+
+Observed comparisons and fitted ratios
+  A_{L,C}: observed 2.000, fitted 2.000
+  A_{R,C}: observed 5.000, fitted 4.827
+  A_{M,C}: observed 3.000, fitted 3.107
+  A_{R,M}: observed 1.500, fitted 1.554
+
+Ratios inferred from the incomplete graph
+  A_{R,L} ~= 2.414
+  A_{M,L} ~= 1.554
+
+Completed (consistent) comparison matrix x_i / x_j, order C, L, R, M:
+[[1.    0.5   0.207 0.322]
+ [2.    1.    0.414 0.644]
+ [4.827 2.414 1.    1.554]
+ [3.107 1.554 0.644 1.   ]]
+consistency ratio of the completed matrix: -3.29e-16 (consistent by construction)
+LLS residuals on the observed edges (ln A_ij - (y_i - y_j)): [ 2.220e-16  3.512e-02 -3.512e-02 -3.512e-02]
+wrote examples/ch03_incomplete_ahp/output/incomplete_ahp.csv
+wrote examples/ch03_incomplete_ahp/output/incomplete_ahp_ratios.csv
+wrote examples/ch03_incomplete_ahp/output/incomplete_ahp.png
+precise sensor : true sigma 0.20 m, sample mean 9.992 m, sample std 0.235 m, range [9.43, 10.66] m
+coarse sensor  : true sigma 0.60 m, sample mean 9.911 m, sample std 0.613 m, range [8.50, 10.95] m
+eigenvalues l1 = 1.4000, l2 = 0.1000 m^2; semi-axes sqrt(l) = 1.183, 0.316 m; first axis at 33.7 deg
+u1 = (0.8321, 0.5547), u2 = (-0.5547, 0.8321)
+correlation coefficient = 0.849
+sample covariance:
+[[0.94300137 0.57608796]
+ [0.57608796 0.48862052]]
+c = 1: theoretical mass 1 - exp(-c^2/2) = 0.393, fraction of samples inside = 0.407
+c = 2: theoretical mass 1 - exp(-c^2/2) = 0.865, fraction of samples inside = 0.887
+c = 3: theoretical mass 1 - exp(-c^2/2) = 0.989, fraction of samples inside = 0.987
+1-D comparison: P(|y - m| <= c sigma) = 0.683, 0.954, 0.997 for c = 1, 2, 3
+outputs written to /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch03_mean_variance_gaussian/output
+============================================================================================================
+A. NOMINAL SCENARIO  (identical to Example ex:ekf-radar-cutin: 60 m ahead, sigma_theta = 0.5 deg)
+   nominal                          EKF pos-RMSE  0.162 m  meanNIS  3.24  UKF pos-RMSE  0.163 m  meanNIS  3.24
+
+B. STRESSED NEAR-FIELD VARIANT (12 m ahead, sigma_theta = 3 deg, poor initialisation)
+   stressed                         EKF pos-RMSE  0.225 m  meanNIS  3.47  UKF pos-RMSE  0.228 m  meanNIS  3.47
+
+Sigma-point weights (n = 4, alpha = 1.0, beta = 2.0, kappa = 1.0):
+   lambda = 1.000   w_m0 = 0.2000   w_i = 0.1000   spread = 2.236 sigma
+
+wrote examples/ch03_ukf_radar_cutin/output/ukf_radar_cutin.csv
+wrote examples/ch03_ukf_radar_cutin/output/ukf_radar_cutin.png
+bound check: realised sensor errors exceeding the bound: range 0, azimuth 0, range rate 0 (of 201)
+bound check: peak true lateral acceleration 2.33 m/s^2 vs assumed bound 2.50 m/s^2 -> VALID
+             relative speed max 5.00 m/s vs assumed 15.0 m/s
+
+zonotope: truth inside the enclosure on 201/201 steps (100.0 %)
+EKF 3-sigma: truth inside on 178/201 steps (88.6 %); during the cut-in 70.5 %
+largest EKF 3-sigma excursion: 0.15 m
+mean lateral width  zonotope 4.81 m   EKF 6-sigma 0.60 m   ratio 8.0x
+lateral width at t=1 s: 7.4 m,  at t=10 s: 1.4 m
+generators after reduction: 7--20 (budget 20)
+
+wrote examples/ch03_zonotope_radar_cutin/output/zono_radar_cutin.csv
+wrote examples/ch03_zonotope_radar_cutin/output/zono_radar_cutin.png
+train: 4 routes, 23446 fixes, 59 min, fix rate 10, 10, 5, 10 Hz, median satellites 8, median C/N0 33.3 dB-Hz
+test : 3 routes, 17035 fixes, 35 min, fix rate 10, 10, 8 Hz, median satellites 7, median C/N0 32.5 dB-Hz
+rav4 : 4 routes, 18059 fixes, 47 min, fix rate 9, 9, 5, 5 Hz, median satellites 16, median C/N0 43.7 dB-Hz
+fix latency (arrival - epoch): median 159 ms, 5-95% 99-233 ms
+train raw fix error: horizontal RMS 3.83 m, along-track mean +1.69 m (sd 2.65), cross-track mean +1.14 m (sd 1.87)
+test  raw fix error: horizontal RMS 3.21 m, along-track mean +2.37 m (sd 1.63), cross-track mean -0.13 m (sd 1.43)
+rav4  raw fix error: horizontal RMS 2.84 m, along-track mean +2.48 m (sd 1.23), cross-track mean -0.30 m (sd 0.56)
+learned along-track offset b_al = 1.69 m
+empirical autocovariance at   0 s: 6.11 m^2
+empirical autocovariance at  10 s: 5.85 m^2
+empirical autocovariance at  30 s: 5.35 m^2
+empirical autocovariance at  60 s: 4.76 m^2
+empirical autocovariance at 120 s: 3.94 m^2
+learned white-noise std (ignoring correlation): 2.47 m
+GP constant: sigma_b = 2.16 m, T = 111 s, theta = [0.318 0.    0.   ], sigma_g at 10 satellites and 34 dB-Hz = 1.37 m
+GP feature-based: sigma_b = 2.35 m, T = 117 s, theta = [ 0.217 -0.21   0.018], sigma_g at 10 satellites and 34 dB-Hz = 1.24 m
+average negative log marginal likelihood per sample on train: constant 0.182, feature-based 0.134
+average negative log marginal likelihood per sample on test: constant 0.121, feature-based 0.161
+average negative log marginal likelihood per sample on rav4: constant -0.149, feature-based -0.287
+training range of the features (1-99 %): satellites 1-13, C/N0 31.2-36.5 dB-Hz
+test  white, datasheet 2.5 m             RMSE 3.25 m | reported sd 0.63 m | mean NEES   133.95 | inside c=2 ellipse   4.7 % | mean NIS 0.02
+test  white, tuned to NIS 0.3 m          RMSE 3.22 m | reported sd 0.12 m | mean NEES  1927.39 | inside c=2 ellipse   0.2 % | mean NIS 0.18
+test  white, learned variance            RMSE 3.25 m | reported sd 0.62 m | mean NEES   136.03 | inside c=2 ellipse   4.6 % | mean NIS 0.02
+test  white, learned variance and offset RMSE 2.31 m | reported sd 0.61 m | mean NEES    55.17 | inside c=2 ellipse  11.4 % | mean NIS 0.02
+test  learned kernel, constant           RMSE 2.35 m | reported sd 2.50 m | mean NEES     1.92 | inside c=2 ellipse  84.9 % | mean NIS 0.07
+test  learned kernel, feature-based      RMSE 2.36 m | reported sd 2.54 m | mean NEES     1.79 | inside c=2 ellipse  88.9 % | mean NIS 0.07
+rav4  white, datasheet 2.5 m             RMSE 2.84 m | reported sd 0.71 m | mean NEES   100.08 | inside c=2 ellipse   0.8 % | mean NIS 0.01
+rav4  white, tuned to NIS 0.3 m          RMSE 2.84 m | reported sd 0.14 m | mean NEES  1471.14 | inside c=2 ellipse   0.0 % | mean NIS 0.07
+rav4  white, learned variance            RMSE 2.84 m | reported sd 0.70 m | mean NEES   101.66 | inside c=2 ellipse   0.7 % | mean NIS 0.01
+rav4  white, learned variance and offset RMSE 1.59 m | reported sd 0.69 m | mean NEES    29.17 | inside c=2 ellipse  37.7 % | mean NIS 0.01
+rav4  learned kernel, constant           RMSE 1.61 m | reported sd 2.51 m | mean NEES     0.85 | inside c=2 ellipse  98.7 % | mean NIS 0.05
+rav4  learned kernel, feature-based      RMSE 1.63 m | reported sd 2.08 m | mean NEES     1.27 | inside c=2 ellipse  91.0 % | mean NIS 0.06
+rav4  learned kernel, features clipped   RMSE 1.61 m | reported sd 2.21 m | mean NEES     1.09 | inside c=2 ellipse  93.6 % | mean NIS 0.05
+raw fix RMSE: test 3.21 m, rav4 2.84 m
+route used for the figure: 99c94dc769b5d96e_2018-07-03--14-38-26
+outputs written to /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch04_comma2k19_learned_gnss/output
+fitted uncertainty head theta = [0.146, 0.0100, 2.017]  (true [0.150, 0.0100, 2.000])
+fixed-R alternative: pooled training std = 1.336 m
+fixed R     RMSE all 0.604 m | clear 0.424 | fog 0.889 || ANIS 1.68  inside-95% 86.5%
+learned R   RMSE all 0.574 m | clear 0.434 | fog 0.808 || ANIS 2.03  inside-95% 96.5%
+oracle R    RMSE all 0.574 m | clear 0.433 | fog 0.809 || ANIS 2.00  inside-95% 96.5%
+raw detections: RMSE all 1.763 m | clear 0.870 | fog 2.916
+ANIS fixed-R in fog 4.55, clear 0.43; learned-R in fog 2.04, clear 2.02
+sigma at t=0 (r=70.1 m): true 0.85, learned 0.84; in fog at t=10 s (r=45.1 m): true 2.00, learned 2.01
+conflict K (clear) = 0.148
+conflict K (fog, undiscounted camera) = 0.554
+conflict K (fog, discounted camera) = 0.233
+rows written: 201
+done
+information matrix Lambda =
+ [[ 200. -100.    0.]
+ [-100.  200. -100.]
+ [   0. -100.  200.]]
+solution x1, x2, x3 = [0.925 1.85  2.775]
+residuals (odo1, odo2, odo3, loop) = [-0.075 -0.075 -0.075  0.075]
+cost sum of squares (weighted) = 2.250
+std of x3 with loop closure = 0.0866 m
+std of x3 without loop closure = 0.1732 m
+solution with overconfident loop closure: [0.9013 1.8026 2.7039]  residuals: [-0.0987 -0.0987 -0.0987  0.0039]
+--- independent-error case: reported standard deviations [m] (sx, sy, major, minor) ---
+camera        : sx=  8.86  sy=  1.58  major=  9.00  minor=  0.21  tr=  81.044
+radar         : sx=  0.37  sy=  1.55  major=  1.57  minor=  0.25  tr=   2.530
+naive fusion  : sx=  0.25  sy=  0.21  major=  0.25  minor=  0.21  tr=   0.106
+CI fusion     : sx=  0.34  sy=  0.31  major=  0.34  minor=  0.31  tr=   0.209
+CI weight omega* = 0.449 (weight on the camera track)
+--- shared heading error sweep (analytic NEES = tr(P_reported^-1 P_actual); consistent iff <= 2) ---
+sigma_psi=0.00 deg: naive NEES= 2.00 (sy reported 0.21 m, actual 0.21 m) | CI NEES= 1.00, omega=0.449 (sy reported 0.31 m, actual 0.21 m)
+sigma_psi=0.25 deg: naive NEES= 2.05 (sy reported 0.33 m, actual 0.33 m) | CI NEES= 1.02, omega=0.559 (sy reported 0.44 m, actual 0.33 m)
+sigma_psi=0.50 deg: naive NEES= 2.18 (sy reported 0.53 m, actual 0.57 m) | CI NEES= 1.05, omega=0.667 (sy reported 0.67 m, actual 0.56 m)
+sigma_psi=1.00 deg: naive NEES= 2.47 (sy reported 0.92 m, actual 1.11 m) | CI NEES= 1.09, omega=0.763 (sy reported 1.15 m, actual 1.06 m)
+sigma_psi=2.00 deg: naive NEES= 2.78 (sy reported 1.62 m, actual 2.15 m) | CI NEES= 1.13, omega=0.814 (sy reported 2.15 m, actual 2.08 m)
+Monte Carlo (20000 trials, sigma_psi=0.5 deg): naive NEES 2.17, CI NEES 1.04; RMS lateral error naive 0.57 m (reported sy 0.53 m), CI 0.56 m (reported sy 0.67 m)
+Shared error 0.5 deg at 60 m moves the target laterally by 0.524 m
+ellipse rows: 73  sweep rows: 41
+figure written
+RMS position error with GNSS available, 5-state filter: 0.60 m
+RMS position error with GNSS available, 3-state filter: 5.02 m
+Position error at the end of the 25 s outage, 5-state: 3.56 m  (3-sigma radius 11.94 m)
+Position error at the end of the outage, 3-state (no bias states): 63.88 m  (3-sigma radius 19.83 m)
+Peak error during outage: 5-state 3.56 m, 3-state 63.88 m
+Error 2 s after re-acquisition: 5-state 0.52 m, 3-state 8.79 m
+Error 5 s after re-acquisition: 5-state 0.10 m, 3-state 4.45 m
+Gyro bias estimate at tunnel entry: 10.29 mrad/s (true 10.00), 3-sigma 1.39 mrad/s
+Scale error estimate at tunnel entry: 2.15 % (true 2.00 %), 3-sigma 0.33 %
+Heading error at tunnel exit: 5-state -0.69 deg, 3-state 17.29 deg
+Fraction of samples with error inside the 3-sigma radius, 5-state: 100.0 %, 3-state: 7.0 %
+Mean NIS of the GNSS updates, 5-state: 1.80 (expected 2), inside 95% chi2_2 interval: 95.2 %
+Distance travelled inside the tunnel: 346 m
+rows written: 240 -> /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch05_gnss_imu_odometry_ekf/output/gnss_imu_odometry.csv
+figure written
+Laplacian eigenvalues: [-0.     1.382  2.382  3.618  4.618]
+algebraic connectivity lambda_2 = 1.3820, lambda_max = 4.6180
+Metropolis weight matrix W =
+ [[0.25   0.25   0.25   0.     0.25  ]
+ [0.25   0.5    0.25   0.     0.    ]
+ [0.25   0.25   0.25   0.25   0.    ]
+ [0.     0.     0.25   0.4167 0.3333]
+ [0.25   0.     0.     0.3333 0.4167]]
+second largest |eigenvalue| of W = 0.6545
+
+chi^2_4 two-sided 95% interval: [0.484, 11.143]
+method                               pos RMSE  mean NEES     median in 95% band
+centralised KF                          0.803       4.25       3.60       95.0%
+isolated local KF                      11.647       4.08       3.37       94.4%
+naive fusion, no feedback               1.100       6.70       5.23       83.6%
+naive fusion with feedback             16.108 42875671.53 13060174.93        0.9%
+consensus on information (L=3)          0.917       2.02       1.53       87.3%
+Kalman-consensus filter                 0.968       3.94       3.31       95.0%
+covariance intersection                 1.021       2.87       2.43       94.6%
+
+steady state (t >= 5 s):
+centralised KF                          0.649       4.41
+isolated local KF                      14.783       4.22
+naive fusion, no feedback               0.837       6.99
+naive fusion with feedback             21.229 75005069.70
+consensus on information (L=3)          0.675       2.33
+Kalman-consensus filter                 0.751       4.09
+covariance intersection                 0.790       3.22
+
+mean CI weight omega over all pairwise fusions (run 0): 0.544
+
+per-node position RMSE (all runs):
+centralised KF                     [0.803 0.803 0.803 0.803 0.803]
+isolated local KF                  [11.665 14.119  2.509 11.691 14.136]
+naive fusion, no feedback          [0.939 0.967 0.954 1.368 1.207]
+naive fusion with feedback         [16.107 16.107 16.107 16.111 16.11 ]
+consensus on information (L=3)     [0.908 0.907 0.909 0.93  0.928]
+Kalman-consensus filter            [0.842 0.895 0.843 1.163 1.055]
+covariance intersection            [0.967 0.967 0.973 1.139 1.048]
+consensus on information with L= 1: pos RMSE 0.956, mean NEES 2.05
+consensus on information with L=10: pos RMSE 0.912, mean NEES 2.01
+
+wrote /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch06_distributed_tracking/output/distributed_tracking.csv (100, 27)
+wrote /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch06_distributed_tracking/output/distributed_tracking.pdf
+copied distributed_tracking.csv -> /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/data/ch06
+copied distributed_tracking.pdf -> /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/figures/ch06
+edges of the densified network: [(1, 2), (1, 3), (1, 5), (2, 3), (2, 4), (2, 5), (3, 4), (3, 5), (4, 5)]
+degrees: [3 4 4 3 4]  Laplacian eigenvalues: [0. 3. 5. 5. 5.]
+average of all five initial values (honest case): 12.2000
+average of the four compliant initial values: 12.0000
+running network (ring + chord): r-robust for r <= 1 (W-MSR with F=1 needs r >= 2F+1 = 3)
+densified network: r-robust for r <= 3 (W-MSR with F=1 needs r >= 2F+1 = 3)
+k= 1  plain: [14.6 15.6 15.6 16.6]   W-MSR: [10.6 12.4 12.  14.4]
+k= 5  plain: [24.08 24.1  24.1  24.13]   W-MSR: [12.58 13.18 13.17 13.49]
+k=10  plain: [28.07 28.07 28.07 28.07]   W-MSR: [13.23 13.32 13.32 13.35]
+k=20  plain: [29.79 29.79 29.79 29.79]   W-MSR: [13.33 13.33 13.33 13.33]
+k=40  plain: [30. 30. 30. 30.]   W-MSR: [13.33 13.33 13.33 13.33]
+plain consensus, mean of correct agents at k=40: 29.998 (spread 0.000)
+W-MSR, mean of correct agents at k=40: 13.3333 (spread 7.80e-08), inside [10.0, 15.0]
+W-MSR limit versus average of the four compliant values: 13.3333 vs 12.0000
+wrote /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch06_resilient_consensus/output/resilient_consensus.csv (41, 11)
+wrote /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/companion_repo/examples/ch06_resilient_consensus/output/resilient_consensus.pdf
+copied resilient_consensus.csv -> /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/data/ch06
+copied resilient_consensus.pdf -> /Users/themis/Downloads/Beast__2___Towards_a_Unified_View_of_Sensor_Fusion/figures/ch06
+thresholds (alpha=0.01): per-step chi2_4 13.28, window chi2_48 73.68, Ljung-Box chi2_20 37.57
+steady-state sqrt(S_11): radar 31.33 m, AIS 13.23 m; position gains radar 0.083, AIS 0.429
+[nominal     300-   590 s] mean NIS 3.76 (radar 1.64, AIS 2.13)  alarm fraction: step 0.00  window 0.00  LB 0.00
+[coloured    660-  1190 s] mean NIS 2.26 (radar 1.82, AIS 0.43)  alarm fraction: step 0.00  window 0.00  LB 0.09
+[spoof      1200-  1800 s] mean NIS 8.91 (radar 6.22, AIS 2.69)  alarm fraction: step 0.21  window 0.33  LB 0.26
+two-sided AIS-only window test, chi2_24 interval [9.89, 45.56]: fraction below lower bound nominal 0.00, coloured 0.94; first low alarm in coloured window: 690.0; median AIS window statistic there 5.1
+first per-step  alarm in spoofing window: 1620.0   in coloured window: None
+first window    alarm in spoofing window: 1610.0   in coloured window: None
+first Ljung-Box alarm in spoofing window: 1580.0   in coloured window: 680.0
+spoofing offset at end of ramp: 180.0 m; position error of the filter then: 167.0 m
+   per-step : delay after onset 420 s, spoofing offset then 88.2 m
+   window   : delay after onset 410 s, spoofing offset then 84.0 m
+   Ljung-Box: delay after onset 380 s, spoofing offset then 72.2 m
+max per-step NIS in spoofing window: 38.32; max window statistic: 263.0; max LB in coloured window: 43.1
+lag-1 autocorrelation of whitened innovations in coloured window (radar E,N, AIS E,N): [ 0.13 -0.05  0.49  0.26]
+RMS position error: nominal 7.5 m, coloured 13.5 m
+rows written: 181
+coloured window: NIS quantiles 50/90/99 %: [2.03 3.98 8.6 ]  window-statistic quantiles: [28.8 34.2 40.2]
+spoof window: NIS quantiles 50/90/99 %: [ 4.72 20.71 33.68]  window-statistic quantiles: [ 42.2 178.2 257.9]
+zeta_1 = 10.3; overdamped modes (zeta_n > 1): n = 1..10; c_d L^2/(pi^2 T) = 126.7 s; slowest time constant of F: 126.4 s
+gauge centres [m]: [ 36.6 134.1 231.7 329.3 426.8 524.4 622.  719.5 817.1 914.6]
+route slopes alpha_j: [ 0.0927  0.0732  0.0537  0.0341  0.0146 -0.0049 -0.0244 -0.0439 -0.0634
+ -0.0829]
+beta_j/sqrt(S_jj): median 1.9e-04, max 4.3e-03; M* = 5e+04 samples = 17 min; state share of S 0.48; closed-loop time constant 12.4 s
+thresholds: per-step chi2_10(0.99) = 23.2; window chi2_500(0.99) = 576.5
+before the load: mean NIS 9.39; per-step alarms 1 and window alarms 0 out of 250 samples
+first alarm after the onset: per-step 0.04 s, window 0.08 s; per-step alarms during the load 248 of 250
+window statistic: peak 9541; alarm from 5.08 s to 18.92 s (13.8 s, i.e. 8.9 s after the load is removed), 691 alarm samples; per-step alarms in the 5 s after the load 140
+largest gauge slope during the load 0.027; channel at 329 m: quadratic/linear part of the reading up to 40%, of the innovation up to 1.0%
+channel gains 1 + s_j/alpha_j at the end of the load: [1.   1.01 1.11 1.79 0.31 1.15 0.99 1.   1.   1.  ]
+residual energy E_j: [  439.  1009.  2499. 32628.  3726.   216.    59.    76.     0.    77.]
+centroid 328 m against a true 341.5 m: error 14 m (grid cell 24.4 m, channel spacing 97.6 m)
+written: cable_das_timeseries.csv ( 1500 rows ) and cable_das_profile.csv
+after combining radar: pairwise conflict K = 0.4200
+after combining imagery: pairwise conflict K = 0.2724
+after combining cable: pairwise conflict K = 0.2412
+fused BBA (Dempster):
+   m({L,N,T}) = 0.0337
+   m({L,T}) = 0.2661
+   m({L}) = 0.1999
+   m({N}) = 0.0506
+   m({T}) = 0.4497
+pignistic: {'N': 0.0618, 'L': 0.3442, 'T': 0.594}
+total conflict mass m(empty) under the Smets rule, four sources: 0.6798
+AIS vs radar alone: K = 0.4200; Bel(T) = 0.1379; Pl(T) = 0.6897
+fused: Bel(T) = 0.4497, Pl(T) = 0.7495, Bel({L,T}) = 0.9157
+cable example, after residual: K = 0.0600
+cable example, after AIS: K = 0.0298
+cable example, after seismic: K = 0.0105
+cable fused BBA:
+   m({A,C,S,V}) = 0.0106
+   m({A,C,V}) = 0.0426
+   m({A,C}) = 0.0798
+   m({A,V}) = 0.3457
+   m({A}) = 0.5186
+   m({S}) = 0.0027
+cable pignistic: {'V': 0.1897, 'A': 0.7482, 'S': 0.0053, 'C': 0.0567}
+AHP weights: {'distance': 0.376, 'association': 0.1209, 'deviation': 0.2147, 'innovation': 0.2147, 'persistence': 0.0738}  lambda_max = 5.0331, CI = 0.0083, CR = 0.0074
+   S(A1 slow near cable) = 0.7014
+   S(A3 AIS/radar mismatch) = 0.5839
+   S(A2 corridor exit) = 0.4946
+   S(A4 loitering anchorage) = 0.2994
+rank-one alert as the innovation weight varies: [(0.05, 'A1'), (0.415, 'A3')]
+S(A1) = S(A3) at w_innovation = 0.4121 (nominal 0.2147)
+[ok] examples/ch03_ekf_radar_cutin/ekf_radar_cutin.py  (1.3 s)
+[ok] examples/ch03_evidence_occlusion/evidence_occlusion.py  (0.8 s)
+[ok] examples/ch03_incomplete_ahp/incomplete_ahp.py  (0.7 s)
+[ok] examples/ch03_mean_variance_gaussian/mean_variance_gaussian.py  (0.5 s)
+[ok] examples/ch03_ukf_radar_cutin/ukf_radar_cutin.py  (0.9 s)
+[ok] examples/ch03_zonotope_radar_cutin/zono_radar_cutin.py  (0.8 s)
+[ok] examples/ch04_comma2k19_learned_gnss/comma2k19_learned_gnss.py  (19.8 s)
+[ok] examples/ch04_hybrid_hetero_kf/hybrid_hetero_kf.py  (0.5 s)
+[ok] examples/ch04_pose_graph_1d/pose_graph_1d.py  (0.1 s)
+[ok] examples/ch05_camera_radar_ci_fusion/camera_radar_ci_fusion.py  (1.2 s)
+[ok] examples/ch05_gnss_imu_odometry_ekf/gnss_imu_odometry_ekf.py  (1.1 s)
+[ok] examples/ch06_distributed_tracking/distributed_tracking.py  (55.4 s)
+[ok] examples/ch06_resilient_consensus/resilient_consensus.py  (0.7 s)
+[ok] examples/ch07_ais_innovation_monitoring/ais_innovation_monitoring.py  (0.7 s)
+[ok] examples/ch07_cable_das_kf/cable_das_kf.py  (1.0 s)
+[ok] examples/ch07_evidence_mcdm/evidence_mcdm.py  (0.4 s)
+------------------------------------------------------------------------
+16/16 scripts succeeded

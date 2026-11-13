@@ -1,0 +1,125 @@
+% Authoritative excerpt from chapters/ch03_classical_sensor_fusion.tex; uses the book preamble.
+\begin{prob}\label{prob:ch03:1}
+\textbf{(Least squares versus weighted least squares.)} A radar and a camera both report the longitudinal distance $x$ to a lead vehicle: $y_1=41.6$\,m with $\sigma_1=0.30$\,m and $y_2=43.4$\,m with $\sigma_2=1.50$\,m, the two errors being zero-mean and independent.
+\begin{enumerate}
+\item[(a)] Write the stacked linear model \eqref{eq:linear-measurement-model}, i.e.\ $\mathbf{G}=\begin{bmatrix}1&1\end{bmatrix}^{\mathsf T}$ and $\mathbf{R}=\diag(\sigma_1^{2},\sigma_2^{2})$, and compute the ordinary least-squares estimate $\widehat{x}_{\mathrm{LS}}$ together with its variance $\operatorname{cov}(\widehat{x}_{\mathrm{LS}})=(\mathbf{G}^{\mathsf T}\mathbf{G})^{-1}\mathbf{G}^{\mathsf T}\mathbf{R}\mathbf{G}(\mathbf{G}^{\mathsf T}\mathbf{G})^{-1}$.
+\item[(b)] Compute the information $\mathbf{\Lambda}=\mathbf{G}^{\mathsf T}\mathbf{R}^{-1}\mathbf{G}$, the WLS estimate $\widehat{x}_{\mathrm{WLS}}$ and its variance $\mathbf{\Lambda}^{-1}$.
+\item[(c)] Show that, in general, $\widehat{x}_{\mathrm{WLS}}=(\sigma_1^{-2}y_1+\sigma_2^{-2}y_2)/(\sigma_1^{-2}+\sigma_2^{-2})$, i.e.\ the fused estimate is the information-weighted average of the two readings, and that its variance never exceeds the variance of the better sensor alone.
+\item[(d)] By which factor does ordinary least squares inflate the variance in this example, and why is the WLS estimate so close to the radar reading?
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:2}
+\textbf{(Regularised least squares as prior-plus-measurement fusion.)} A tracker predicts the range and range rate of the same lead vehicle as $\mathbf{m}=\begin{bmatrix}42.0 & -5.0\end{bmatrix}^{\mathsf T}$ (m, m/s) with prior covariance
+$\mathbf{P}=\begin{bmatrix}1.0&0.3\\0.3&0.25\end{bmatrix}$.
+The radar of Problem~\ref{prob:ch03:1} then measures the range only, $y=41.6$\,m with $\mathbf{R}=0.09$\,m$^{2}$, so that $\mathbf{G}=\begin{bmatrix}1&0\end{bmatrix}$.
+\begin{enumerate}
+\item[(a)] Compute $\mathbf{P}^{-1}$, the posterior information matrix $\mathbf{\Lambda}_{\mathrm{post}}=\mathbf{G}^{\mathsf T}\mathbf{R}^{-1}\mathbf{G}+\mathbf{P}^{-1}$ and the posterior covariance $\mathbf{P}^{+}$.
+\item[(b)] Compute $\widehat{\mathbf{x}}_{\mathrm{ReLS}}=\widehat{\mathbf{x}}_{\mathrm{MAP}}$.
+\item[(c)] Verify the result through the correction form of Section~\ref{subsubsec:sequential_least_squares}, $\mathbf{K}=\mathbf{P}\mathbf{G}^{\mathsf T}(\mathbf{G}\mathbf{P}\mathbf{G}^{\mathsf T}+\mathbf{R})^{-1}$, $\widehat{\mathbf{x}}=\mathbf{m}+\mathbf{K}(y-\mathbf{G}\mathbf{m})$, $\mathbf{P}^{+}=(\mathbf{I}-\mathbf{K}\mathbf{G})\mathbf{P}$.
+\item[(d)] The range rate is not measured, yet it is corrected. Explain why, and state what happens when the off-diagonal entry of $\mathbf{P}$ is set to zero.
+\item[(e)] Discuss the limits $\mathbf{P}^{-1}\to\mathbf{0}$ (no prior information) and $\mathbf{R}^{-1}\to\mathbf{0}$ (useless measurement).
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:3}
+\textbf{(Sequential least squares is batch least squares.)} Two measurements $\mathbf{y}_1=\mathbf{G}_1\mathbf{x}+\mathbf{r}_1$ and $\mathbf{y}_2=\mathbf{G}_2\mathbf{x}+\mathbf{r}_2$, with independent zero-mean noises of covariances $\mathbf{R}_1$ and $\mathbf{R}_2$, are available together with a prior $(\mathbf{m},\mathbf{P}_0)$ on the static unknown $\mathbf{x}$.
+\begin{enumerate}
+\item[(a)] Apply the information-form update of Section~\ref{subsubsec:sequential_least_squares} twice and show that the resulting estimate and covariance coincide with the batch regularised estimate obtained from the stacked matrix $\mathbf{G}=\begin{bmatrix}\mathbf{G}_1^{\mathsf T}&\mathbf{G}_2^{\mathsf T}\end{bmatrix}^{\mathsf T}$ and the block-diagonal covariance $\mathbf{R}=\diag(\mathbf{R}_1,\mathbf{R}_2)$.
+\item[(b)] Deduce that the result does not depend on the order in which the two measurements are processed.
+\item[(c)] Take the radar of Problem~\ref{prob:ch03:1} as the starting point ($\widehat{x}_1=41.6$, $P_1=0.09$) and process the camera reading with the gain form; check numerically that the WLS values of Problem~\ref{prob:ch03:1} are recovered.
+\item[(d)] Identify the step of the derivation that fails when $\mathbf{r}_1$ and $\mathbf{r}_2$ are correlated, and relate it to the discussion of double counting in Section~\ref{subsec:track-fusion}.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:4}
+\textbf{(One Kalman-filter step by hand.)} A lead vehicle is tracked along one dimension with the state $\mathbf{x}=\begin{bmatrix}p&v\end{bmatrix}^{\mathsf T}$ (relative position and velocity), the constant-velocity model $\mathbf{F}=\begin{bmatrix}1&T\\0&1\end{bmatrix}$ with $T=0.5$\,s and the discrete random-acceleration covariance $\mathbf{Q}=\sigma_a^{2}\begin{bmatrix}T^{4}/4&T^{3}/2\\T^{3}/2&T^{2}\end{bmatrix}$ with $\sigma_a=0.8$\,m/s$^{2}$, as in Example~\ref{ex:ekf-radar-cutin}. At time $k-1$ the posterior is $\widehat{\mathbf{x}}_{k-1|k-1}=\begin{bmatrix}50.0&-4.0\end{bmatrix}^{\mathsf T}$, $\mathbf{P}_{k-1|k-1}=\diag(0.25,0.16)$. At time $k$ a range-only measurement $y_k=47.4$\,m arrives, with $\mathbf{H}=\begin{bmatrix}1&0\end{bmatrix}$ and $\mathbf{R}=0.09$\,m$^{2}$.
+\begin{enumerate}
+\item[(a)] Compute $\mathbf{Q}$.
+\item[(b)] Compute the prediction \eqref{eq:kf_state_prediction}--\eqref{eq:kf_cov_prediction}.
+\item[(c)] Compute the innovation \eqref{eq:kf_innovation}, its covariance \eqref{eq:kf_innovation_covariance} and the gain \eqref{eq:kf_gain}.
+\item[(d)] Compute the posterior \eqref{eq:kf_state_update}--\eqref{eq:kf_cov_update} and verify that the Joseph form of Section~\ref{subsubsec:sequential_least_squares} gives the same covariance.
+\item[(e)] Compute the NIS \eqref{eq:nis} and compare it with the two-sided $95\,\%$ interval of the $\chi^{2}_{1}$ distribution, $[0.00098,\,5.02]$.
+\item[(f)] Only the position is measured, yet the velocity is corrected and the position standard deviation drops from $0.55$\,m (predicted) to $0.26$\,m. Explain both facts in terms of the entries of $\mathbf{P}_{k|k-1}$.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:5}
+\textbf{(EKF Jacobian of a range--bearing sensor and azimuth wrapping.)} A sensor observes $\mathbf{g}(\mathbf{x})=\begin{bmatrix}\sqrt{p_x^{2}+p_y^{2}} & \operatorname{atan2}(p_y,p_x)\end{bmatrix}^{\mathsf T}$ of the state $\mathbf{x}=\begin{bmatrix}p_x&p_y&v_x&v_y\end{bmatrix}^{\mathsf T}$, with $\sigma_\theta=0.5^{\circ}$.
+\begin{enumerate}
+\item[(a)] Derive the Jacobian $\mathbf{H}=\partial\mathbf{g}/\partial\mathbf{x}$ and check that it coincides with the first two rows of \eqref{eq:ekf-radar-jacobian}.
+\item[(b)] Evaluate it at $\widehat{\mathbf{x}}_{k|k-1}=\begin{bmatrix}40&3&-5&0\end{bmatrix}^{\mathsf T}$.
+\item[(c)] The bearing row scales as $1/d$. Explain the consequence for the lateral position information and compute the lateral standard deviation implied by $\sigma_\theta$ at $60$\,m and at $10$\,m.
+\item[(d)] The predicted bearing is $3.135$\,rad and the sensor returns $-3.140$\,rad. Compute the raw difference and the innovation wrapped to $(-\pi,\pi]$. Assuming that the innovation covariance is dominated by the sensor noise, $S\approx\sigma_\theta^{2}$, compute the NIS in both cases and state what a $\chi^{2}_{1}$ gate at the $97.5\,\%$ quantile ($5.02$) would do with the detection.
+\item[(e)] Explain why the wrapping must be applied to the innovation and cannot be replaced by wrapping the predicted measurement or the state.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:6}
+\textbf{(Zonotope propagation and a single-strip correction.)} A scalar position and velocity are enclosed at time $k$ by the zonotope $\mathcal{X}_k=p\oplus H\mathbb{B}_{\infty}^{2}$ with
+$p=\begin{bmatrix}1\\0\end{bmatrix}$, $H=\begin{bmatrix}1&0.5\\0&1\end{bmatrix}$.
+The dynamics are the constant-velocity model $F=\begin{bmatrix}1&1\\0&1\end{bmatrix}$ ($T=1$\,s) driven by an unknown acceleration bounded by $\bar a=0.2$\,m/s$^{2}$, which maps onto the generator $\bar a\begin{bmatrix}T^{2}/2&T\end{bmatrix}^{\mathsf T}$ as in Example~\ref{ex:zono-radar-cutin}.
+\begin{enumerate}
+\item[(a)] Compute the predicted zonotope $\widetilde{\mathcal{X}}_{k+1}=\tilde p\oplus\tilde H\mathbb{B}_{\infty}^{3}$ and its interval hull.
+\item[(b)] The position is then measured as $y=1.4$ with a bounded error $|\Delta y|\le\bar\phi=0.3$. Write the strip $\mathcal{S}$ with normal $c=\begin{bmatrix}1&0\end{bmatrix}^{\mathsf T}$.
+\item[(c)] Compute the gain $\lambda^{\star}$ of \eqref{eq:zono-optimal-gain} (the strip gain $\gamma$ of Table~\ref{tab:notation}), the corrected centre $\hat p$, the corrected generator matrix $\hat H$ (four columns) and the resulting interval hull.
+\item[(d)] Repeat with the choice $\lambda=c$ used in Example~\ref{ex:zonotope-strip}, and compare the two enclosures through their interval hulls and through $\|\hat H\|_{F}^{2}$. Which quantity does each choice minimise?
+\item[(e)] Compute the exact interval hull of $\widetilde{\mathcal{X}}_{k+1}\cap\mathcal{S}$ (two linear programmes over $\xi\in[-1,1]^{3}$ suffice) and comment on the conservatism of both zonotopic enclosures.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:7}
+\textbf{(Dempster's rule versus Smets' rule.)} Let $\Omega=\{P,V,S\}$ (pedestrian, vehicle, static obstacle). A camera classifier and a LiDAR shape classifier return the BBAs
+\begin{equation*}
+\begin{array}{c|ccccc}
+ & P & V & S & \{P,V\} & \Omega\\
+\hline
+m_C & 0.5 & 0 & 0 & 0.3 & 0.2\\
+m_L & 0 & 0.4 & 0.1 & 0.4 & 0.1
+\end{array}
+\end{equation*}
+\begin{enumerate}
+\item[(a)] Compute the conflict mass $K$.
+\item[(b)] Compute the fused BBA under Dempster's rule \eqref{eq:dempster}.
+\item[(c)] Compute $\mathrm{Bel}$, $\mathrm{Pl}$ and the pignistic probability \eqref{eq:pignistic-transform} of each singleton.
+\item[(d)] Compute the fused BBA under Smets' rule \eqref{eq:smets}, including $m(\emptyset)$, and explain in one sentence what the two rules do differently with the same products.
+\item[(e)] Two other sources return $m_1(P)=0.99$, $m_1(S)=0.01$ and $m_2(V)=0.99$, $m_2(S)=0.01$. Compute $K$ and the two combinations, and explain why the Dempster result is unsafe for a planner.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:8}
+\textbf{(Covariance intersection.)} Two tracks $(\widehat{\mathbf{x}}_1,\mathbf{P}_1)$ and $(\widehat{\mathbf{x}}_2,\mathbf{P}_2)$ of the same object are consistent, i.e.\ their errors are zero-mean and their true error covariances $\bar{\mathbf{P}}_1$ and $\bar{\mathbf{P}}_2$ satisfy $\bar{\mathbf{P}}_i\preceq\mathbf{P}_i$, but their cross-covariance $\bar{\mathbf{P}}_{12}$ is unknown.
+\begin{enumerate}
+\item[(a)] Prove that the CI estimate \eqref{eq:ci-cov}--\eqref{eq:ci-est} is consistent for \emph{every} $\omega\in[0,1]$ and every $\bar{\mathbf{P}}_{12}$ for which the joint error covariance is positive semidefinite. \emph{Hint:} write the CI error as $\mathbf{e}=\mathbf{P}_{\mathrm{CI}}\left(\omega\mathbf{P}_1^{-1}\mathbf{e}_1+(1-\omega)\mathbf{P}_2^{-1}\mathbf{e}_2\right)$ and show first that
+\begin{equation*}
+\begin{bmatrix}\bar{\mathbf{P}}_1&\bar{\mathbf{P}}_{12}\\ \bar{\mathbf{P}}_{12}^{\mathsf T}&\bar{\mathbf{P}}_2\end{bmatrix}\preceq\begin{bmatrix}\bar{\mathbf{P}}_1/\omega&\mathbf{0}\\ \mathbf{0}&\bar{\mathbf{P}}_2/(1-\omega)\end{bmatrix}.
+\end{equation*}
+\item[(b)] Let $\mathbf{P}_1=\diag(0.25,\,1.0)$ (radar track, precise longitudinally) and $\mathbf{P}_2=\diag(1.0,\,0.16)$ (camera track, precise laterally). Write $\tr\mathbf{P}_{\mathrm{CI}}(\omega)$ in closed form, find the weight $\omega^{\star}$ that minimises it by solving the stationarity condition, and compute $\mathbf{P}_{\mathrm{CI}}(\omega^{\star})$.
+\item[(c)] Compare with the covariance of the independent-track fusion rule of Section~\ref{subsec:track-fusion}, $\mathbf{P}_{\mathrm{f}}^{-1}=\mathbf{P}_1^{-1}+\mathbf{P}_2^{-1}$, and explain why the CI result remains direction dependent although $\omega$ is a scalar.
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:9}
+\textbf{(Incomplete AHP by logarithmic least squares.)} A single expert compares four reliability criteria, labelled $1$ to $4$, but only on the pairs
+$A_{12}=3$, $A_{23}=2$, $A_{13}=4$, $A_{34}=2$.
+\begin{enumerate}
+\item[(a)] Draw the comparison graph. Is it connected? Is the cycle $1\!-\!2\!-\!3$ consistent?
+\item[(b)] Show that the normal equations of \eqref{eq:lls-ahp} read $\mathbf{L}\bm{y}=\bm{b}$, where $\mathbf{L}$ is the Laplacian of the undirected comparison graph and $b_i=\sum_{j}\ln A_{ij}$ over the neighbours of $i$, with $A_{ji}=1/A_{ij}$; write $\mathbf{L}$ and $\bm{b}$ explicitly.
+\item[(c)] Solve with the gauge $\sum_i y_i=0$ and normalise the priorities $x_i^{*}$.
+\item[(d)] Compute the fitted ratios $x_i^{*}/x_j^{*}$ and the residuals on the four edges. How is the cycle inconsistency $\ln(A_{12}A_{23}/A_{13})$ distributed, and why is the edge $(3,4)$ fitted exactly?
+\item[(e)] Predict the missing comparisons $A_{14}$ and $A_{24}$.
+\item[(f)] What changes if the comparison $A_{13}$ is removed?
+\end{enumerate}
+\end{prob}
+
+\begin{prob}\label{prob:ch03:10}
+\textbf{(Computational: process noise and innovation consistency.)} Reproduce the radar cut-in scenario of Example~\ref{ex:ekf-radar-cutin} (ego vehicle at $27$\,m/s, target at $22$\,m/s initially $60$\,m ahead in the adjacent lane, lane change from $3.5$\,m to $0$\,m between $t=5$\,s and $t=8$\,s, radar at $20$\,Hz with $\sigma_r=0.30$\,m, $\sigma_\theta=0.5^{\circ}$, $\sigma_{\dot r}=0.10$\,m/s) and run the constant-velocity EKF on one and the same detection sequence for $\sigma_a\in\{0.1,0.2,0.4,0.8,1.6,3.2,6.4\}$\,m/s$^{2}$. For each value report the position RMSE, the mean NIS \eqref{eq:nis} and the fraction of samples inside the two-sided $95\,\%$ interval of $\chi^{2}_{3}$, separately on the constant-velocity segments after the first second and inside the lane-change window. Use polar-to-Cartesian covariance propagation at initiation and do not update again with the initiating detection.
+\begin{enumerate}
+\item[(a)] For which values do the innovation statistics suggest under- or over-reported uncertainty? Use the NIS and discuss what a single run can establish.
+\item[(b)] Explain why the RMSE on the constant-velocity segments first decreases and then increases with $\sigma_a$, whereas the RMSE inside the lane change decreases monotonically.
+\item[(c)] Which value gives mean NIS closest to $3$ in both segments in this run? Does this, or a single threshold crossing, establish consistency? Relate your answer to the closing remark of Example~\ref{ex:ekf-radar-cutin} on interacting multiple-model filters.
+\end{enumerate}
+A self-contained script and notebook are provided in the companion repository, in \codeentry{P3}.
+\end{prob}
+
+% ============================================

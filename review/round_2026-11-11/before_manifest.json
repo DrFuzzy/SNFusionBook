@@ -1,0 +1,202 @@
+[
+  {
+    "path": "main.tex",
+    "sha256": "f3bde16a0eea7d6a2e352fadc50009b5b82d1bd27e9fe158809b4cf9b0e9c04d"
+  },
+  {
+    "path": "main_red_blue.tex",
+    "sha256": "65b75a432e73fdfe53541ac24a29e636b7d7c3d6d365a446d72eec941f5e5272"
+  },
+  {
+    "path": "README.md",
+    "sha256": "7eaa89b8c88a3cc6ec523e10cfb601ab97a3517d0aa722ad4254bc3bb13a9efd"
+  },
+  {
+    "path": "Makefile",
+    "sha256": "a00ae6d4c5fa71a654ab846071200ec7f0965308070b0458a05f83f8e1f25f81"
+  },
+  {
+    "path": "frontmatter/dedication.tex",
+    "sha256": "1e836b504e51f2d669a035feb3a6d5d447f83d769cc54f5f86c8bcb9eed62ae3"
+  },
+  {
+    "path": "frontmatter/acknowledgement.tex",
+    "sha256": "b62ec302dbfffd26125646fcc4b167797a96529b55253c98811da8656e3df2be"
+  },
+  {
+    "path": "frontmatter/preface.aux",
+    "sha256": "96b0b708cd9db43134584d2cea9bb56bdb2a2baa412bc93da5770b38c54a9e6a"
+  },
+  {
+    "path": "frontmatter/acronym.aux",
+    "sha256": "7386338e804cfb95c459e8bd7212e204838025f8729f56932e25b07d5839673b"
+  },
+  {
+    "path": "frontmatter/ethics.tex",
+    "sha256": "3796b5af5f75fa0420af01fb902832ed3c3fcb2ca8ac21e3c2b89f5a7a60aff0"
+  },
+  {
+    "path": "frontmatter/foreword.tex",
+    "sha256": "282f3da804f9b0d6ebf3f7fa43522275d2ba19f77556a5436d56b7c874e5064c"
+  },
+  {
+    "path": "frontmatter/book_abstract.tex",
+    "sha256": "427046c9d1126649f26f87277033d1ebe261929b5d8eb82b894ef8b32d6d7434"
+  },
+  {
+    "path": "frontmatter/acknowledgement.aux",
+    "sha256": "8cf6698d7875543dc9dffd643cbf1bd9727860301ffecfecab0fef8b201df959"
+  },
+  {
+    "path": "frontmatter/preface.tex",
+    "sha256": "ba4458bf39afa4c7f7fe899d7252534250ef9e04cb2333b7fb1017d87327802e"
+  },
+  {
+    "path": "frontmatter/book_abstract.aux",
+    "sha256": "9c8f535d48c361abbe9b9cd65b874c3cfe52a8f585802a5ae1a02ee8797bbb33"
+  },
+  {
+    "path": "frontmatter/acronym.tex",
+    "sha256": "bd621ea688811f4023b65c7bb7697d0538a3ccf4cf1d20b4e1c8bb573f974e93"
+  },
+  {
+    "path": "chapters/ch06_multi_agent_sensor_fusion.aux",
+    "sha256": "debffe25072b50235a575542ecabe7f3ca5c2d67e380f83a838cc5c711997bb1"
+  },
+  {
+    "path": "chapters/ch05_autonomous_driving_application.aux",
+    "sha256": "f86ce37572b3b1f3e5fceacd4f27fcc0ee19c01cac072fad1ac9c05ccd436356"
+  },
+  {
+    "path": "chapters/ch09_concluding_remarks.tex",
+    "sha256": "5a967a024078f1df496e3658450711fd41be50503647f62abf95a4dc5047cf02"
+  },
+  {
+    "path": "chapters/ch03_classical_sensor_fusion.aux",
+    "sha256": "7c60eac5c76b85b91958874f6c78fb449300aa29a143bd44295c96a201dc5901"
+  },
+  {
+    "path": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "sha256": "90acebee9bcf5d05976f6d0c882a100e6d6f79ce2965102392acd9b4c00e312b"
+  },
+  {
+    "path": "chapters/ch02_principles_and_components.tex",
+    "sha256": "eb1f3f193240c7e370d9dbf326fcd10a86757c00848430fbd219a0232c257c8f"
+  },
+  {
+    "path": "chapters/ch04_learning_based_and_hybrid_fusion.aux",
+    "sha256": "21fb3432535447ef6c672c1c4a468ef03591e803b34690c5bb874ac52b67e6da"
+  },
+  {
+    "path": "chapters/ch01_introduction.tex",
+    "sha256": "5d9ea2c0d8a8cf610b9162ec821c4f5e8210effbec2d053d7b8ff87d535b7d6a"
+  },
+  {
+    "path": "chapters/ch08_open_challenges_and_future_directions.aux",
+    "sha256": "59ad7b506c3cce14e9bada5b3a9171806a0a060c08d57d8ee75c6dd12369b6c8"
+  },
+  {
+    "path": "chapters/ch05_autonomous_driving_application.tex",
+    "sha256": "a98a493f3ee76c8870bd0461bb30ddb1db0df30bd353612e411eaff5cb09aa38"
+  },
+  {
+    "path": "chapters/ch09_concluding_remarks.aux",
+    "sha256": "58009728e4c2df06138d4ec3a91beb4ad2dfdb7905c8b876dc3ef626308f2f18"
+  },
+  {
+    "path": "chapters/ch03_classical_sensor_fusion.tex",
+    "sha256": "72905589595a3b3208b8ceec024eb24916d1b97a8f4d7bbac817d029f38df51d"
+  },
+  {
+    "path": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "sha256": "4ea8a021e65096c200bd01e1e26db7f7f0129a05c17694174f285ced11b11482"
+  },
+  {
+    "path": "chapters/ch01_introduction.aux",
+    "sha256": "fad87eb26190247f2276ffa1d8a4e3675a10739643fa2d45011aafa3d3412ef6"
+  },
+  {
+    "path": "chapters/ch08_open_challenges_and_future_directions.tex",
+    "sha256": "895f6b30de3934e94f0767847b0d0d28565d03847afd9b69d3f8ff5ff0698528"
+  },
+  {
+    "path": "chapters/ch02_principles_and_components.aux",
+    "sha256": "9b73ba1652417141922818c33e5903477a1abdaf3dd619544d2b41dbaa748bd3"
+  },
+  {
+    "path": "chapters/ch07_applications_beyond_autonomous_vehicles.aux",
+    "sha256": "1f748b16f0dd4df8a278216f804071f535a488b73b9b6c6293614b9ce30e1a5a"
+  },
+  {
+    "path": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "sha256": "952988ce578942e6856264bc9602bdf8a87ad9723fce0d1d393319afe5aa9a8d"
+  },
+  {
+    "path": "backmatter/solutions_ch05.tex",
+    "sha256": "cec96c464e2bdaf7933ee1bb134cdf3d26868f48f0d46ab69df1c47ada1320dc"
+  },
+  {
+    "path": "backmatter/solutions_ch04.tex",
+    "sha256": "3b029c5addeafce2c3d28008bc140a26f9b13aa49dc3616ddab0f51bca85dbc8"
+  },
+  {
+    "path": "backmatter/solutions_ch06.tex",
+    "sha256": "2f4ad35f6e2710f61dcaae0e8b6ae75c469c51a0d02c9850c21da1d089272808"
+  },
+  {
+    "path": "backmatter/solutions_ch07.tex",
+    "sha256": "33e4805009d42f63f026a333d993b90dce1f60f7d5f90b633c72510db5bd6688"
+  },
+  {
+    "path": "backmatter/solutions_ch03.tex",
+    "sha256": "58935203cf75a5c6a707b20672b1b5f03a41892682c2201805d8ae709e3c3c84"
+  },
+  {
+    "path": "backmatter/solutions.aux",
+    "sha256": "7058fa4224ad1a973015a50d2164d100340c55f12d7860cddd4b9fd6b444b594"
+  },
+  {
+    "path": "backmatter/author_biographies.aux",
+    "sha256": "17991ff3e20638d7f5eca78f67f9dc4b193f98383c57547856d798fdbdf68066"
+  },
+  {
+    "path": "backmatter/solutions.tex",
+    "sha256": "83dea9d3e153da2debaecc9f951b312ae1ff30e635260e8ae2869e696a118a01"
+  },
+  {
+    "path": "backmatter/author_biographies.tex",
+    "sha256": "acafa4ba92bff726e70e83764ae4a4ad64c0bcaa72d4f797e9f8e7b932415eb9"
+  },
+  {
+    "path": "backmatter/glossary.tex",
+    "sha256": "ce1cb1b1ce4bb0b49405f45c68cbf0ac130f006d8ad0977531036d27baef9667"
+  },
+  {
+    "path": "backmatter/solutions_ch08.tex",
+    "sha256": "46c739eb883cc695ea7c28290193c2b493ffd6911af877555fecc3b3820c31c7"
+  },
+  {
+    "path": "backmatter/appendix.tex",
+    "sha256": "5afb822ecf7d35659a28aff62423fdfeb92a980fee4ee4951c7ba6e251b56a10"
+  },
+  {
+    "path": "scripts/check_chapter.sh",
+    "sha256": "877270b41cc147aa80f91fd01fc8ae7176f1a2867da4b4299d3519bcaa6a00d5"
+  },
+  {
+    "path": "scripts/finalize_comparison.py",
+    "sha256": "b90549bff7332a165e1456c2f77fffe947c45e880a3801b3d4fae3c2cbaa4351"
+  },
+  {
+    "path": "scripts/build_review_versions.py",
+    "sha256": "7e06011305df30b00c7818a8c28c4d4ae0f145f23932ea9902ae3ff45447ecf2"
+  },
+  {
+    "path": "output/pdf/sensor_fusion_red_blue.pdf",
+    "sha256": "540b1ec779edc330ce4f845d1f8af87a7a95fa92be45e0e9f42cf58ab74a837f"
+  },
+  {
+    "path": "output/pdf/sensor_fusion_revised.pdf",
+    "sha256": "b8be0368505eab9adc4e841d1f79f3ea756df5aba698662471b977d6edd4a9a7"
+  }
+]

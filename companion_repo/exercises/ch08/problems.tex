@@ -1,0 +1,36 @@
+% Authoritative excerpt from chapters/ch08_open_challenges_and_future_directions.tex; uses the book preamble.
+\begin{prob}\label{prob:ch08:1}
+\textbf{Sensor-health monitor (design).} A vehicle fuses camera, radar, and LiDAR detections in a Kalman tracker as in Fig.~\ref{fig:hybrid-pipeline}. Design a sensor-health monitor that uses the per-sensor NIS \eqref{eq:nis}, an evidence-theoretic discount factor per sensor, and a graceful-degradation policy. Specify (a) the statistics that are computed and over which window, (b) the thresholds and how their false-alarm rate is set, (c) how the discount factor is derived from the statistics, and (d) how the policy distinguishes a blocked sensor (no detections) from a miscalibrated one (biased detections) and what the planner is told in each case.
+\end{prob}
+
+\begin{prob}\label{prob:ch08:2}
+\textbf{Expected calibration error (computational).} A detector reports the following twelve confidences, and ground truth states whether each detection was correct ($1$) or not ($0$):
+\begin{center}\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{l*{12}{c}}
+\toprule
+$p_i$ & $0.95$ & $0.92$ & $0.88$ & $0.85$ & $0.78$ & $0.72$ & $0.65$ & $0.58$ & $0.52$ & $0.45$ & $0.35$ & $0.22$ \\
+$y_i$ & $1$ & $1$ & $0$ & $1$ & $1$ & $0$ & $1$ & $0$ & $0$ & $0$ & $1$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+(a) Compute the expected calibration error with $M=5$ equal-width bins on $[0,1]$. (b) Compute the Brier score $\frac{1}{N}\sum_i(p_i-y_i)^2$ and the overall accuracy and mean confidence. (c) Is the detector over- or under-confident? Temperature scaling replaces $p_i$ by $\sigma(z_i/T)$ with $z_i=\log\frac{p_i}{1-p_i}$; state whether $T>1$ or $T<1$ is needed and verify numerically by finding the $T$ that minimises the negative log-likelihood, using the companion script \codeentry{P8.2} in \codeentry{P8}. (d) Comment on the reliability of an ECE estimate from twelve samples.
+\end{prob}
+
+\begin{prob}\label{prob:ch08:3}
+\textbf{Timestamp offset and the innovation test (computational).} A radar measures the range to a lead vehicle with standard deviation $\sigma=0.3$~m, and the measurement is fused in a filter whose innovation covariance is $S=\sigma^2$ (scalar measurement, negligible prediction uncertainty). The radar clock is offset by an unknown $\delta$ with respect to the fusion clock, so that each measurement is interpreted $\delta$ seconds late. The lead vehicle closes at relative speed $v=15$~m/s. (a) Show that the offset produces an innovation bias $b=v\delta$ and compute $b$ for $\delta=20$~ms and $\delta=50$~ms. (b) Show that the expected NIS \eqref{eq:nis} becomes $1+b^2/\sigma^2$ and evaluate it for both offsets. (c) The single-sample $95\%$ gate for $\chi^2_1$ is $3.84$: for which offset does the expected NIS exceed the gate? Compute the rejection probability for each offset. (d) A windowed test averages the NIS over $N=20$ samples and compares it with $\chi^2_{20,0.95}/20\approx1.57$: find the offset at which the expected window mean reaches the threshold, at $v=15$~m/s and at $v=2$~m/s. This is a mean-crossing value, not a guaranteed detection limit. Then find the offset giving $95\,\%$ detection probability for one complete independent window, using the non-central chi-square distribution. (e) Interpret the result for urban versus motorway driving and propose how $\delta$ could be estimated rather than merely detected. The script \codeentry{P8.3} in \codeentry{P8} simulates the scenario.
+\end{prob}
+
+\begin{prob}\label{prob:ch08:4}
+\textbf{Sim-to-real transfer protocol (design).} A camera--LiDAR detector with learned covariances has been trained entirely in simulation. Propose a protocol, using only unlabelled real recordings, to screen modality by modality for evidence that the detector or its uncertainty model has failed to transfer. State which transfer claims cannot be established without labels or an independent reference. Specify the statistics (for instance the NIS of the tracker fed by the detector, the conflict mass between the camera and LiDAR branches, and the temporal consistency of detections), the reference values expected if transfer were perfect, and accept/reject thresholds. Discuss what a small labelled subset would add.
+\end{prob}
+
+\begin{prob}\label{prob:ch08:5}
+\textbf{Cooperative perception message (discussion).} A roadside unit broadcasts object tracks to approaching vehicles. (a) List the minimal fields a message must carry for the receiver to apply covariance intersection \eqref{eq:ci-est}--\eqref{eq:ci-cov} and evidence discounting consistently. (b) Explain what goes wrong if the covariance is omitted and the receiver assumes a default one, and if the same track is received through two paths without provenance. (c) Propose how the receiver could estimate its trust in the sender from the consistency of past messages and how that trust should enter the fusion.
+\end{prob}
+
+\begin{prob}\label{prob:ch08:6}
+\textbf{A foundation model as an information source (discussion).} A multimodal language model labels rare objects in camera images with a free-text class and a self-reported confidence. Explain how its output can be mapped to a basic belief assignment on a frame of discernment, how a discount factor can be estimated from a held-out set, how the conflict mass $K$ with the explicit sensors should be interpreted, and where in the pipeline of Fig.~\ref{fig:hybrid-pipeline} such a source should be inserted so that it cannot override a consistent classical estimate.
+\end{prob}
+
+% ============================================

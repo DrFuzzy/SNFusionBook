@@ -46,6 +46,11 @@ def convert(path, out=None):
     with open(path, encoding="utf-8") as f:
         src = f.read()
     cells = []
+    # Match script semantics in a notebook opened from the script's own folder.
+    bootstrap = ["from pathlib import Path", "import sys",
+                 "__file__ = str(Path.cwd() / " + repr(os.path.basename(path)) + ")",
+                 "sys.argv = [__file__]  # remove Jupyter kernel command-line arguments"]
+    cells.append(make_cell("code", bootstrap))
     # module docstring -> markdown intro
     m = re.match(r'\s*(?:#![^\n]*\n)?\s*(?:from __future__[^\n]*\n)?\s*("""|\'\'\')(.*?)\1', src, re.S)
     if m:

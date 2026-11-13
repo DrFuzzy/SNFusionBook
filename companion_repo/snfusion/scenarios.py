@@ -59,7 +59,7 @@ def F_matrix(dt: float) -> Array:
 
 
 def Q_matrix(dt: float, sigma_a: float) -> Array:
-    """Discretised white-noise-acceleration process noise of the example."""
+    """Discrete, independent piecewise-constant acceleration model (sigma_a in m/s^2)."""
     return white_noise_acceleration_Q(dt, sigma_a, 2)
 
 
@@ -139,9 +139,13 @@ def nominal_run(seed: int = RNG_SEED) -> Tuple[Array, Array, Array, Array]:
     return ts, Xt, Z, err
 
 
-def initial_estimate(z0: Array, p0_vel: float = 10.0) -> Tuple[Array, Array]:
+def initial_estimate(z0: Array, p0_vel: float = 10.0,
+                     sig_r: float = SIG_R, sig_th: float = SIG_TH) -> Tuple[Array, Array]:
     """Track initiation from the first detection (velocity essentially unknown)."""
     r0, th0, _ = z0
     x0 = np.array([r0 * np.cos(th0), r0 * np.sin(th0), 0.0, 0.0])
-    P0 = np.diag([SIG_R ** 2, SIG_R ** 2, p0_vel ** 2, p0_vel ** 2])
+    J = np.array([[np.cos(th0), -r0 * np.sin(th0)],
+                  [np.sin(th0), r0 * np.cos(th0)]])
+    P0 = np.diag([0.0, 0.0, p0_vel ** 2, p0_vel ** 2])
+    P0[:2, :2] = J @ np.diag([sig_r ** 2, sig_th ** 2]) @ J.T
     return x0, P0

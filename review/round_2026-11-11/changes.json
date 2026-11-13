@@ -1,0 +1,368 @@
+[
+  {
+    "file": "frontmatter/preface.tex",
+    "before": "The companion source bundle contains the Python library, numerical examples, exercise scripts, and notebooks. Generated numerical data are also shipped with the manuscript so that the book can be compiled independently. Computational comparisons state their seeds, evaluation intervals, and noise conventions; real-data experiments identify their reference estimates and their limitations. Solutions to all 48 end-of-chapter problems in Chapters~\\ref{sec:classicalSF}--\\ref{sec:open-challenges} appear in the back matter. Design and discussion solutions illustrate defensible choices rather than prescribe a unique implementation.",
+    "after": "The \\href{https://github.com/DrFuzzy/SNFusionCompanion}{SNFusionCompanion repository} contains the code and notebooks. Numerical files used to draw the figures accompany the LaTeX sources, allowing compilation without running the programs. The code documents simulation settings, seeds, and evaluation procedures; real-data examples give dataset-access instructions and explain reference-measurement limitations. Short code references link to the ``Companion Code and Data'' guide, which lists script locations and commands.\n\nWorked solutions to all 48 problems in Chapters~\\ref{sec:classicalSF}--\\ref{sec:open-challenges} are collected in ``Solutions to the Problems'' at the end of the book. For design and discussion problems, the proposed solutions illustrate reasonable approaches; other approaches may also satisfy the requirements.",
+    "reason": "Clarify generated results versus external datasets, name the solutions section, explain open-ended answers, and identify the repository."
+  },
+  {
+    "file": "main.tex",
+    "before": "Companion Python code and notebooks are supplied in the \\repopath{companion\\_repo} folder of the accompanying source bundle.",
+    "after": "The companion repository is \\url{https://github.com/DrFuzzy/SNFusionCompanion}. Short code references link to the ``Companion Code and Data guide, which lists exact script locations and data-access instructions.",
+    "reason": "Provide the repository URL supplied by the authors."
+  },
+  {
+    "file": "main.tex",
+    "before": "\\newcommand{\\repopath}[1]{\\texttt{#1}}",
+    "after": "\\newcommand{\\repopath}[1]{\\texttt{#1}}\n% Short code identifiers link to the complete companion-code directory.\n\\DeclareRobustCommand{\\codeentry}[1]{\\hyperref[code:#1]{\\texttt{#1}}}\n",
+    "reason": "Use stable, short code identifiers in prose and captions."
+  },
+  {
+    "file": "chapters/ch03_classical_sensor_fusion.tex",
+    "before": "The script's \\texttt{--montecarlo} option exports \\repopath{output/ukf\\_rate\\_sweep.csv}.",
+    "after": "The script for this comparison is the UKF radar cut-in script, identified as \\codeentry{E3-UKF} in the companion-code guide. Its Monte Carlo option reproduces Table~\\ref{tab:ekf-ukf-rate} and saves the rate-sweep results as a CSV file; the command and output file are listed under \\codeentry{D3-UKF}.",
+    "reason": "Identify the script in a full sentence and move the exact command/output path to the code guide."
+  },
+  {
+    "file": "chapters/ch02_principles_and_components.tex",
+    "before": "\\includegraphics[width=0.85\\columnwidth]{figures/fusion_pipeline_v02.pdf}",
+    "after": "\\includegraphics[width=0.68\\columnwidth]{figures/fusion_pipeline_v02.pdf}",
+    "reason": "Reduce Figure 2.1 by 20 percent in both dimensions, preserving aspect ratio."
+  },
+  {
+    "file": "backmatter/author_biographies.tex",
+    "before": " (Senior Member, IEEE) received",
+    "after": " received",
+    "reason": "Remove IEEE membership designation from author biographies."
+  },
+  {
+    "file": "backmatter/author_biographies.tex",
+    "before": " (Senior Member, IEEE) received",
+    "after": " received",
+    "reason": "Remove IEEE membership designation from all author biographies."
+  },
+  {
+    "file": "backmatter/author_biographies.tex",
+    "before": "~(Senior Member, IEEE) received",
+    "after": " received",
+    "reason": "Remove IEEE membership designation from author biographies."
+  },
+  {
+    "file": "chapters/ch01_introduction.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak \\ldots}",
+    "after": "\\codeentry{Repository}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch03_classical_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak solutions/}",
+    "after": "\\codeentry{P3}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch03_classical_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch03/\\allowbreak }",
+    "after": "\\codeentry{P3}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch03_classical_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch03\\_mean\\_variance\\_gaussian/}",
+    "after": "\\codeentry{E3-GAUSS}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }",
+    "after": "\\codeentry{P4}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak }",
+    "after": "\\codeentry{P4}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss/}",
+    "after": "\\codeentry{E4-GNSS}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "after": "\\codeentry{Examples}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{ch04\\_\\allowbreak comma2k19\\_\\allowbreak learned\\_\\allowbreak gnss}",
+    "after": "\\codeentry{E4-GNSS}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "after": "\\codeentry{Examples}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{ch04\\_\\allowbreak hybrid\\_\\allowbreak hetero\\_\\allowbreak kf}",
+    "after": "\\codeentry{E4-HYBRID}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "after": "\\codeentry{Examples}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "\\repopath{ch04\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 1d}",
+    "after": "\\codeentry{E4-POSE}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch05_autonomous_driving_application.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }",
+    "after": "\\codeentry{P5}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch05_autonomous_driving_application.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak }",
+    "after": "\\codeentry{P5}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch05_autonomous_driving_application.tex",
+    "before": "\\repopath{ch05\\_\\allowbreak camera\\_\\allowbreak radar\\_\\allowbreak ci\\_\\allowbreak fusion}",
+    "after": "\\codeentry{E5-CI}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch05_autonomous_driving_application.tex",
+    "before": "\\repopath{ch05\\_\\allowbreak gnss\\_\\allowbreak imu\\_\\allowbreak odometry\\_\\allowbreak ekf}",
+    "after": "\\codeentry{E5-GNSS}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch05_autonomous_driving_application.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak }",
+    "after": "\\codeentry{Examples}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "after": "\\codeentry{P6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "after": "\\codeentry{P6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak }",
+    "after": "\\codeentry{P6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak resilient\\_\\allowbreak consensus/\\allowbreak }",
+    "after": "\\codeentry{E6-WMSR}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch06_multi_agent_sensor_fusion.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch06\\_\\allowbreak distributed\\_\\allowbreak tracking/\\allowbreak }",
+    "after": "\\codeentry{E6-TRACK}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }",
+    "after": "\\codeentry{P7}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak }",
+    "after": "\\codeentry{P7}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak cable\\_\\allowbreak das\\_\\allowbreak kf/\\allowbreak }",
+    "after": "\\codeentry{E7-CABLE}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak evidence\\_\\allowbreak mcdm/\\allowbreak }",
+    "after": "\\codeentry{E7-MCDM}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch07_applications_beyond_autonomous_vehicles.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples/\\allowbreak ch07\\_\\allowbreak ais\\_\\allowbreak innovation\\_\\allowbreak monitoring/\\allowbreak }",
+    "after": "\\codeentry{E7-AIS}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch08_open_challenges_and_future_directions.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "after": "\\codeentry{P8}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch08_open_challenges_and_future_directions.tex",
+    "before": "\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}",
+    "after": "\\codeentry{P8.3}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch08_open_challenges_and_future_directions.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "after": "\\codeentry{P8}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch08_open_challenges_and_future_directions.tex",
+    "before": "\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}",
+    "after": "\\codeentry{P8.2}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch09_concluding_remarks.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak chNN}",
+    "after": "\\codeentry{Exercises}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch09_concluding_remarks.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak examples}",
+    "after": "\\codeentry{Examples}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch03.tex",
+    "before": "\\repopath{exercises/\\allowbreak ch03/\\allowbreak solutions/\\allowbreak }",
+    "after": "\\codeentry{P3}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch03.tex",
+    "before": "\\repopath{ch03\\_\\allowbreak prob10\\_\\allowbreak ekf\\_\\allowbreak process\\_\\allowbreak noise.py}",
+    "after": "\\codeentry{P3.10}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch04.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak }",
+    "after": "\\codeentry{P4}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch04.tex",
+    "before": "\\repopath{prob9\\_\\allowbreak 10\\_\\allowbreak comma2k19.py}",
+    "after": "\\codeentry{P4.9-10}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch04.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob7\\_\\allowbreak pose\\_\\allowbreak graph\\_\\allowbreak 2d.py}",
+    "after": "\\codeentry{P4.7}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch04.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch04/\\allowbreak solutions/\\allowbreak prob6\\_\\allowbreak miscalibrated\\_\\allowbreak head.py}",
+    "after": "\\codeentry{P4.6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch05.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak ci\\_\\allowbreak sensitivity.py}",
+    "after": "\\codeentry{P5.6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch05.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch05/\\allowbreak solutions/\\allowbreak prob04\\_\\allowbreak gnss\\_\\allowbreak outage\\_\\allowbreak variants.py}",
+    "after": "\\codeentry{P5.4}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch06.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak wmsr\\_\\allowbreak path.py}",
+    "after": "\\codeentry{P6.7}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch06.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak packet\\_\\allowbreak loss.py}",
+    "after": "\\codeentry{P6.6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch06.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch06/\\allowbreak solutions/\\allowbreak prob05\\_\\allowbreak consensus\\_\\allowbreak rounds.py}",
+    "after": "\\codeentry{P6.5}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch07.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob07\\_\\allowbreak cable\\_\\allowbreak sweep.py}",
+    "after": "\\codeentry{P7.7}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch07.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch07/\\allowbreak solutions/\\allowbreak prob06\\_\\allowbreak spoof\\_\\allowbreak sweep.py}",
+    "after": "\\codeentry{P7.6}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch08.tex",
+    "before": "\\repopath{ch08\\_\\allowbreak p3\\_\\allowbreak timestamp\\_\\allowbreak offset.py}",
+    "after": "\\codeentry{P8.3}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch08.tex",
+    "before": "\\repopath{companion\\_\\allowbreak repo/\\allowbreak exercises/\\allowbreak ch08/\\allowbreak solutions/\\allowbreak }",
+    "after": "\\codeentry{P8}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "backmatter/solutions_ch08.tex",
+    "before": "\\repopath{ch08\\_\\allowbreak p2\\_\\allowbreak ece.py}",
+    "after": "\\codeentry{P8.2}",
+    "reason": "Replace long path with a linked entry in the companion-code guide."
+  },
+  {
+    "file": "chapters/ch01_introduction.tex",
+    "before": "whose paths are typeset as \\codeentry{Repository}.",
+    "after": "identified by short references such as \\codeentry{E3-UKF}. These references link to the ``Companion Code and Data guide, where the exact paths and data-access instructions are collected.",
+    "reason": "Explain the new code-reference convention instead of referring to printed paths."
+  },
+  {
+    "file": "main.tex",
+    "before": "\\include{backmatter/author_biographies}",
+    "after": "\\include{backmatter/author_biographies}\n\\include{backmatter/companion_code_guide}",
+    "reason": "Add a central guide containing exact paths and commands."
+  },
+  {
+    "file": "chapters/ch04_learning_based_and_hybrid_fusion.tex",
+    "before": "which also downloads the data (about $110$~MB).",
+    "after": "the accompanying downloader retrieves the data (about $110$~MB).",
+    "reason": "Clarify external-data download instructions."
+  }
+]

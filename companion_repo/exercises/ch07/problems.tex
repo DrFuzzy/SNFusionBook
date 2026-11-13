@@ -1,0 +1,22 @@
+% Authoritative excerpt from chapters/ch07_applications_beyond_autonomous_vehicles.tex; uses the book preamble.
+\begin{prob}\label{prob:ch07:1}
+Two sources report on the frame $\Omega=\{N,L,T\}$ of Example~\ref{ex:ch07-maritime-evidence}: an AIS cue $m_1(\{N\})=0.7$, $m_1(\Omega)=0.3$ and a radar cue $m_2(\{T\})=0.4$, $m_2(\{L,T\})=0.4$, $m_2(\Omega)=0.2$. Compute by hand the conflict $K$, the Dempster-combined BBA \eqref{eq:dempster}, $\mathrm{Bel}(T)$, $\mathrm{Pl}(T)$ and the pignistic probabilities \eqref{eq:pignistic-transform}. Then discount the AIS source with reliability $\alpha_1=0.5$ and repeat; comment on how the conflict and $\mathrm{BetP}(T)$ change.
+\end{prob}
+\begin{prob}\label{prob:ch07:2}
+A fused AIS--radar filter processes $n_y=4$ scalar innovation components per 10-s period. Derive the distribution of the sliding-window statistic \eqref{eq:ch07-window-nis} for $W=12$ under $\mathcal{H}_0$ and compute its one-sided $99\,\%$ threshold and its two-sided $99\,\%$ interval (use a $\chi^{2}$ table or the Wilson--Hilferty approximation $\chi^{2}_{\nu}(p)\approx\nu\bigl[1-\tfrac{2}{9\nu}+z_p\sqrt{\tfrac{2}{9\nu}}\bigr]^{3}$). If the window is advanced by one sample at a time, explain why the number of alarms per hour under $\mathcal{H}_0$ cannot be read directly from $\alpha$, and give an upper bound on the expected number of alarm \emph{samples} per hour.
+\end{prob}
+\begin{prob}\label{prob:ch07:3}
+Let a constant bias $\mathbf{b}$ affect otherwise independent Gaussian innovations of a sensor with innovation covariance $\mathbf{S}$. Show that the per-step NIS is non-central $\chi^{2}_{n_y}$ with non-centrality $\lambda=\mathbf{b}^{\mathsf T}\mathbf{S}^{-1}\mathbf{b}$ and that the windowed statistic is non-central $\chi^{2}_{Wn_y}$ with non-centrality $W\lambda$. For the radar of Example~\ref{ex:ch07-ais-innovation} ($\sqrt{S_{11}}=31.3$\,m, $n_y=2$, $W=12$), compute the mean of each statistic for a $50$-m bias and compare it with the respective $99\,\%$ thresholds; explain why the windowed test is the more sensitive one for a slow ramp.
+\end{prob}
+\begin{prob}\label{prob:ch07:4}
+Using the score matrix $\mathbf{Q}$ and the weights $\mathbf{w}$ of Example~\ref{ex:ch07-maritime-mcdm}, verify the four scores $S(a_i)$. Then find analytically the value of the proximity weight $w_1$ (rescaling the other weights proportionally) at which $a_3$ would overtake $a_1$, or show that no such value exists in $[0,1)$.
+\end{prob}
+\begin{prob}\label{prob:ch07:5}
+For the string of Section~\ref{subsec:cable-model} with $L=1000$\,m and $L_g=10$\,m, write the entries $g_{jn}$ of the slope row in \eqref{eq:ch07-strain-channel} for a channel centred at $x_j=250$\,m and $n=1,2,3,4$. Show that the channel is blind to mode $n=2$ and explain, using the small-gauge approximation $g_{jn}\approx\varphi_n'(x_j)$, which modes a channel at $x_j=500$\,m cannot observe. For the route of Example~\ref{ex:ch07-cable-das}, compute $\alpha_j$ at both positions and explain why, at rest, the channel at $500$\,m observes no mode at all to first order, and what changes when the cable is deformed. What does this imply for the choice of channel positions?
+\end{prob}
+\begin{prob}\label{prob:ch07:6}
+(Computational.) Starting from the script of Example~\ref{ex:ch07-ais-innovation}, vary the spoofing acceleration $a_s\in\{0.0005,0.001,0.002,0.004\}$\,m/s$^{2}$ and the window length $W\in\{6,12,24\}$ and tabulate, for each pair, the detection delay of the per-step and windowed tests and the AIS offset at detection. Then repeat the coloured-disturbance regime with $\phi\in\{0.5,0.7,0.85,0.95\}$ and report the fraction of Ljung--Box alarms. See \codeentry{P7}.
+\end{prob}
+\begin{prob}\label{prob:ch07:7}
+(Computational.) Starting from the script of Example~\ref{ex:ch07-cable-das}, move the load to $x_e\in\{195,390,512,805\}$\,m and to the centre of the gauge at $329$\,m; report the detection delay and the localisation error of the centroid \eqref{eq:ch07-residual-profile}, and explain the delay of the load centred on a gauge. Then remove the load and let the true coupling of the channels at $232$ and $329$\,m be half, and then twice, the value $0.78$ assumed by the filter; compare the alarm rate of the window test with the matched case, and describe how the residual profile distinguishes this coupling artefact from a mechanical event. See \codeentry{P7}.
+\end{prob}

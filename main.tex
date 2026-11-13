@@ -32,6 +32,9 @@
 \usepackage{newtxtext}
 \usepackage[varvw]{newtxmath}
 
+% ---------------------------------------------------------------- line breaking (avoids overfull lines without changing the text)
+\setlength{\emergencystretch}{5em}
+
 % ---------------------------------------------------------------- mathematics
 \usepackage{amsmath}
 \usepackage{bm}
@@ -89,17 +92,18 @@
 \newcommand{\pmark}{\textcolor{MarkerOrange}{\ding{108}}}
 \newcommand{\xmark}{\textcolor{red}{\ding{55}}}
 
-% ================================================================ REVISION MARKUP (October 2026 round)
+% ================================================================ REVISION MARKUP (November 2026 round)
 %  Blue  = text ADDED in this round          \added{...}      or  \begin{addedblock} ... \end{addedblock}
 %  Red   = text REMOVED in this round        \deleted{...}    or  \begin{deletedblock} ... \end{deletedblock}
-%  Everything in black is the accepted baseline (all previous revision rounds have been flattened).
+%  Everything in black is the accepted baseline (all previous revision rounds, up to the October 2026
+%  ones, have been flattened; their marked-up sources are in SN_book_20261108_round2_markup.zip).
 %
 %  To produce the clean camera-ready version, change \revisionmarkuptrue to \revisionmarkupfalse:
 %  added text becomes black, deleted text disappears.  (deletedblock environments must have
 %  \begin{deletedblock} and \end{deletedblock} on their own lines.)
 \usepackage{comment}
 \newif\ifrevisionmarkup
-\revisionmarkuptrue
+\revisionmarkupfalse   % all revision markup of the November 2026 round has been accepted in this copy
 \definecolor{RevisionBlue}{RGB}{0,0,255}
 \definecolor{RevisionRed}{RGB}{200,0,0}
 % Floats (figures, tables, algorithms) do not inherit the colour of the surrounding group, so the
@@ -125,6 +129,11 @@
 \newcommand{\problemsection}{\section*{Problems}\addcontentsline{toc}{section}{Problems}}
 % Pointer to the companion repository
 \newcommand{\repopath}[1]{\texttt{#1}}
+% Short code identifiers link to the complete companion-code directory.
+\DeclareRobustCommand{\codeentry}[1]{\hyperref[code:#1]{\texttt{#1}}}
+
+% URL of the companion repository, printed in a footnote at its first mention (Chapter 1). TO BE SET BY THE AUTHORS.
+\newcommand{\repourl}{The companion repository is \url{https://github.com/DrFuzzy/SNFusionCompanion}. Short code references link to the ``Companion Code and Data guide, which lists exact script locations and data-access instructions.}
 
 % ---------------------------------------------------------------- compact list used throughout the manuscript
 \newenvironment{list4a}{
@@ -153,6 +162,10 @@
 
 % DOI handling in the reference list
 \usepackage{doi}
+\usepackage{xurl}
+\hypersetup{hidelinks,
+  pdftitle={Towards a Unified View of Sensor Fusion},
+  pdfauthor={Kyriakos M. Deliparaschos; Gabriele Oliva; Themistoklis Charalambous}}
 
 \makeindex
 
@@ -175,7 +188,6 @@ Themistoklis Charalambous: Department of Electrical and Computer Engineering, Un
 
 % ================================================================ front matter
 \frontmatter
-\ifrevisionmarkup\include{frontmatter/revision_note}\fi
 % \include{frontmatter/dedication}   % empty
 % \include{frontmatter/foreword}     % empty
 \include{frontmatter/preface}
@@ -185,7 +197,7 @@ Themistoklis Charalambous: Department of Electrical and Computer Engineering, Un
 
 \setcounter{tocdepth}{2}
 \tableofcontents
-% \include{frontmatter/acronym}      % empty
+\include{frontmatter/acronym}      % list of acronyms (added November 2026)
 
 % ================================================================ main matter
 \mainmatter
@@ -204,9 +216,10 @@ Themistoklis Charalambous: Department of Electrical and Computer Engineering, Un
 \include{backmatter/solutions}
 
 \bibliographystyle{style/spmpsci}
-\bibliography{bib/references}
+\bibliography{bib/references,bib/additions_2026-11_ch01-04,bib/additions_2026-11_ch05,bib/additions_2026-11_ch07,bib/review_2026-11-10}
 
 \include{backmatter/author_biographies}
+\include{backmatter/companion_code_guide}
 % \include{backmatter/glossary}      % empty
 \printindex
 

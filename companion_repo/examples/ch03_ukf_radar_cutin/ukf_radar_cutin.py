@@ -24,14 +24,11 @@ Outputs
 sources): nominal and stressed lateral errors of both filters and the stressed
 position errors; columns ``t, ekf_ey_nom, ukf_ey_nom, ekf_ey_str, ukf_ey_str,
 ekf_ep_str, ukf_ep_str``.  ``output/ukf_radar_cutin.png`` is a preview.  The
-numbers quoted in the example (nominal/stressed RMSE and mean NIS, sigma-point
-weights) are printed.  The optional ``--montecarlo`` flag (100 runs per update
-rate, about a minute) re-runs the rate sweep of Table tab:ekf-ukf-rate with this
-script's scenario; it reproduces the 200-run statement of the text (EKF and UKF
-indistinguishable at 20 Hz, about 0.18 m) but, since the authors' Monte Carlo
-script and its exact settings are not part of the shipped sources, the row-wise
-values of the table are only approximate.
-
+numbers quoted in the example are printed. The optional --montecarlo flag runs
+100 paired realisations per update rate, seeds 1000..1099, and saves
+output/ukf_rate_sweep.csv. RMSE is the mean of per-run Euclidean position RMSEs
+on t >= 1 s; sigma_y is the mean predicted lateral standard deviation on the
+same samples. Both filters use the first detection only for initiation.
 Run:  python3 ukf_radar_cutin.py [--montecarlo]
 """
 
@@ -57,7 +54,7 @@ OUT.mkdir(exist_ok=True)
 from snfusion.kalman import ExtendedKalmanFilter, UnscentedKalmanFilter   # noqa: E402
 from snfusion.scenarios import (                                          # noqa: E402
     N, RNG_SEED, SIG_A, SIG_R, SIG_RD, SIG_TH, T,
-    F_matrix, H_jacobian, Q_matrix, h, simulate_measurements, truth)
+    F_matrix, H_jacobian, Q_matrix, h, simulate_measurements, truth, initial_estimate)
 
 ALPHA, BETA, KAPPA = 1.0, 2.0, 1.0
 
@@ -69,10 +66,14 @@ ALPHA, BETA, KAPPA = 1.0, 2.0, 1.0
 # authors' script.
 
 # %%
-def run(px0, py0, vx0, sig_th, p0_vel, seed, n_steps, cut=True, dt=T):
+def run(px0, py0, vx0, sig_th, p0_vel, seed, n_steps, cut=True, dt=T, continuous_q=None):
     """Simulate one scenario and filter it with both an EKF and a UKF."""
     rng = np.random.default_rng(seed)
     F, Q = F_matrix(dt), Q_matrix(dt, SIG_A)
+    if continuous_q is not None:
+        Q = continuous_q * np.array([[dt**3/3, 0, dt**2/2, 0],
+                                    [0, dt**3/3, 0, dt**2/2],
+                                    [dt**2/2, 0, dt, 0], [0, dt**2/2, 0, dt]])
     R = np.diag([SIG_R ** 2, sig_th ** 2, SIG_RD ** 2])
     ts = np.arange(n_steps + 1) * dt
 
@@ -92,18 +93,20 @@ def run(px0, py0, vx0, sig_th, p0_vel, seed, n_steps, cut=True, dt=T):
 
     out = {}
     for name, filt in (("EKF", ekf), ("UKF", ukf)):
-        r0, th0, _ = Z[0]
-        x = np.array([r0 * np.cos(th0), r0 * np.sin(th0), 0.0, 0.0])
-        P = np.diag([SIG_R ** 2, SIG_R ** 2, p0_vel ** 2, p0_vel ** 2])
-        est, nis = [], []
+        x, P = initial_estimate(Z[0], p0_vel, SIG_R, sig_th)
+        est, nis, sy_pred = [], [], []
         for k in range(len(ts)):
             if k > 0:
                 x, P = filt.predict(x, P)
-            upd = filt.update(x, P, Z[k])
-            x, P = upd.x, 0.5 * (upd.P + upd.P.T)
+                sy_pred.append(np.sqrt(P[1, 1]))
+                upd = filt.update(x, P, Z[k])
+                x, P = upd.x, 0.5 * (upd.P + upd.P.T)
+            if k == 0:
+                sy_pred.append(np.sqrt(P[1, 1]))
             est.append(x.copy())
-            nis.append(upd.nis)
+            nis.append(upd.nis if k > 0 else 0.0)  # no re-use of initiation detection
         out[name] = (np.array(est), np.array(nis))
+    run.last_sigma_y = np.asarray(sy_pred)  # same process model; final loop is UKF
     return ts, Xt, Z, out
 
 
@@ -181,17 +184,22 @@ MONTE_CARLO = "--montecarlo" in sys.argv
 if MONTE_CARLO:
     print("\nTable tab:ekf-ukf-rate: EKF vs UKF position RMSE as the update rate is reduced")
     print(f"{'rate':>8s} {'EKF RMSE [m]':>14s} {'UKF RMSE [m]':>14s}")
+    sweep_rows = []
     for rate in (20.0, 5.0, 1.0, 0.5):
         dt = 1.0 / rate
         n_steps = int(round(10.0 / dt))
-        e_ekf, e_ukf = [], []
+        e_ekf, e_ukf, sigma_y = [], [], []
         for run_id in range(100):
-            tsr, Xr, _, o = run(60.0, 3.5, -5.0, SIG_TH, 10.0, 1000 + run_id, n_steps, dt=dt)
+            tsr, Xr, _, o = run(60.0, 3.5, -5.0, SIG_TH, 10.0, 1000 + run_id, n_steps, dt=dt, continuous_q=SIG_A**2*T)
             m = tsr >= 1.0
+            sigma_y.append(np.mean(run.last_sigma_y[m]))
             for name, acc in (("EKF", e_ekf), ("UKF", e_ukf)):
                 E, _ = o[name]
                 acc.append(rms(np.hypot(E[m, 0] - Xr[m, 0], E[m, 1] - Xr[m, 1])))
-        print(f"{rate:6.1f} Hz {np.mean(e_ekf):14.3f} {np.mean(e_ukf):14.3f}")
+        sweep_rows.append([rate, np.mean(sigma_y), np.mean(e_ekf), np.mean(e_ukf)])
+        print(f"{rate:6.1f} Hz {np.mean(e_ekf):14.3f} {np.mean(e_ukf):14.3f} sigma_y={np.mean(sigma_y):.3f}")
+    np.savetxt(OUT / "ukf_rate_sweep.csv", sweep_rows, delimiter=",",
+               header="rate_hz,sigma_y,ekf_rmse,ukf_rmse", comments="", fmt="%.9f")
 
 # %% [markdown]
 # ## Preview figure

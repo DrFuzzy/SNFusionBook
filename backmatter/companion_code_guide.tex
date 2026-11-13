@@ -1,0 +1,182 @@
+\chapter*{Companion Code and Data}
+\markboth{Companion Code and Data}{Companion Code and Data}
+\addcontentsline{toc}{chapter}{Companion Code and Data}
+\phantomsection\label{sec:companion-code}
+The companion repository is \url{https://github.com/DrFuzzy/SNFusionCompanion}.
+The identifiers below are used throughout the text so that full file paths do not interrupt the explanation. Each identifier links to its entry in this guide. Paths are relative to the companion-code folder, supplied as \repopath{companion\_repo} with the book sources. Run the commands below from that folder; in a checkout containing only the companion code, this is the checkout root. Script names and paths identify the files supplied with this revision. The repository README gives installation and execution instructions.
+
+\section*{Repository and data access}
+\phantomsection\label{code:Repository}
+\textbf{Repository.} The URL above is the entry point for the code and supporting files.
+\phantomsection\label{code:Examples}
+\textbf{Examples.} Worked-example scripts are grouped by chapter in \repopath{examples/}.
+\phantomsection\label{code:Exercises}
+\textbf{Exercises.} Problems, solution scripts, and notebooks are grouped by chapter in \repopath{exercises/}; exact problem statements are supplied as \repopath{problems.tex}. Computational solutions are in each chapter's \repopath{solutions/} subfolder.
+
+The numerical files used by the book's figures are generated results, distinct from the original observations used in real-data experiments. Copies accompany the LaTeX sources in \repopath{data/} and \repopath{figures/}, allowing compilation without running Python. Worked-example programs write generated results to their local \repopath{output/} folders; the export tool copies the files needed by the book into its source tree.
+
+The comma2k19 driving observations are an external dataset, accessed at \url{https://huggingface.co/datasets/commaai/comma2k19} and described in \cite{schafer2018_comma2k19}. Download instructions are provided with \codeentry{E4-GNSS}; the raw-data cache is not part of the book's generated figure data. Run the downloader in that example's folder before the real-data script or Problems~\ref{prob:ch04:9}--\ref{prob:ch04:10}. The reference trajectory shares some GNSS observations with the evaluated measurements; it therefore supports reference-relative diagnostics, with the limitations stated in Chapter~\ref{sec:learning}.
+
+\section*{Worked-example scripts}
+
+\par\medskip\phantomsection\label{code:E3-GAUSS}
+\noindent\textbf{E3-GAUSS --- Measurement uncertainty}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak mean\_\allowbreak variance\_\allowbreak gaussian/\allowbreak mean\_\allowbreak variance\_\allowbreak gaussian.py}\par
+
+\par\medskip\phantomsection\label{code:E3-EKF}
+\noindent\textbf{E3-EKF --- EKF radar cut-in}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak ekf\_\allowbreak radar\_\allowbreak cutin/\allowbreak ekf\_\allowbreak radar\_\allowbreak cutin.py}\par
+
+\par\medskip\phantomsection\label{code:E3-UKF}
+\noindent\textbf{E3-UKF --- UKF radar cut-in and Monte Carlo rate sweep}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak ukf\_\allowbreak radar\_\allowbreak cutin/\allowbreak ukf\_\allowbreak radar\_\allowbreak cutin.py}\par
+
+\par\medskip\phantomsection\label{code:E3-ZONO}
+\noindent\textbf{E3-ZONO --- Zonotope radar cut-in}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak zonotope\_\allowbreak radar\_\allowbreak cutin/\allowbreak zono\_\allowbreak radar\_\allowbreak cutin.py}\par
+
+\par\medskip\phantomsection\label{code:E3-EVID}
+\noindent\textbf{E3-EVID --- Evidence fusion under occlusion}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak evidence\_\allowbreak occlusion/\allowbreak evidence\_\allowbreak occlusion.py}\par
+
+\par\medskip\phantomsection\label{code:E3-AHP}
+\noindent\textbf{E3-AHP --- Incomplete AHP}\par
+\noindent\repopath{examples/\allowbreak ch03\_\allowbreak incomplete\_\allowbreak ahp/\allowbreak incomplete\_\allowbreak ahp.py}\par
+
+\par\medskip\phantomsection\label{code:E4-HYBRID}
+\noindent\textbf{E4-HYBRID --- Learned uncertainty and Kalman tracking}\par
+\noindent\repopath{examples/\allowbreak ch04\_\allowbreak hybrid\_\allowbreak hetero\_\allowbreak kf/\allowbreak hybrid\_\allowbreak hetero\_\allowbreak kf.py}\par
+
+\par\medskip\phantomsection\label{code:E4-GNSS}
+\noindent\textbf{E4-GNSS --- Learned GNSS error model on comma2k19}\par
+\noindent\repopath{examples/\allowbreak ch04\_\allowbreak comma2k19\_\allowbreak learned\_\allowbreak gnss/\allowbreak comma2k19\_\allowbreak learned\_\allowbreak gnss.py}\par
+Download script: \repopath{examples/\allowbreak ch04\_\allowbreak comma2k19\_\allowbreak learned\_\allowbreak gnss/\allowbreak download\_\allowbreak comma2k19.py}.\par
+
+\par\medskip\phantomsection\label{code:E4-POSE}
+\noindent\textbf{E4-POSE --- One-dimensional pose graph}\par
+\noindent\repopath{examples/\allowbreak ch04\_\allowbreak pose\_\allowbreak graph\_\allowbreak 1d/\allowbreak pose\_\allowbreak graph\_\allowbreak 1d.py}\par
+
+\par\medskip\phantomsection\label{code:E5-CI}
+\noindent\textbf{E5-CI --- Camera--radar covariance intersection}\par
+\noindent\repopath{examples/\allowbreak ch05\_\allowbreak camera\_\allowbreak radar\_\allowbreak ci\_\allowbreak fusion/\allowbreak camera\_\allowbreak radar\_\allowbreak ci\_\allowbreak fusion.py}\par
+
+\par\medskip\phantomsection\label{code:E5-GNSS}
+\noindent\textbf{E5-GNSS --- GNSS--IMU--odometry localisation}\par
+\noindent\repopath{examples/\allowbreak ch05\_\allowbreak gnss\_\allowbreak imu\_\allowbreak odometry\_\allowbreak ekf/\allowbreak gnss\_\allowbreak imu\_\allowbreak odometry\_\allowbreak ekf.py}\par
+
+\par\medskip\phantomsection\label{code:E6-TRACK}
+\noindent\textbf{E6-TRACK --- Distributed tracking}\par
+\noindent\repopath{examples/\allowbreak ch06\_\allowbreak distributed\_\allowbreak tracking/\allowbreak distributed\_\allowbreak tracking.py}\par
+
+\par\medskip\phantomsection\label{code:E6-WMSR}
+\noindent\textbf{E6-WMSR --- Resilient consensus}\par
+\noindent\repopath{examples/\allowbreak ch06\_\allowbreak resilient\_\allowbreak consensus/\allowbreak resilient\_\allowbreak consensus.py}\par
+
+\par\medskip\phantomsection\label{code:E7-AIS}
+\noindent\textbf{E7-AIS --- AIS--radar innovation monitoring}\par
+\noindent\repopath{examples/\allowbreak ch07\_\allowbreak ais\_\allowbreak innovation\_\allowbreak monitoring/\allowbreak ais\_\allowbreak innovation\_\allowbreak monitoring.py}\par
+
+\par\medskip\phantomsection\label{code:E7-CABLE}
+\noindent\textbf{E7-CABLE --- Idealised cable strain benchmark}\par
+\noindent\repopath{examples/\allowbreak ch07\_\allowbreak cable\_\allowbreak das\_\allowbreak kf/\allowbreak cable\_\allowbreak das\_\allowbreak kf.py}\par
+
+\par\medskip\phantomsection\label{code:E7-MCDM}
+\noindent\textbf{E7-MCDM --- Maritime evidence and prioritisation}\par
+\noindent\repopath{examples/\allowbreak ch07\_\allowbreak evidence\_\allowbreak mcdm/\allowbreak evidence\_\allowbreak mcdm.py}\par
+
+\section*{Computational exercise scripts}
+
+\par\medskip\phantomsection\label{code:P3-HAND}
+\noindent\textbf{P3-HAND --- Chapter 3 hand computations}\par
+\noindent\repopath{exercises/\allowbreak ch03/\allowbreak solutions/\allowbreak ch03\_\allowbreak hand\_\allowbreak computations.py}\par
+
+\par\medskip\phantomsection\label{code:P3.10}
+\noindent\textbf{P3.10 --- Process noise and innovation consistency}\par
+\noindent\repopath{exercises/\allowbreak ch03/\allowbreak solutions/\allowbreak ch03\_\allowbreak prob10\_\allowbreak ekf\_\allowbreak process\_\allowbreak noise.py}\par
+
+\par\medskip\phantomsection\label{code:P4.6}
+\noindent\textbf{P4.6 --- Miscalibrated uncertainty head}\par
+\noindent\repopath{exercises/\allowbreak ch04/\allowbreak solutions/\allowbreak prob6\_\allowbreak miscalibrated\_\allowbreak head.py}\par
+
+\par\medskip\phantomsection\label{code:P4.7}
+\noindent\textbf{P4.7 --- Planar pose graph}\par
+\noindent\repopath{exercises/\allowbreak ch04/\allowbreak solutions/\allowbreak prob7\_\allowbreak pose\_\allowbreak graph\_\allowbreak 2d.py}\par
+
+\par\medskip\phantomsection\label{code:P4.9-10}
+\noindent\textbf{P4.9-10 --- GNSS calibration and temporal correlation}\par
+\noindent\repopath{exercises/\allowbreak ch04/\allowbreak solutions/\allowbreak prob9\_\allowbreak 10\_\allowbreak comma2k19.py}\par
+
+\par\medskip\phantomsection\label{code:P5.4}
+\noindent\textbf{P5.4 --- GNSS outage variants}\par
+\noindent\repopath{exercises/\allowbreak ch05/\allowbreak solutions/\allowbreak prob04\_\allowbreak gnss\_\allowbreak outage\_\allowbreak variants.py}\par
+
+\par\medskip\phantomsection\label{code:P5.6}
+\noindent\textbf{P5.6 --- Covariance-intersection sensitivity}\par
+\noindent\repopath{exercises/\allowbreak ch05/\allowbreak solutions/\allowbreak prob06\_\allowbreak ci\_\allowbreak sensitivity.py}\par
+
+\par\medskip\phantomsection\label{code:P6.5}
+\noindent\textbf{P6.5 --- Consensus rounds and topology}\par
+\noindent\repopath{exercises/\allowbreak ch06/\allowbreak solutions/\allowbreak prob05\_\allowbreak consensus\_\allowbreak rounds.py}\par
+
+\par\medskip\phantomsection\label{code:P6.6}
+\noindent\textbf{P6.6 --- Packet loss}\par
+\noindent\repopath{exercises/\allowbreak ch06/\allowbreak solutions/\allowbreak prob06\_\allowbreak packet\_\allowbreak loss.py}\par
+
+\par\medskip\phantomsection\label{code:P6.7}
+\noindent\textbf{P6.7 --- W-MSR graph robustness}\par
+\noindent\repopath{exercises/\allowbreak ch06/\allowbreak solutions/\allowbreak prob07\_\allowbreak wmsr\_\allowbreak path.py}\par
+
+\par\medskip\phantomsection\label{code:P7.6}
+\noindent\textbf{P7.6 --- AIS spoofing and window-length sweep}\par
+\noindent\repopath{exercises/\allowbreak ch07/\allowbreak solutions/\allowbreak prob06\_\allowbreak spoof\_\allowbreak sweep.py}\par
+
+\par\medskip\phantomsection\label{code:P7.7}
+\noindent\textbf{P7.7 --- Cable location and coupling sweep}\par
+\noindent\repopath{exercises/\allowbreak ch07/\allowbreak solutions/\allowbreak prob07\_\allowbreak cable\_\allowbreak sweep.py}\par
+
+\par\medskip\phantomsection\label{code:P8.2}
+\noindent\textbf{P8.2 --- Expected calibration error}\par
+\noindent\repopath{exercises/\allowbreak ch08/\allowbreak solutions/\allowbreak ch08\_\allowbreak p2\_\allowbreak ece.py}\par
+
+\par\medskip\phantomsection\label{code:P8.3}
+\noindent\textbf{P8.3 --- Timestamp offset and detection power}\par
+\noindent\repopath{exercises/\allowbreak ch08/\allowbreak solutions/\allowbreak ch08\_\allowbreak p3\_\allowbreak timestamp\_\allowbreak offset.py}\par
+
+\section*{Problem collections}
+
+\par\medskip\phantomsection\label{code:P3}
+\noindent\textbf{P3 --- Chapter 3 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch03/\allowbreak }\par
+
+\par\medskip\phantomsection\label{code:P4}
+\noindent\textbf{P4 --- Chapter 4 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch04/\allowbreak }\par
+
+\par\medskip\phantomsection\label{code:P5}
+\noindent\textbf{P5 --- Chapter 5 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch05/\allowbreak }\par
+
+\par\medskip\phantomsection\label{code:P6}
+\noindent\textbf{P6 --- Chapter 6 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch06/\allowbreak }\par
+
+\par\medskip\phantomsection\label{code:P7}
+\noindent\textbf{P7 --- Chapter 7 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch07/\allowbreak }\par
+
+\par\medskip\phantomsection\label{code:P8}
+\noindent\textbf{P8 --- Chapter 8 problems and computational solutions}\par
+\noindent\repopath{exercises/\allowbreak ch08/\allowbreak }\par
+
+\section*{UKF rate-sweep command and output}
+\phantomsection\label{code:D3-UKF}
+\textbf{D3-UKF.} From the companion-code folder, run:
+\begin{lstlisting}
+python3 examples/ch03_ukf_radar_cutin/ukf_radar_cutin.py --montecarlo
+\end{lstlisting}
+The command uses the paired seeds and noise convention specified in Example~\ref{ex:ukf-radar-cutin} and saves the rate-sweep table as
+\repopath{examples/\allowbreak ch03\_\allowbreak ukf\_\allowbreak radar\_\allowbreak cutin/\allowbreak output/\allowbreak ukf\_\allowbreak rate\_\allowbreak sweep.csv}.
+The values are generated numerical results, not an independently collected dataset.
+
+\section*{Notebooks and execution context}
+Scripts have matching Jupyter notebooks in the same folders. Open each notebook from its own folder so relative paths resolve correctly. Notebooks are supplied unexecuted; their script source records the settings and seeds used in the examples. The repository README identifies required packages and the public-data download step.

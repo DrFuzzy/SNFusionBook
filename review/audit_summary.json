@@ -1,0 +1,13 @@
+{
+  "cited": 255,
+  "active_entries": 282,
+  "reference_statuses": {
+    "verified-public-record": 251,
+    "author-confirmation": 1,
+    "catalogue-confirmed": 2,
+    "unpublished-not-verified": 1
+  },
+  "existing_cited_records_changed": 120,
+  "new_cited_records": 3,
+  "exercise_count": 48
+}
