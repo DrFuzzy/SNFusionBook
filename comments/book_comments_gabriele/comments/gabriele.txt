@@ -1,0 +1,227 @@
+Hi Themis! Here are my own comments on Chapters 4 to 8. I recorded them as voice notes while reading the printed book, so below they are transcribed and lightly cleaned up. Page numbers are those of the same version (10–11 Nov); where I refer to a passage I quote it so it's easy to find. I didn't check the exercises yet.
+
+*General remarks*
+
+- Chapter 4 reads more like the state of the art of a paper than a tutorial. Chapter 3 was very clear: toy examples, how to do things; you read it and you understand how to implement the methods. In Chapter 4 I often don't see what the reader is learning.
+- Throughout Chapter 4 we present particular cases (specific sensors, range and visibility, OctoMap, IMU preintegration) as if they were general methodologies. I would first give the general approach and then the application.
+- There is a lot of forward referencing throughout the chapters.
+- Some symbols are heavily overloaded (σ, K, k, F, α).
+- Chapter 5 is the natural place for all the autonomous-driving details that are now in Chapter 4. One way to restructure would be to move some of the Chapter 4 content there, and keep in Chapter 4 the generality of the methods and what is useful for the reader.
+- I would remove Chapter 7 altogether (see below).
+
+*Chapter 4*
+
+1) *p. 67, abstract*
+The abstract is basically a list of methodologies; perhaps we should rewrite it. There is first a sentence and then, in brackets, "concatenation, weighted sums, gating, cross-attention": it looks like we are saying the same thing twice. There are also citations in the abstract, which is maybe not a good idea.
+
+2) *p. 68, Sect. 4.1* – "end-to-end"
+I don't completely understand what end-to-end means here.
+
+3) *p. 68* – "— visibility, blockage, calibration residuals, expected noise level —"
+The long dashes should maybe become brackets.
+
+4) *p. 68* – "... weights and discounting factors used in the fuzzy and evidence-theoretic schemes of Chapter 3"
+There is no fuzzy in Chapter 3. This looks like a hallucination or something like that.
+
+5) *p. 69, Sect. 4.1.1* – "random forests are the usual choice for h"
+Maybe we can soften this a bit.
+
+6) *p. 69* – "When the weights of (4.1) are constant, the ensemble cannot react to context"
+I didn't understand.
+
+7) *p. 69* – "the experts are frozen"
+I didn't understand.
+
+8) *p. 69* – "fuzzy rule"
+Again fuzzy, but we are not speaking about fuzzy yet.
+
+9) *p. 69, Sect. 4.1.2* – discount α_i
+Not defined.
+
+10) *p. 69* – "Instead of hand-tuning membership functions"
+Again, is this about fuzzy? Fuzzy has not been introduced yet.
+
+11) *p. 69, eq. (4.3)*
+σ is used here for something else (the logistic function), which creates some confusion. To be honest I don't understand this subsection very well: β and so on, what are we doing here?
+
+12) *p. 70, after eq. (4.4)* – "P_rep is the variance reported under independent, effective noise ..." and "When the errors are biased ..."
+I don't understand this part.
+
+13) *p. 70, Example 4.1* – "later in the fuzzy example"
+I don't understand why we mention fuzzy so much.
+
+14) *p. 70, Sect. 4.1.3*
+Another σ, with something else in brackets. Is it the same as before or something else?
+
+15) *p. 71, end of Sect. 4.1.3* – "σ(q) = θ0 + θ1 r + θ2(1 − v) for range r and visibility v"
+I don't understand. It looks like we are presenting a particular case (range, visibility) as if it were a general methodology. This becomes more evident later in the chapter.
+
+16) *p. 71, Sect. 4.1.4* – "When the measurement function g(·) of Chapter 3 ..."
+I would remind the reader what it is.
+
+17) *p. 71* – "a residual with kernel k"
+I don't think the kernel has been defined. Later we have bold uppercase K_M, the kernel matrix; I don't know where it is defined.
+
+18) *p. 71* – the O(M³) cost
+I think the point is that (4.6) contains an inverse, and inverting an M×M matrix costs O(M³). But this is not clear from the text, and I don't completely understand why we are saying it.
+
+19) *p. 72, Sect. 4.1.5* – "Modern networks are typically over-confident [78]"
+I don't know if this is still true; we should check it.
+
+20) *p. 72* – "calibration is measured by binning"
+I don't understand what binning means here. Is it a figurative usage?
+
+21) *p. 72* – NIS and χ²
+This discussion is correct only if the model is correct; otherwise the NIS is not guaranteed to follow the χ² distribution. We need to check it.
+
+22) *p. 72, Sect. 4.2* – "Camera networks ..., LiDAR networks process point clouds or voxelised representations ..."
+This is an instance of what I said above: we are using particular cases from the autonomous-driving application, while so far the book has been general. We speak of particular sensors even before eq. (4.8) (camera, LiDAR), then again single-modality LiDAR detectors. This creates confusion and looks like the state of the art of a paper. Is the reader learning something from it?
+
+23) *p. 73, Algorithm 1*
+Is it of any use?
+
+24) *p. 74, Table 4.1*
+Again, it is something I would put in the state of the art of a paper to show the novelty of what we are doing. This is not the case here: by looking at it, I don't learn anything.
+
+25) *p. 75, Sect. 4.2.1, eq. (4.9)*
+Again σ, which is very overloaded as a symbol. I don't understand what we are doing here. Also the cross-attention formulas later in this subsection are not explained and look a bit out of the blue.
+
+26) *p. 77, Sect. 4.3* – "Bird's-Eye-View and Occupancy-Based Fusion"
+Is this at the level of the other categories of methods, or should it be a subsection of something else? It also suffers from the same problems as before. For instance, Sect. 4.3.1 (from image plane to ground plane) seems to consider a very particular case.
+
+27) *p. 79, Sect. 4.3.2* – "Probabilistic Occupancy Mapping"
+This looks more classical than technical: a lot of log-odds, and then OctoMap, which is something very particular, linked to a specific case.
+
+28) *p. 80, Sect. 4.3.3* – "Semantic Occupancy Networks"
+Very brief and descriptive. I don't see what the reader learns from it. The same for Sect. 4.3.4 (design trade-offs): very brief.
+
+29) *p. 84, Algorithm 3*
+What is the reader learning?
+
+30) *p. 84, Sect. 4.4.1* – "IMU Preintegration"
+This is a really particular application. I don't see it as a general methodology; it looks like something applied to a specific case.
+
+31) *p. 86, end of Example 4.3* – from "Since all information weights are equal, the normal equations ..." to the end of the subsection
+This part is not quite right and not explained in depth. We need to check it. (Point raised when I went through it with Claude: the halving of the uncertainty of the last pose would also be obtained by a filter, so it is not the advantage of smoothing; and with σ = 0.02 the χ² test would still not flag the loop closure.)
+
+32) *p. 86, Sect. 4.4.3* – "Between a full smoother and a plain EKF sits the ..."
+"Sits" used in a figurative sense: I don't like it, I would never use it.
+
+33) *p. 87, Sect. 4.5*
+As I said, we speak about specific things without first giving the general approach and then the application. The example rule "if camera visibility is low and radar confidence is high ..." is maybe fine, since here an example about cars makes sense.
+
+34) *p. 87, Sect. 4.5*
+Reliability-aware fusion is dealt with in one paragraph; perhaps too brief. Then there is a lot of fuzzy, and it is not clear what that first paragraph on reliability-aware fusion has to do with fuzzy.
+
+35) *p. 87–89, fuzzy*
+It could be useful to add a figure showing what a fuzzy set is. Fuzzy logic is easy to explain, but here it looks like we are just throwing equations around without explaining them. When we speak about inference we don't say what inference is, what we are doing, that there are two types and what the differences are. Sect. 4.5.1 only mentions Sugeno and Mamdani, but I don't see an application.
+
+36) *p. 90, Sect. 4.5.2* – "From Learned Reliability to Evidence Discounting"
+I don't understand what it is.
+
+37) *p. 90, Sect. 4.6* – "Many practical autonomous-driving systems combine ..."
+Here too we start from the autonomous-driving system, never from something general, and then we list examples.
+
+*Chapter 5*
+
+38) *p. 101, abstract*
+The first part is more or less fine, but from "Autonomous driving is a representative high-complexity ..." it looks more like an introduction than an abstract. I would end the abstract around "... with solutions and companion code".
+
+39) *p. 102–103, Sect. 5.1*
+LiDAR and IMUs are defined here, but they are used before. Are they redefined here, or did we use them in the previous chapters without defining them? Also V2X is not completely explained here.
+
+40) *p. 103, Table 5.1* – "Ultrasonic"
+Ultrasonic, or should it be ultrasound?
+
+41) *p. 105, Table 5.3*
+We need to double-check all these numbers (update rate, range, ...).
+
+42) *p. 104–105, Sect. 5.1.2*
+At some point the IMU placement is discussed, which I don't think needs to be there, and then there are many details on the IMU and the GNSS; I don't understand exactly why they are there.
+
+43) *p. 106, Fig. 5.2*
+Very small, to the point of not being readable, and I don't think it is completely explained.
+
+44) *p. 106, Sect. 5.2*
+The beginning seems a bit of a repetition of what we discussed before.
+
+45) *p. 107, Sect. 5.2.1*
+First of all SE(3) and SO(3): I'm not sure they have ever been defined before. I more or less understand the idea of spatial alignment, but I don't know if it makes sense to discuss it here. Later in the subsection K and F are used, but they are very overloaded symbols. We are mixing generic things with very detailed specific things, a few independent equations, and then generic things again.
+
+46) *p. 108, Sect. 5.2.2*
+The beginning is a bit unclear to me, and α in eq. (5.3) has certainly been used already. More generally for Sect. 5.2: how general is this material, and how much is a particular case? We need to understand whether it makes sense here.
+
+47) *p. 109, Sect. 5.3*
+We start again with very generic, discursive text: we interrupted the generic discussion with some equations, and here the generic discussion starts again. (The examples I still need to check.)
+
+48) *p. 115, Sect. 5.3.3* – Design Guidelines
+I think this subsection is nice. But in the second bullet, "transform them with the Jacobian": the Jacobian of what? Of the rotation, of the full transformation, of the translation?
+
+49) *p. 117, Sect. 5.4*
+I like the beginning, and the idea of the datasets, but maybe we need to check them. I should also check whether Table 5.5 is correct.
+
+50) *p. 118, Sect. 5.4.1* – metric definitions
+Important, but I start losing the thread with mATE, mASE, mAOE, mAVE, mAAE; they should be explained there.
+
+51) *p. 118, eq. (5.11)*
+Who decided that this is divided by 10 and mAP multiplied by 5? Is it an example or a general formula?
+
+52) *p. 118* – "Multi-object tracking adds identity"
+Looks a bit emphatic; I don't understand it. I'm also not completely following what comes after, MOTA and AMOTA.
+
+53) *p. 120, Sect. 5.5*
+Very generic. Not many citations at the beginning, while we speak about things that deserve a reference to the literature.
+
+54) *p. 121, Sect. 5.5.1, eq. (5.17)*
+A lot of τ with text subscripts; I don't understand exactly what it is.
+
+55) *p. 122, Sect. 5.5.2* – "Precision Time Protocol"
+I don't know what it is. Isn't it the Network Time Protocol (NTP), or is it a different thing?
+
+56) *p. 123–124, Sect. 5.5.3 and Fig. 5.5*
+I like the idea of determinism, but to be honest I don't understand why we present one particular architecture for cameras. What is the advantage for the reader of Fig. 5.5? I see a lot of details. Is the part about ROS Melodic and ptz_control useful for the reader? I don't think so.
+
+*Chapter 6*
+
+57) *p. 129, abstract*
+It looks a bit generated; perhaps we need to rewrite it by hand. Some things are repeated several times, like the idea that we use the same network throughout the chapter.
+
+58) *p. 130, Fig. 6.1 caption* – "The running network of the chapter."
+This is very AI-ish. "Running" here means that it is used throughout the chapter, but I don't like it at all.
+
+59) *p. 130, Sect. 6.1* – "Three questions determine which architecture is appropriate: ..."
+Do we want to put them in bullet points? By the way, this and many other sentences are very emphatic.
+
+60) *p. 131, Sect. 6.1.1* – "jointly connected"
+I don't think we defined it.
+
+61) *p. 132, Sect. 6.1.2*
+Very good; do we want to expand it a bit? Does it make sense to add a sentence saying that things are kept simple on purpose, to focus on the sensor-fusion aspects? We address mostly simple undirected consensus, and I'm not even sure it is clear that we are presenting consensus, because later the Kalman filtering is somehow based on consensus. I think we should explain it.
+
+62) *p. 135–136, Sect. 6.3.2* – Olfati-Saber; Battistelli and Chisci
+Olfati-Saber is very old (2004), and I guess Battistelli and Chisci is also quite old. I want to check more recent work.
+
+63) *p. 137, eq. (6.15)*
+This is one of the metrics we defined in Chapter 5 (NEES); I don't know if I would give it again.
+
+64) *Sect. 6.3, code references*
+Does it make sense to always give the path of the code in the text, and then the URL of the code at the end of the section?
+
+65) *p. 137–138, Fig. 6.2*
+Are we explaining enough why the naive approach performs so badly compared with the others?
+
+66) *p. 141–142, Sect. 6.5.2*
+Perhaps we need to verify what we say at the beginning. I don't completely understand "P_i + P_j − P_ij − P_ijᵀ". In the trust score τ_j(k+1) = ... there is a symbol I don't recognise, a sort of double bar (the indicator function?); it looks like a logic operator. And K appears again here; K is very overloaded.
+
+67) *Chapter 6, overall*
+This chapter is also quite brief, to be honest.
+
+*Chapter 7*
+
+68) Chapter 7 is mostly my doing, but now that I read it again there is too much about underwater cables. I'm still working on this, and this material is based on a paper that got a major revision, which I am revising right now. So I'm really not sure it provides much value: there are a lot of details, especially on the mechanics and the model of the cable, which is exactly what I'm revising in the journal paper. Since I'm only speaking here about this, maybe it really makes sense to get rid of this chapter altogether. What do you think?
+
+*Chapter 8*
+
+69) Chapter 8 is good; I don't have many comments. On some of these aspects I'm not an expert, so I'm not sure I can provide meaningful comments. One point: after reading it, I think the book really reads much better without Chapter 7. Removing Chapter 7 would also reduce the "attack surface" of the book, because we would get rid of many aspects that in my opinion are not yet established enough to end up in this book.
+
+Gabriele

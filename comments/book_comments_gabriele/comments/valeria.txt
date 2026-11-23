@@ -1,0 +1,96 @@
+Hi Themis! Valeria went through the PDF of the book and left comments. Below are her overall message, her general remarks and then each comment one by one, translated from Italian. Page numbers are those of the version she annotated (10 Nov); I quote the highlighted text so it's easy to find.
+
+*Her overall message*
+"Hiii, I've added a few comments, let me know if anything is unclear! My two main comments: (1) some figures have labels much smaller than the body text; if you can, I would enlarge them so that they reach the same font size as the text. (2) Content-wise I think the book is really nice, but in some places it still has a bit too much of the structure of a paper/survey. Minor things: (1) every now and then a word is in American English, e.g. 'organization'; (2) sometimes you write 'next section' when you mean the next chapter."
+
+*General remarks (on the title page)*
+
+- The title talks about a _unified view_, while the abstract, the introduction and the conclusions present the book mainly as a survey on autonomous driving. The message could be aligned a bit.
+
+- In some places it looks like a survey turned into a book (abstract with keywords, list of contributions, IEEE-style biographies); it may be worth adapting these to the book format.
+
+- The code is cited as "companion repo/...": it would make sense to give a public link to the repository (if you already plan to).
+
+- The chapters have rather different lengths (Chapter 2 is short, factor graphs take little space); you could consider rebalancing them.
+
+*Comments one by one*
+
+1) *p. 1, title page* – "Towards a Unified View of Sensor Fusion"
+Maybe break the title after "View of", so that "Sensor Fusion" stays on one line.
+
+2) *p. v, Preface* – "The companion source bundle contains the Python library, numerical examples, ..."
+Will the reader have the bundle? If possible, add a link (GitHub + Zenodo?).
+
+3) *p. vii, book abstract* – "This book presents a tutorial and survey of sensor fusion techniques for autonomous driving, ..."
+In a book the abstract and the keywords are probably not needed. Here you could give more room to the _unified view_ of the title.
+
+4) *p. 3, Chapter 1* – "The main contributions of this book are as follows:"
+This list feels a bit like a paper, and it comes back in the Preface, in Sect. 1.4 and in Chapter 9; maybe keep it in one place only.
+
+5) *p. 6, comparison table (row "This book")*
+If there are any, the table could also include some books, not only papers and surveys.
+
+6) *p. 7* – "The word unified in the title calls for a precise meaning, because the book does ..."
+This passage is very clear; I would bring it into the abstract as well.
+
+7) *p. 9, Sect. 1.4 heading* – "Organization of the book" (struck out)
+Maybe "Organisation", since the rest is in UK English.
+
+8) *p. 11, Chapter 2* – "Principles and Components of Sensor Fusion"
+The chapter is short and has no exercises; it could be merged with Chapter 1, or a few exercises could be added.
+
+9) *p. 14, Fig. 2.2* – "Representative application areas of sensor fusion"
+These look like AI-generated images; I don't know what Springer's policy on this is.
+
+10) *p. 16, Fig. 2.3* – "Representative outputs produced by sensor-fusion systems, ..."
+The labels in the figure are a bit small compared with the text; if possible I would enlarge them.
+
+11) *p. 16* – "... classical mathematical tools reviewed in the next section." ("section" struck out)
+Chapter?
+
+12) *p. 17, Sect. 3.1* – "Mathematical introduction to sensor fusion"
+The section is a bit long; to even out the sizes of the sections something could be summarised, but it is not necessary.
+
+13) *p. 48, Sect. 3.4 heading* – "Track-Level Fusion and Data Association"
+Highlighted, no comment.
+
+14) *p. 57, Sect. 3.6* – "Optimisation-Based Fusion and Factor Graphs"
+The factor-graph section is very short; maybe expand it a little (Sect. 4.4 says that the formulation is introduced here).
+
+15) *p. 57, Sect. 3.7* – "Fusion based on Multi-Criteria Decision-Making"
+AHP gets a bit more space than factor graphs; maybe rebalance.
+
+16) *p. 65, Table 3.2* – "The main objects of this book in the vocabulary of machine learning and computer science"
+Maybe move the table close to where it is first cited (same for Tables 3.3 and 5.5).
+
+17) *p. 67, Chapter 4* – "Learning-Based and Hybrid Sensor Fusion"
+SLAM, IMU preintegration, MSCKF and fuzzy methods are more classical; they might also fit in Chapter 3.
+
+18) *p. 102, Fig. 5.1 (sensor layout)*
+The labels are a bit small; I would try to give them the same font and size as the text.
+
+19) *p. 106, Fig. 5.2 (fusion pipeline)*
+Here too the text is a bit small; I would enlarge it if possible.
+
+20) *p. 123* – "A concrete example is the Multi-User Environment for Autonomous Vehicle Innovation (MUEAVI), ..."
+Maybe link this example a bit more to fusion, and possibly update the versions mentioned (ROS Melodic, YOLOv3).
+
+21) *p. 130* – "... information form of the Kalman filter of Section 3 applies directly ..." ("Section 3" struck out)
+Chapter 3?
+
+22) *p. 147* – "The two case studies in this section are deliberately chosen ..." ("section" struck out)
+Chapter? And a few lines below, maybe "book's" instead of "survey's" in "integrative worked examples of the survey's toolbox".
+
+23) *p. 179, Chapter 9* – "This book has presented a tutorial and survey of sensor fusion for autonomous driving ..."
+Maybe the conclusions could start from the _unified view_ of the title.
+
+24) *p. 203, References*
+If possible I would add some more recent work (2024-26) and make the DOI/URL formats uniform.
+
+25) *p. 210, ref. 142* – "Liggins, M.E.I., Hall, D.L., Llinas, J. (eds.): Handbook of Multisensor Data Fusion ..."
+Should be "Liggins II, M.E.".
+
+26) *p. 218, author biographies (G. Oliva)* – "Since 2022, he is an Associate Editor for the IEEE Control Systems Letters" ("is" struck out, no comment)
+Presumably "has been".
+
+Gabriele

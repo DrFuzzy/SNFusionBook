@@ -1,0 +1,245 @@
+% delk_comments.tex -- personal review notes on the book (main.tex + chapters/ + bib/), 22 Nov 2026.
+% Section numbers follow the current sources; [chNN:LLL] = source file and line, to find the spot quickly.
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\newcommand{\src}[1]{{\footnotesize\texttt{[#1]}}}
+\newcommand{\err}{\textbf{ERROR:}~}
+\newcommand{\key}[1]{\texttt{#1}}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1pt,topsep=2pt}
+\setlist[enumerate]{leftmargin=1.6em,itemsep=2pt,topsep=2pt}
+\title{Review notes (K.\,M.\,Deliparaschos) -- \emph{Towards a Unified View of Sensor Fusion}}
+\author{}
+\date{22 November 2026}
+\begin{document}
+\sloppy
+\maketitle
+
+\noindent\textbf{How to read.} Part~A lists the issues that affect the book as a whole. Part~B covers the bibliography. Part~C gives text-flow comments per chapter (order of paragraphs, what each section is for). Part~D gives detailed comments per chapter. \err marks a factual or numerical inconsistency.
+All worked numbers were recomputed (from the formulas or from the CSV files in \texttt{data/}); unless listed, they are correct.
+
+%=====================================================================
+\section*{A. Serious issues affecting the whole book}
+\begin{enumerate}
+\item \textbf{The ``unified view'' is promised but not delivered in the form promised.} \S1.3 \src{ch01:134} says that every method is presented through three ingredients (model, uncertainty description, combination rule) in Ch.~3, and that Table~9.1 ``collects the result''. Ch.~3 never presents the methods in that frame, and Table~9.1 is organised by \emph{task} (classical tool / learned component / interface), not by the three ingredients. A reviewer will notice. \emph{Fix:} close Ch.~3 with a short section and a table, one row per method (LS, WLS, MAP, KF/EKF/UKF, PF, zonotope, independent/CI track fusion, Dempster/TBM, AHP) and columns \emph{model / uncertainty / combination rule / output / consistency check}. Then reword \src{ch01:134} so that it points to that table and to Table~9.1 for the hybrid side.
+\item \textbf{Ch.~3 is about 30\,\% of the book} (179\,KB of source against 16\,KB for Ch.~2 and 14\,KB for Ch.~9). It has no chapter roadmap and no closing summary; the only ``concluding perspective'' (\S3.1.12) covers \S3.1 alone. Either split it into two chapters (``Estimation foundations: LS to Kalman/smoothing'' and ``Beyond Gaussian: sets, track fusion, evidence, MCDM''), or at least add an opening roadmap and a closing summary that bridges to Ch.~4.
+\item \textbf{The same material is presented two or three times with different symbols.} Data association/gating: \S3.2 and \S3.4.2. Time alignment: \S3.4.1 and \S5.2.2. Pinhole model: \S4.3.1 and \S5.2.1. ECE: \S4.1.5, \S5.4.1, \S8.3. mIoU: \S4.3.3 and \S5.4.1. NEES: \S5.4.1 and \S6.3.4. Factor graphs: \S3.6 and \S4.4. Embedded/FPGA paragraphs: \src{ch04:162, 301, 320--322, 387}, \S5.5.1, \S8.4. Scenario-based testing: \S5.4 and \S8.5. The fusion levels: \S2.1, \S4.2 (Table~4.2), \src{ch05:133}, \S6.1.2. Define each once and cross-reference afterwards.
+\item \textbf{Forward references make the early chapters depend on later ones:} \src{ch01:15} (Table~5.3), \src{ch02:30} (Table~4.2), Table~3.1 (symbols of Ch.~4--7), \src{ch04:670} (\S5.2.2), \src{ch04:680} (Ex.~5.1), \src{ch04:522} (\S8.8), \src{ch04:834} (Ch.~5). \emph{Concrete fix:} give Ch.~2 a short section ``Sensor models, frames and time'' (pinhole, $SE(3)$, timestamps and latency, lever arm), so that Ch.~3--5 can refer \emph{back}. This also gives the thin Ch.~2 a technical core.
+\item \textbf{Voice changes between chapters.} The book is announced as a ``tutorial and survey''. Ch.~3, Ch.~6 and Ch.~7 are tutorial (derivations and worked examples); \S4.2--4.3, \S5.3--5.5 and Ch.~8 are survey prose built on lists of systems. Say in the Preface how the chapters differ. Give each survey-style section a closing ``what to take away'' paragraph that ties it back to the frame of item~1.
+\item \textbf{IMM is used but never introduced} (Ex.~3.1 \src{ch03:1416} ``mentioned earlier in this subsection''; \src{ch07:41} ``recalled in Chapter~3''; \src{ch07:315}; Prob.~3.10(c)). Add one paragraph on IMM to \S3.2.
+\item \textbf{An unpublished manuscript underpins Ex.~7.4.} \key{oliva\_quadratic\_ejc\_2026} (``Manuscript under review'', no public copy) is cited seven times in \S7.2, including for results the reader cannot check: ``a perturbation analysis \ldots{} indicates that its remaining bias is of third order'' \src{ch07:302}, and ``all four detecting alike at rest'' \src{ch07:323}. Either wait for acceptance, put the needed derivation in the book, or remove these claims.
+\item \textbf{Running examples are a strength but are never announced:} the radar cut-in (Ex.~3.1--3.4, Prob.~3.4, 3.10), the dusk-fog range triple $41.8/42.6/43.1$\,m (Ex.~4.1, Ex.~4.4, Prob.~4.1--4.2) and the five-node network (Ch.~6). Announce them in the Preface or \S1.4. The cut-in could be reused in Ch.~4/5 (Ex.~4.5 introduces yet another scenario).
+\item \textbf{Notation} (in addition to $\sigma,K,F,\alpha$ noted by Gab): $\gamma$ is the gate threshold (\S3.2), gradient step (\S3.1.10), strip gain (Table~3.1), power-set element (\S3.5) and KCF gain (\S6.3.2). $\lambda$ is eigenvalue, strip gain, pinhole depth and non-centrality. $q$ is process noise, quality indicator, information vector (\S6.3.1) and modal coordinate (\S7.2.2). $L$ is Laplacian, consensus rounds, Ljung--Box lags and span length. $m$ is prior mean, BBA, map and voxel occupancy. $\omega$ is CI weight, hypotheses $\omega_i$, turn rate and gyro rate. $r$ is noise, range (\S4.1.3) and track existence (\S3.4.1). $c$ is strip normal, class, criterion and confidence. $\epsilon/\varepsilon$ is both the consensus step and the NEES. There are also inconsistent symbols for the same object: $d_x,d_y$ (\S3.1) vs.\ $n_x,n_y$ (\S3.2 on); \S3.3 rewrites the model with $\mathbf{w},\mathbf{v},\mathbf{h}$ and $k\!+\!1$ indexing; \S4.3.2/\S4.4 use $z$, $P(\cdot)$ and non-bold $x$; $\hat{}$ and $\widehat{}$ are mixed; the zonotope $p,H$ is non-bold and $H$ clashes with the Jacobian $\mathbf{H}$ (Ex.~3.4 uses both); rotation is $\boldsymbol{\mathcal R}$ \src{ch03:117}, $\mathbf{R}_i$ (\S4.4.1) and $\mathbf{R}_{VS}$ (\S5.2.1). Do one pass driven by Table~3.1, and move that table to the front matter as a book-wide symbol list.
+\end{enumerate}
+
+%=====================================================================
+\section*{B. Bibliography}
+\textbf{What was checked.} All 255 cited keys resolve to an entry in the bib files loaded by \texttt{main.tex}. There are no missing keys and no duplicate keys. All 201 DOIs resolve (Crossref/DataCite), and the publisher metadata matches the bib entry for title and first author in every case. The 54 entries without a DOI (books, NeurIPS/ICML/ICLR papers, standards, arXiv preprints) are correct as far as can be checked by hand. Author names used in the running text (``Khaleghi et al.'', ``LeBlanc et al.'', ``Battistelli and Chisci'', \ldots) agree with the cited entries. The benchmark figures of Table~4.1 (PointPillars to CRN) and the dataset figures of Table~5.5 agree with the original publications. \emph{The references stand}; the items below are fixes.
+\begin{itemize}
+\item \err \key{TANG2023109165}: the \texttt{doi} field contains \texttt{https://doi.org/10.1016/...}. \texttt{spmpsci.bst} wraps it in \verb|\doi{}|, which adds the prefix again and gives a broken link. Keep only the bare DOI.
+\item \key{shah\_airsim\_2017}: typed as a CoRR article but carries the Springer DOI of \emph{Field and Service Robotics} (SPAR~5, 2018). Make it \verb|@inproceedings| with the FSR booktitle, year~2018.
+\item \key{iso26262\_2018}: cites Part~1 (Vocabulary) for ``functional safety of electronic systems'' \src{ch08:101}; cite the ISO~26262:2018 series instead.
+\item \key{oliva\_quadratic\_ejc\_2026}: \verb|@unpublished|, under review (see A.7). The other recent self-citations (\key{oliva\_innovation\_2026}, \key{oliva\_tomei\_prm\_access\_2026}, \key{fioravanti\_cable\_med\_2026}) now have resolving DOIs, so update the text where it calls them ``recent''/``under review''. \key{modares2026reachability} and \key{narri2026\_hybrid\_zonotope\_awareness} are arXiv-only (2026); check before submission whether they have been published.
+\item \key{roy\_electreiii\_1978}: the accents are missing in the French title (\emph{fond\'e}, \emph{repr\'esentation}, \emph{pr\'ef\'erences}, \emph{crit\`eres}).
+\item Cited without the DOI that exists: \key{ren2005\_consensus} (IEEE TAC) and \key{nabati2021\_centerfusion} (WACV, IEEE Xplore). Add them for uniformity.
+\item 50 entries carry both \texttt{doi} and \texttt{url}, and the style prints both. For the published ones, drop the \texttt{url}.
+\item Key years that differ from the (correct) \texttt{year} field: \key{saha1998track} (1996), \key{guo\_deep\_2019} (2021), \key{feng2021\_probabilistic\_od} (2022), \key{deng\_edge\_2021} (2020), \key{baudouin\_cable\_pde\_2018} (2019), \key{ieee1588\_2019} (2020). \key{dong2023\_robobev} is by Xie, Kong et~al.\ (Dong et~al.\ 2023 is a different CVPR paper). These are cosmetic but confusing when editing; rename the keys.
+\item 27 uncited leftovers in \texttt{references.bib} from an older paper (fall detection, wearables, IoT, \ldots), including near-duplicates of cited works: \key{ester\_dbscan\_1996} vs.\ \key{ester1996\_dbscan}; \key{deliparaschos\_fpga\_2016} and \key{deliparaschos\_fpgabased\_2016} vs.\ \key{deliparaschos2016\_jee\_fpga}. Delete them. The files \texttt{bib/additions\_ch04..ch08.bib} are \emph{not} loaded by \texttt{main.tex}; delete them, or merge everything into one \texttt{references.bib} (see also \src{main.tex:219}).
+\item Claims whose citation should be re-read for support: \src{ch04:212} (``predicted covariances are often mis-scaled by a constant factor'', \key{feng2021\_probabilistic\_od}); \src{ch06:343} (``an $r$-robust graph is $r$-connected'', \key{leblanc2013\_wmsr}); \src{ch04:10} (\key{li2022\_gp\_zkf}, cited for a general statement about hybrid systems). Uncited claims that need a reference or softening: \src{ch04:21} (``train in minutes rather than days \ldots{} degrade more predictably''), \src{ch04:522} (``common industrial pattern''), \src{ch03:1360} (``representative of 77\,GHz radar''), \src{ch07:19} (X-band plot accuracy), \src{ch08:88} (``usual 100\,ms budget''). The dataset citations at \src{ch05:493} are bundled after ``BDD100K''. The standards ETSI~TS~103~324, TR~103~562, SAE~J2735 and J3224 \src{ch08:135} have no bib entries.
+\end{itemize}
+
+%=====================================================================
+\section*{C. Text flow and structure, per chapter}
+
+\subsection*{Chapter 1}
+\begin{itemize}
+\item \S1.1: the concrete camera/radar paragraph \src{ch01:15} comes before fusion is defined \src{ch01:17}, and the AD paragraph \src{ch01:28} repeats its sensor list. Order: definition $\to$ camera/radar example (absorbing \src{ch01:28}) $\to$ benefits $\to$ challenges.
+\item \S1.2 opens \src{ch01:34} by restating the last paragraph of \S1.1 (``motivates the need for a unified treatment''). Cut it. The audience paragraph \src{ch01:51} duplicates the Preface.
+\item \S1.3: the gap argument is spread over five paragraphs that each say ``gap'' (\src{ch01:117--132}), two of them one sentence long. Rewrite it as an enumerated list: G1 separation of communities, G2 shift to learned representations, G3 integration in a safety-critical real-time stack, G4 distributed/communication-aware fusion. Map each gap to the chapter that addresses it. Then the ``unified'' paragraph follows naturally (see A.1).
+\item \S1.3.1 \src{ch01:161}: one paragraph carries the definition of modality, two remarks and the notation convention. Split it into three.
+\end{itemize}
+
+\subsection*{Chapter 2}
+\begin{itemize}
+\item \S2.1: the taxonomy paragraph (Dasarathy, Durrant-Whyte, JDL, early/late) \src{ch02:30} interrupts the stage-by-stage walk-through between stage~4 and ``the final stages'' \src{ch02:33}. Move it after the OODA paragraph, or into its own section ``Taxonomies of fusion''.
+\item \S2.2: the two domain paragraphs \src{ch02:45, 47} are enumerations; the point of the section is the requirements paragraph \src{ch02:49}. Reduce the domains to one sentence plus Fig.~2.2.
+\item \S2.3: the component list repeats the pipeline stages of \S2.1 almost one to one. Turn it into a table \emph{stage $\to$ component $\to$ where in the book}, which gives the chapter a real roadmap function, and keep the outputs paragraph.
+\item The closing paragraph addressed to the reader \src{ch02:74} belongs in the Preface.
+\end{itemize}
+
+\subsection*{Chapter 3}
+\begin{itemize}
+\item The chapter opens with two full-page tables (notation, ML dictionary) before any content, and the dictionary uses concepts not yet introduced. Move the notation table to the front matter and the dictionary to the end of the chapter as a summary.
+\item \S3.1 has no in-text numerical example; everything is pushed to the problems. Prob.~3.1 (radar+camera WLS) would make an ideal Example at the end of \S3.1.7 and gives the toy example that Gab liked about this chapter.
+\item The dynamic model is introduced twice: \S3.1.11 (no input) and \S3.2 (with $\mathbf{u}$). Let \S3.1.11 hand over to \S3.2.
+\item \S3.2: the ego-localisation and object-tracking paragraphs \src{ch03:1244--1248} are application prose between the PF and data association; move them to Ch.~5 or condense them into an end remark. The summary paragraph \src{ch03:1305} comes \emph{before} ``Let us conclude this subsection with some examples''; put the summary after the examples.
+\item \S3.3: the probabilistic-zonotope paragraph \src{ch03:1780} (a research aside) sits between order reduction and the big Ex.~3.4. Move it to the end of the section, after the AD use cases.
+\item Suggested section order: LS $\to$ Bayesian filtering $\to$ smoothing/factor graphs (the batch counterpart; \S3.1.11 already wrote its cost) $\to$ set-membership $\to$ track-level fusion $\to$ evidence $\to$ MCDM. This gives a clean progression from probability to sets to beliefs to preferences, and keeps \S3.6 from being an orphan.
+\item \S3.4: track management (\S3.4.3) sits between association and the fusion rules; move it after \S3.4.6.
+\item \S3.7: ELECTRE III and DEMATEL \src{ch03:2395} are introduced before AHP is defined, and \src{ch03:2397} repeats the camera/LiDAR/radar contrast from Ch.~1/2. Move the other MCDM methods to the end of the section.
+\end{itemize}
+
+\subsection*{Chapter 4}
+\begin{itemize}
+\item There is no roadmap paragraph announcing \S4.1--4.6; add one after \src{ch04:10}.
+\item \S4.1: three patterns are announced \src{ch04:19}, but the mapping sentence \src{ch04:22} realises only two of them (``learning on fused features'' has no subsection), and \S4.1.4 (GP) does not fit the mapping. Update the roadmap sentence.
+\item \S4.2: a survey narrative (\src{ch04:123--129}), then Table~4.1, then the embedded-hardware paragraph \src{ch04:162}, and only then the operator taxonomy. Put the tutorial part first (\S4.2.1 operators, early/mid/late levels), so that the system narrative can use it (``TransFusion = cross-attention (4.x)''), followed by the table, then robustness.
+\item \S4.3.2: log-odds mapping is a binary Bayes filter and could sit in Ch.~3 as an example of \S3.2; \S4.3 would then keep the fusion of learned and probabilistic grids.
+\item \S4.4: five descriptive paragraphs and Algorithm~3 precede the first technical subsection. The filtering-vs-smoothing paragraph \src{ch04:383} is the framing of \S4.4.1--4.4.3 and should come right before them. Move the factor-graph equation to Ch.~3 (see Part~D).
+\item \S4.5: the order is definitions $\to$ rules $\to$ weighted fusion $\to$ example $\to$ explainable/neuro-fuzzy $\to$ Mamdani/Sugeno $\to$ discounting. Put Mamdani/Sugeno right after the rules, then a real inference example, then explainability, then discounting. Reliability is also treated in three separate places (\S4.1.2, \S4.1.3, \S4.5); consider one ``reliability'' section: logistic, fuzzy, heteroscedastic $\to$ discounting.
+\item \S4.6: good flow. Number the interfaces of Fig.~4.? (I1 learned $\mathbf{R}$, I2 conflict monitor, I3 set-membership check) and let \S4.6.1--4.6.3 refer to them. I3 is announced \src{ch04:520} but never exemplified; add a short example or drop it. Open \S4.6.2 with ``I1 on real data''.
+\end{itemize}
+
+\subsection*{Chapter 5}
+\begin{itemize}
+\item The intro \src{ch05:10} is a fourth description of the organisation; replace it with two sentences on what this chapter adds that Ch.~3--4 do not.
+\item \S5.1: three consecutive tables on the sensor suite (5.1, 5.2, 5.3). Merge the qualitative Table~5.1 into Table~5.3.
+\item \S5.2: the opener \src{ch05:122} and the levels paragraph \src{ch05:133} repeat \S2.1; cut them to a pointer.
+\item \S5.3: four descriptive task paragraphs \src{ch05:208--216} repeat Ch.~1/4. Trim them, and say upfront which tasks are worked here (localisation, tracking) and where the others are treated (perception \S4.2, occupancy \S4.3).
+\item \S5.4: the scenario-based testing paragraphs \src{ch05:598--600} sit after the metric definitions; move them to \S5.5 (validation), where they belong, and let \S8.5 refer to them.
+\item \S5.5: the first three paragraphs \src{ch05:604--608} are generic (ROS, Python/C++, PyTorch), and \src{ch05:608} lists the implementation patterns a third time. \S5.5.4 ``Links'' could become the chapter's closing summary.
+\end{itemize}
+
+\subsection*{Chapter 6}
+\begin{itemize}
+\item The best-structured chapter (objectives, running network, three examples). Remaining issues: the \S6.1/\S6.2 overlap (Part~D), and the abstract and intro repeating ``one question'' (Gab).
+\item \S6.4 is short and largely repeats \S3.4.6. Say upfront that only the multi-source form and split CI are new.
+\item \S6.6 packs packet loss, cooperative perception and validation into three dense paragraphs. Split them into subsections, and set the validation protocol \src{ch06:405} as a checklist; it is one of the most useful pieces of the chapter.
+\end{itemize}
+
+\subsection*{Chapter 7}
+\begin{itemize}
+\item Each lead-in paragraph sits \emph{before} the heading it introduces (\src{ch07:169--171, 200, 254, 305, 391}); move them (details in Part~D).
+\item \S7.1.1 (``Sources and Their Failure Modes'') contains two paragraphs on behaviour and trajectory features with the PRM \src{ch07:22, 24}; they belong to \S7.1.4.
+\item \S7.2: the literature/applications paragraphs \src{ch07:250--252} interrupt between the DAS measurement model and the cable model. Move them to the section intro, before \S7.2.1.
+\item The pattern stated in the closing paragraph \src{ch07:402} (KF + innovation tests $\to$ evidence $\to$ MCDM, same tools on different sensors) should also be announced briefly at the start, so the reader knows what is being demonstrated.
+\end{itemize}
+
+\subsection*{Chapter 8}
+\begin{itemize}
+\item The fixed template (problem, precise statement, tools of the book, gap, open questions) works well. The first paragraph of each section is old survey text that the ``Stated precisely'' paragraph then repeats; trim it.
+\item Tie each challenge to the evidence the book produced: \S8.2 to Ex.~5.2 (shared heading error); \S8.3 to \S4.6.2 (the NIS cannot see slowly varying common GNSS errors, the strongest real-data argument in the book); \S8.1 to Ex.~4.5 (fog).
+\end{itemize}
+
+\subsection*{Chapter 9}
+\begin{itemize}
+\item \src{ch09:12} restates the book abstract, \src{ch09:14} is one sentence, and \src{ch09:16} repeats the challenges of Ch.~1; the ``main lesson'' paragraph \src{ch09:19} is the real opening. Start there.
+\item ``How to Use This Book'' duplicates, and partly contradicts, the Preface reading routes (Preface: Ch.~6--7 for network readers; here: Ch.~6--8 for readers who know one tradition). Keep one, in the Preface.
+\item The final ``Future research'' paragraph \src{ch09:63} repeats Ch.~8; keep only its last sentence.
+\end{itemize}
+
+%=====================================================================
+\section*{D. Detailed comments}
+
+\subsection*{General}
+\begin{itemize}
+\item \textbf{Clean-up pass of the sources.} Remove the stale comments (``This chapter abstract has not yet been written'' in every chapter, \texttt{\% GAB:}, \texttt{\% [July/October 2026 pass]}, \texttt{\% Addressed\ldots}, \texttt{(blue block)}, the CYAN note \src{ch01:112}, the IEEE~Access remark \src{ch08:101}) and the commented-out paragraphs \src{ch01:128--130}, \src{ch03:449--465, 1021--1046, 1055, 1111, 1242, 1276, 1783}, \src{ch04:327--329}.
+\item \textbf{Acronyms.} They are re-defined in several chapters (GNSS, IMU, LiDAR, V2X, HD, GPS in \S4.4, \S4.6.2, \S5.1); define them once in Ch.~1 and in the list. Missing from the list: ANFIS, AR/VR, BBA, COG, CT, CV, DDS, ENU, GNN, HIL, IDS, JPDA, LLS, LQG, MHT, mIoU, MMSI, MOTP, OOSM, PDA, PRM, PTZ, SOG, UAV. ``Analytic Hierarchy Process'' is the only capitalised entry.
+\item \textbf{Section vs.\ chapter wording:} ``next subsection'' \src{ch03:1016}; ``this subsection'' \src{ch03:1307, 1788, 1842}; ``preceding subsections'' \src{ch03:1997}; ``introduced above / following sections'' \src{ch02:17}; ``next section'' \src{ch02:72}; ``this section'' and ``the survey's toolbox'' \src{ch07:11}. ``Section~\textbackslash ref\{sec:classicalSF\}'' prints ``Section~3'' for a chapter \src{ch06:43}. Unify ``Section'' vs.\ ``Sect.'' (Springer uses Sect.).
+\item \textbf{Headings:} capitalisation is inconsistent (``Mathematical introduction to sensor fusion'', ``Fusion based on Multi-Criteria\ldots'', ``Organization of the book''). ``Organization'' and ``characterized'' \src{ch03:1248} are US spelling in a British-spelled book.
+\item Tables~8.1 and 9.1 use booktabs (\verb|\toprule|), all others \verb|\hline|; pick one. Remove the full stop inside the brackets of the example titles (Ex.~3.5, 3.6, 7.1--7.5).
+\item ``autonomous driving vehicles'' (book abstract, \src{ch01:36}, \src{ch09:12, 63}) $\to$ ``autonomous vehicles''.
+\end{itemize}
+
+\subsection*{main.tex and front matter}
+\begin{itemize}
+\item \err \verb|\repourl| \src{main.tex:136}: \verb|``Companion Code and Data guide,| has no closing quotes; the same bug is at \src{ch01:166}. The comment ``TO BE SET BY THE AUTHORS'' is obsolete.
+\item \src{main.tex:177}: stray comma in ``Department of Electrical Engineering, and Computer Science and Engineering''; check the official name.
+\item The book abstract and the Preface describe Ch.~7 differently (``cable deformation'' vs.\ ``submarine-cable monitoring''). There is a stale comment in \texttt{book\_abstract.tex} lines~1--2.
+\end{itemize}
+
+\subsection*{Chapter 1}
+\begin{itemize}
+\item Abstract: the contributions are ``summarised in three groups'', but \S1.2 is a flat list of eleven bullets. Group the bullets, or change the abstract.
+\item \S1.2, ``Connection between theory and implementation'': this bullet lists a worked \emph{camera--LiDAR feature-level fusion} example, but none exists. ``Review of classical fusion techniques'' promises optimisation-based methods, but \S3.6 has three paragraphs and no equation.
+\item \S1.3: merge the one-sentence paragraphs \src{ch01:121, 126}. Table~1.1 needs two or three 2024--2025 AD/BEV-fusion surveys; justify ``partial'' for ``This book'' on implementation.
+\item \src{ch01:166}: ``a dedicated section at the end'' $\to$ the back-matter chapter ``Solutions to the Problems''.
+\end{itemize}
+
+\subsection*{Chapter 2}
+\begin{itemize}
+\item Delete the GAB comments \src{ch02:6--8}. The abstract (``never a bare point estimate but always\ldots'') overstates \src{ch02:72}. In \src{ch02:52}, ``therefore'' has no antecedent. The abstract says ``extended reality'', the text AR/VR. Fuzzy is listed as a fusion mechanism \src{ch02:28, 57}; add a pointer to \S4.5.
+\end{itemize}
+
+\subsection*{Chapter 3}
+\begin{itemize}
+\item \S3.1.1 \src{ch03:117}: the camera equation has no left-hand side ($y_n=$ missing).
+\item \S3.1.2 \src{ch03:136}: ``off-diagonal entries represent correlations'' $\to$ covariances.
+\item \S3.1.7 \src{ch03:448}: plain \verb|$$...$$| inside a sentence. \S3.1.8: $\mathbf{P}^{+}$ is not introduced. \S3.1.9 \src{ch03:895}: ``discussed later'' $\to$ (Sect.~3.2).
+\item \S3.2 has no subsections in 530 source lines; split it. The gating text \src{ch03:1250--1272} duplicates \S3.4.2.
+\item \S3.2 \src{ch03:1239}: the PF cost is linear in $N_p$; it is the number of particles \emph{needed} that grows quickly with dimension.
+\item Ex.~3.1 \src{ch03:1376}: the Jacobian is \emph{undefined}, not singular, at $d=0$. The CSV detail \src{ch03:1381} belongs in the companion guide. $J_0$ should be bold.
+\item \err Ex.~3.1 \src{ch03:1399--1401}: mean NIS $2.54$ and $98.8\,\%$ are reproduced from \texttt{ekf\_radar\_cutin.csv} only for $1\le t<5$\,s. With $8$--$10$\,s included (``constant-velocity segments'', as in Prob.~3.10) they become $2.98$ and $95.8\,\%$. State the window, or update the numbers.
+\item Ex.~3.1: $\sigma_\theta=0.5^\circ$ is called ``representative of 77\,GHz radar'', while Table~5.3 gives $1$--$5^\circ$ and Ex.~5.2 uses $1.5^\circ$. Harmonise.
+\item Ex.~3.2 \src{ch03:1567}: run-on sentence; $\mathbf{P}_{zz}$ is not defined (the book uses $\mathbf{S}$).
+\item \S3.3 \src{ch03:1614}: the line starts with ``, in contrast'', which prints a space before the comma.
+\item Table~3.1 calls the strip gain $\gamma$, the text $\lambda_{i,k}$, Ex.~3.3 ``$\gamma=c$'', and Prob.~3.6(c) needs an explanation. Use one symbol.
+\item Ex.~3.3 \src{ch03:1755}: ``a zonotope cannot represent the slanted cut that the strip actually makes''. The strip is horizontal; what is lost are the slanted \emph{edges of the prediction} inside it. Show the optimal gain $\lambda^\star=(0.574,\,0.896)^{\mathsf T}$ next to the unexplained choice $\gamma=c$.
+\item \err Ex.~3.4 \src{ch03:1844--1846} and the Fig.~3.6 caption \src{ch03:1943--1945} say the band is ``never violated'' outside the lane change. From \texttt{zono\_radar\_cutin.csv}: 18 of the 23 breaches are in $[5,8]$\,s, and 5 are at $t=8.1$--$8.5$\,s, after the manoeuvre. Rephrase.
+\item Ex.~3.4 \src{ch03:1853}: ``the EKF's $6\sigma$ band'' $\to$ $\pm3\sigma$. Merge the 4$\sigma$ disclaimer \src{ch03:1835} into the following sentence.
+\item \S3.4 is the only method section without a worked example; Prob.~3.8(b) already has the numbers for a 2$\times$2 CI example.
+\item \S3.4.1 \src{ch03:2010}: $r_{i,k}$ (existence) and $c_{i,k}$ (class) are both taken symbols. \S3.4.2: GNN/PDA/JPDA/MHT are measurement-to-track methods (the JPDA equation uses $\boldsymbol\nu_{ij}$). $\beta_{i0}$ is the probability that none of the gated candidates is correct.
+\item \S3.5 \src{ch03:2256}: $\Gamma(\Omega)$ with elements $\gamma_a$ $\to$ $2^\Omega$ with $A,B,C$. The hypotheses $\omega_i$ clash with the CI weight $\omega$.
+\item \S3.6: no equation, yet Table~3.2 and \src{ch04:359} point here. Move eq.~(factor\_graph) of \S4.4 here and link it to the batch cost of \S3.1.11.
+\item \S3.7 notation: $r$, $g$, $u$, $x_i$, $y_i$ clash with the core notation; rename them. \src{ch03:2477, 2483}: the weight-to-discount conversion appears only in \S4.5.2; give it here and close the loop with Ex.~3.5 (camera $\alpha\approx0.21$).
+\item Prob.~3.8(a): state $\omega\in(0,1)$.
+\end{itemize}
+
+\subsection*{Chapter 4}
+\begin{itemize}
+\item Stale comments \src{ch04:5--6, 91--93, 161, 435, 513}. ``Early, mid, and late fusion'' is the only \verb|\subsubsection*| in the book; make it a numbered subsection.
+\item \S4.3.1 \src{ch04:226}: the ``ego frame'' has $Y$ down and $Z$ forward; Ex.~3.1/5.2 use $x$ forward and $y$ left. Say ``camera frame''.
+\item \S4.3.3 \src{ch04:316}: typo ``\ldots camera-only methods [..], These mIoU values''. The ``dominated by large classes'' sentence does not match its example.
+\item \S4.4 \src{ch04:359}: residual $\mathbf{r}_i$ $\to$ $\mathbf{e}_i$ (\S3.1.6). \S4.4.1 \src{ch04:405}: garbled last sentences (``and \emph{it} is what makes\ldots'').
+\item Ex.~4.4 (fuzzy) \src{ch04:480}: $\mu(q)=q$ and weights $\propto\mu$, so there is no rule base and no inference. \S4.5.1 has no numbers. Replace it with a 2--3-rule Sugeno/Mamdani example plus a membership plot.
+\item Ex.~4.5 \src{ch04:572}: ``discards good detections'' $\to$ under-weights.
+\item \src{ch04:520}: ``the evidence-theory subsection'' $\to$ Sect.~3.5. \src{ch04:666}: comma splice.
+\item \S4.6.2 \src{ch04:682, 697}: the learned kernel gives $6.55/6.10/5.30$\,m$^2$ at lags $0/30/120$\,s, against the empirical $6.11/5.35/3.94$; it over-predicts the long-lag covariance by about $35\,\%$. Comment on it. Say that ``$0.134$ vs.\ $0.182$ nats'' are NLLs (lower is better) and which model is which.
+\item \S4.6.2 Step~5 \src{ch04:708}: it is the RAV4, not ``the kernel'', that sees twice as many satellites.
+\item \S4.6.3 \src{ch04:823}: ``brings the conflict back to $0.233$'' is still above the clear-weather $0.148$; say ``reduces''. $c_i$ (confidence) clashes with class $c$.
+\item \S4.6.4 \src{ch04:830}: ``an uncalibrated covariance is worse than a fixed one'' is too absolute.
+\end{itemize}
+
+\subsection*{Chapter 5}
+\begin{itemize}
+\item Ex.~5.1 \src{ch05:241}: rename the input Jacobian $\mathbf{G}_k$ (e.g.\ $\boldsymbol\Gamma_k$) rather than warning the reader about it. State $\sigma_\psi,\sigma_b,\sigma_s$ of the five-state filter.
+\item Ex.~5.2, Fig.~5.4 \src{ch05:468}: delete the empty \verb|\node{}|.
+\item \S5.4 \src{ch05:493, 495}: \textbf{ApolloScape} and \textbf{View-of-Delft} appear in the text but not in Table~5.5 (nor in ``radar is recorded only by\ldots''). Add them or drop them. Cite each dataset after its name.
+\item Table~5.5: ``lidar'' $\to$ LiDAR. \S5.4.1: the NEES symbol $\epsilon_k$ clashes with the consensus step.
+\item \S5.5 (our own material): \key{deliparaschos2016\_jee\_fpga} is cited four times; MUEAVI takes three paragraphs plus Fig.~5.5 on PTZ control, which is not fusion. Shorten it to one paragraph and drop or justify the figure. YOLOv3 looks dated.
+\end{itemize}
+
+\subsection*{Chapter 6}
+\begin{itemize}
+\item Structure: \S6.1.1 introduces consensus (with Ex.~6.1) and \S6.2 does it again; the \S6.1.2 title nearly repeats \S6.1. Make \S6.1 architectures + exchange levels, and \S6.2 graphs + consensus (absorbing \S6.1.1).
+\item $L$ (rounds) vs.\ the Laplacian $\mathbf{L}$; $\mathbf{q}$ as information vector; $\mathbf{u}_i,\mathbf{U}_i$ in the KCF.
+\item \S6.5.2 \src{ch06:396}: two unrelated clauses joined by ``and''; $P_i+P_j-P_{ij}-P_{ij}^{\mathsf T}$ is non-bold; the trust score reuses $\alpha$ and $\tau$.
+\item Checked OK: spectrum, $\rho$, rounds $9/8/38$, SLEM $0.6545$, Ex.~6.1, the first W-MSR step, message sizes $18/14$.
+\end{itemize}
+
+\subsection*{Chapter 7}
+\begin{itemize}
+\item Lead-in paragraphs placed before their headings: \src{ch07:169--171} (before \S7.1.5; \src{ch07:169} also repeats \S7.1.3 and can go), \src{ch07:200} (\S7.1.6), \src{ch07:254} (\S7.2.2), \src{ch07:305} (\S7.2.3), \src{ch07:391} (\S7.2.4).
+\item \err Ex.~7.1 \src{ch07:66}: the text says ``$1\,\%$ in each tail ($2\,\%$ total)'', but the quoted $\chi^2_{24}$ interval $[9.89,\,45.56]$ is the $0.5/99.5\,\%$ interval. The $1/99\,\%$ interval is $[10.86,\,42.98]$. Fix the text, or the numbers and the Fig.~7.1c band.
+\item Ex.~7.2: say that the operator's ``conflict of $0.68$'' is the cumulative Smets empty-set mass (step-wise $K$: $0.42$, $0.272$, $0.241$). Ex.~7.5: ``pairwise'' $\to$ sequential conflicts.
+\item \S7.2.1 \src{ch07:247}: the strain-rate digression uses $\alpha_j$, $s_j$ before they are defined; move it after eq.~(ch07-strain-channel) or into a footnote. \S7.2.2: local notation ($q_n$, $\rho$, $\boldsymbol\Omega$, $\alpha_j$, $h(\cdot)$, $\mathbf{g}_j$, $\beta$).
+\item \src{ch07:388}: ``Like the benchmark of [..], is idealised'' $\to$ ``\ldots, it is idealised''.
+\item Checked OK: AHP eigenvector, CI/CR and scores (Ex.~7.3); evidence combinations (Ex.~7.2, 7.5); cable parameters (Ex.~7.4).
+\end{itemize}
+
+\subsection*{Chapter 8}
+\begin{itemize}
+\item Promote \S8.8.1 (research agenda, covering all eight challenges) to \S8.9.
+\item \src{ch08:88}: ``end-to-end budget of roughly 100\,ms'' contradicts \S5.5.1 (end-to-end $=300$--$500$\,ms); write ``perception-and-fusion budget''.
+\item \src{ch08:101}: awkward ``applicability depends on the system and these standards are not\ldots:''. The trailing comment is wrong now.
+\end{itemize}
+
+\subsection*{Chapter 9}
+\begin{itemize}
+\item Use \verb|\section*| instead of \verb|\subsection*| directly under \verb|\chapter|. Stale comments \src{ch09:6--8, 18, 25}.
+\item Table~9.1, anomaly row: ``fuzzy rules'' are not used in Ch.~7. \src{ch09:57}: ``in these chapters'' $\to$ ``in this chapter''.
+\end{itemize}
+
+\end{document}

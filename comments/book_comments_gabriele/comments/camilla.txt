@@ -1,0 +1,196 @@
+Hi Themis! Camilla also went through the PDF of the book and left comments directly on it. She did not write an overall message, so below are her comments one by one, translated from Italian. Page numbers are those of the version she annotated (10 Nov, the same one Valeria used); I quote the highlighted text so it's easy to find. Her comments stop at p. 140 (Chapter 6).
+
+*Recurring points*
+
+- Several passages read like a paper rather than a book (chapter abstracts, "Scope & Contributions", the organisation of the book described twice).
+- In Chapter 4 the subsections are short and self-contained: she often cannot see why a method is presented, what it is for, how it connects to the previous subsection and to autonomous driving.
+- Some claims rest on a single reference or on none.
+- The generic algorithms (Algorithms 1, 2, 3) are lists of sentences and add little.
+- Sentences built as "vague statement: explanation" sound chat-like; she would remove them as far as possible.
+
+*Comments one by one*
+
+1) *p. ix, Acknowledgements* – "The authors gratefully acknowledge the colleagues and collaborators whose discussions and feedback contributed to the development of this monograph."
+Are you leaving it like this? It seems a bit too vague.
+
+2) *p. 1, Chapter 1 abstract* – "This chapter motivates the book and defines its scope. ..."
+Is this standard in a book? It looks very much like a paper, and so does the section after it, "Motivation".
+
+3) *p. 3, Sect. 1.2 heading* – "Scope & Contributions"
+I'm not sure I would call this "contributions" either.
+
+4) *p. 6, Table 1.1* – "Qualitative comparison of related sensor-fusion surveys and reference works."
+I'm not keen on the look of this table.
+
+5) *p. 7* – "ingredients:"
+Steps? (She also highlights the later "ingredient", without comment.)
+
+6) *p. 7* – "The title says towards because several connections, for instance between learned representations and calibrated uncertainty, are still open (Chapter 8)."
+I don't like this sentence.
+
+7) *p. 8* – "The problem studied in this book is old,"
+I'm not keen on this.
+
+8) *p. 8* – "Table 1.2 aligns the vocabularies that a reader is most likely to meet."
+This is already said a little earlier.
+
+9) *p. 8* – "First, in estimation theory a multimodal distribution is a probability density with several peaks; in this book the adjective always refers to modalities of data. Second, the fusion levels of the information-fusion literature ..."
+I don't really understand why this description is placed in this section on terminology.
+
+10) *p. 9, Sect. 1.4* – "Organization of the book. The remainder of the book is organised as follows. ..."
+The organisation of the chapters is also described earlier anyway.
+
+11) *p. 11, Chapter 2* – "Principles and Components of Sensor Fusion Systems"
+This chapter is really very short.
+
+12) *p. 12, Fig. 2.1* – "A typical sensor fusion pipeline, from heterogeneous data acquisition to downstream application and feedback-based adaptation."
+I don't like this figure; too chat-like in style.
+
+13) *p. 19* – "the unknown state or parameter vector."
+Of what? I would give more context.
+
+14) *p. 19* – "y_GNSS = p + r_GNSS, ..."
+It bothers me a little that these equations are not numbered.
+
+15) *p. 20* – "standard starting assumption"
+Standard in absolute terms? Maybe some references are needed.
+
+16) *p. 20* – "A common simplifying assumption is that the errors of different measurements are mutually independent."
+Here too I would support this claim with some references.
+
+17) *p. 22* – "This compact representation is important because it allows heterogeneous measurements to be handled in a unified way."
+Unclear; I would explain it better.
+
+18) *p. 32* – "The step size must be chosen carefully: a very small step leads to slow convergence, while a very large step can increase the cost or cause divergence."
+I would remove as far as possible constructions of this kind, very chat-like: a vague statement followed by a colon and then the explanation.
+
+19) *p. 35* – "The prediction step propagates the previous posterior through the state-transition model ..."
+This sentence is not very clear to me.
+
+20) *p. 36* – "When the models in (3.72a)–(3.72b) are nonlinear, the integrals in (3.76) and (3.77) generally cannot be evaluated in closed form."
+Perhaps a somewhat abrupt transition. And what bothers me most is that the section is titled "Bayesian Filtering" when it is about the Kalman filter.
+
+21) *p. 36* – "The unscented Kalman filter (UKF) avoids explicit linearisation [111]. ... Particle filters provide a more general approximation for nonlinear and non-Gaussian problems [75, 4]."
+This looks like a list of things to me; there is no real logical thread. I mean, you just go from EKF to UKF to particle filters like that.
+
+22) *p. 37* – "is inseparable from"
+I would change this.
+
+23) *p. 37* – "For ego-localisation, the state can ..."
+This transition is also a bit abrupt.
+
+24) *p. 37* – "A practical caveat concerns filter consistency. The covariance reported by a Bayesian filter ..."
+It seems that here we first moved on to other things and then come back to Bayesian filters.
+
+25) *p. 42, eq. (3.98)* – "A zonotope in R^{d_x} can be written as ..."
+What is d_x? Is it defined?
+
+26) *p. 44, Fig. 3.4* – "Geometric interpretation of one strip correction. ..."
+Could the figure be improved? Also, the caption does not explain what the points p and p̂ are.
+
+27) *p. 45* – "Example 3.4"
+Some examples have a title in parentheses and some do not. Maybe that's fine, but you could make them uniform and remove the titles.
+
+28) *p. 46* – "Frobenius radius"
+Is it defined?
+
+29) *p. 55* – "Recent autonomous-vehicle work has used Dempster–Shafer fusion and evidence-distance weighting for real-time cooperative perception and collision warning, illustrating the relevance of evidence-theoretic reasoning beyond purely theoretical uncertainty modelling [37]."
+So you justify including a section on evidence theory in a book that is, let's say, about autonomous driving with a single reference?
+
+30) *p. 56* – "The main limitation of evidence theory is computational complexity: the power set grows exponentially with the number of hypotheses. ..."
+And here you stress that it may not be the best methodology for the application considered.
+
+31) *p. 58* – "AHP is a widely used MCDM method in which criterion weights are elicited through pairwise comparisons [202]."
+Here too, only one supporting reference.
+
+32) *p. 68* – the em-dash asides "— visibility, blockage, calibration residuals, expected noise level —" and "— reliability estimation, track-quality scoring, fault and anomaly flags, fusion-strategy selection —"
+Highlighted without comment (the dashes themselves are highlighted; the same on p. 90).
+
+33) *p. 69, Sect. 4.1.1* – "Ensembles and Mixture-of-Experts Gating"
+It is not clear to me what we are doing: why do we present this technique? What advantages does it have? How is it applied?
+
+34) *p. 69, Sect. 4.1.2* – "Learned Reliability as an Input to Weighted Least Squares"
+Same as the previous comment, although here there is a minimum of explanation.
+
+35) *p. 70, Sect. 4.1.3* – "Heteroscedastic Noise Models"
+Again the same thing: in my opinion the subsections are too short, and it is not clear what each method is for or how it fits in.
+
+36) *p. 72, Sect. 4.1.5* – "Calibration of Learned Uncertainties" (whole subsection highlighted)
+For me this subsection is incomprehensible.
+
+37) *p. 72, Sect. 4.2* – "Deep Multimodal Fusion"
+I don't understand the link between the sections, i.e. between all those of 4.1, for instance, and this 4.2; I don't understand how we get to talk about this.
+
+38) *p. 73* – "Algorithm 1 summarises the generic processing pipeline adopted by many contemporary multimodal perception systems."
+Vague sentence without a reference. The algorithm is also rather useless written like this: it is a sequence of sentences, so it can go in the text; it is not an algorithm.
+
+39) *p. 76* – "Where in the network F is applied changes what can be learned and what can fail."
+Badly structured sentence.
+
+40) *p. 76* – "Table 4.2 summarises the trade-off."
+Which trade-off?
+
+41) *p. 79, Sect. 4.3.2* – "Probabilistic Occupancy Mapping"
+In several subsections of this chapter I miss the connection with autonomous driving.
+
+42) *p. 80* – "Algorithm 2"
+This one is also a bit useless.
+
+43) *p. 81, Sect. 4.3.4* – "Despite their advantages, BEV and occupancy-based representations introduce important design trade-offs. ..."
+This part could be argued better.
+
+44) *p. 83* – "the residual associated with measurement i,"
+I didn't understand.
+
+45) *p. 83* – "... on the linearised system (Σ_i J_iᵀ Ω_i J_i) δx = ... Sect. 4.4.2 works a small instance by hand."
+I didn't understand.
+
+46) *p. 84, Sect. 4.4.1* – "IMU Preintegration"
+How did we get to talk about this? They are all small self-contained subsections; I don't see a continuous logical thread, and I lose the connection with the other chapters and with autonomous driving.
+
+47) *p. 84* – "Algorithm 3"
+Same point as the previous ones.
+
+48) *p. 86, Sect. 4.4.3* – "... with a sliding window of N_c past camera poses, ..., but not the landmark positions."
+"not" highlighted, without comment.
+
+49) *p. 88, Sect. 4.5* – "This formulation is useful for autonomous-driving scenarios in which the fusion strategy should adapt to context."
+Here it already works better, because the connection with autonomous driving is justified and the section is longer.
+
+50) *p. 90* – "The three reliability devices met so far — the defuzzified weight w_i of this section, the logistic probability p_i of Sect. 4.1.2, and the heteroscedastic variance of Sect. 4.1.3 — all answer the same question, 'how much should source i be trusted now?' ..."
+This could be a very interesting line of discussion to extend; instead it gets little space.
+
+51) *p. 90, Sect. 4.6* – "Many practical autonomous-driving systems combine learning-based perception with classical estimation. ..."
+References should be added here.
+
+52) *p. 129, Chapter 6* – "A network of five sensing nodes is used throughout."
+Does it need to be said? I mean, I don't understand why exactly five.
+
+53) *p. 131* – "no agent needs global knowledge of the network."
+"has" instead of "needs".
+
+54) *p. 131, Sect. 6.1.1* – "Communication Graphs and the Consensus Primitive"
+I think there could be much more to say about these two topics. (She later adds: "ok, I saw that you explain these things a bit later".)
+
+55) *p. 132* – "Hybrid architectures are often the most practical:"
+Compared with what? Hybrid between centralised and distributed, I think, but it needs to be said.
+
+56) *p. 132, Sect. 6.2* – "Graph-Theoretic Preliminaries and Consensus"
+I don't understand why consensus is introduced first, then the discussion is interrupted, and then it is taken up again here.
+
+57) *p. 133* – "Metropolis weights"
+It is not clear what they are for.
+
+58) *p. 134* – "When balancing is impossible, the push-sum or ratio-consensus iteration runs two coupled averaging processes, ..."
+Explained too briefly; I fear it is not very understandable.
+
+59) *p. 140* – "stubborn node,"
+Stubborn, but also malicious, because it does not follow the protocol.
+
+60) *p. 140* – "in the F-total model at most F agents misbehave in the whole network, while in the F-local model at most F misbehave in the neighbourhood of every compliant agent."
+Add references.
+
+61) *p. 140, Sect. 6.5.1* – "Fault Models and Trimmed Consensus"
+I think this subsection and the next one don't add much: they seem to me problems out of the scope of the book, and I'm not sure it makes sense to include just two short subsections on them with a few specific methods, cutting out completely a huge part of the literature.
+
+Gabriele
